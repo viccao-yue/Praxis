@@ -1,3 +1,4 @@
+import { PRAXIS_FAVICON_DATA_URL } from '../assets/praxis-favicon.js';
 import { ShellAppearance } from '../components/ShellAppearance.js';
 import type { Context } from '@deepseek-ai/cordis';
 import type {} from '@deepseek-ai/dsh-api-remotes/client';
@@ -17,7 +18,52 @@ const productViews: Readonly<Record<string, string>> = {
   library: 'workdsh-library', automation: 'workdsh-automation', more: 'workdsh-more',
 };
 
+const PRODUCT_TITLE = '开物Praxis';
+const OFFICIAL_PRODUCT_TITLE = 'DeepSeek Harness';
+
+/**
+ * The official layout owns `document.title` (`productTitle` is hardcoded) and
+ * the static index owns the favicon. Rewrite the product name after each
+ * official write, and swap the tab icon. Session titles stay: `任务 — 开物Praxis`.
+ */
+function installBrowserChrome(): () => void {
+  const head = document.head;
+  const previousTitle = document.title;
+  const previousIcons = [...head.querySelectorAll('link[rel~="icon"]')].map(node => {
+    const clone = node.cloneNode(true) as HTMLLinkElement;
+    node.remove();
+    return clone;
+  });
+  const link = document.createElement('link');
+  link.rel = 'icon';
+  link.type = 'image/png';
+  link.href = PRAXIS_FAVICON_DATA_URL;
+  head.append(link);
+
+  let writing = false;
+  const rewriteTitle = () => {
+    if (writing) return;
+    const current = document.title;
+    if (!current.includes(OFFICIAL_PRODUCT_TITLE)) return;
+    writing = true;
+    document.title = current.replaceAll(OFFICIAL_PRODUCT_TITLE, PRODUCT_TITLE);
+    writing = false;
+  };
+  rewriteTitle();
+  const titleNode = document.querySelector('title');
+  const observer = new MutationObserver(rewriteTitle);
+  if (titleNode) observer.observe(titleNode, { childList: true, characterData: true, subtree: true });
+
+  return () => {
+    observer.disconnect();
+    link.remove();
+    for (const node of previousIcons) head.append(node);
+    document.title = previousTitle;
+  };
+}
+
 export function apply(ctx: Context): void {
+  ctx.effect(installBrowserChrome);
   ctx.slots.inject('shell.overlay', () => ctx.slots.register({ name: 'shell.overlay', id: 'workdsh-shell-appearance' }, ShellAppearance));
   const diagnostics = new URL(window.location.href).searchParams.get('diagnostics') === '1';
   const viewToPanel = diagnostics ? { ...productViews, diagnostics: 'workdsh-probe' } : productViews;

@@ -1,3 +1,15 @@
+## 2026-09-25：桌面安装包换用新 1024 logo
+
+用户提供 1024×1024 开关形渐变标（黑底）。已写入 `assets/brand/workdsh-logo-concept.png` 与 `praxis-desktop-icon-1024.png`，并用 10 档 iconset 重生成 `scripts/desktop/patches/upstream/apps/desktop/workdsh-icon.icns`（sha256 `77397ac2…`）。electron-builder `mac.icon` 仍指向该文件。未执行本轮桌面重打包；Web SVG 主标未改。
+
+## 2026-09-25：浏览器标签标题
+
+标签悬停文字来自官方布局里写死的 `productTitle = "DeepSeek Harness"`，`DocumentTitle` 在加载后写入 `document.title`，所以只改一次会被盖回去。工作台客户端监听 `<title>`，把产品名换成「开物Praxis」，会话标题保留为「任务 — 开物Praxis」。未在浏览器悬停验收。
+
+## 2026-09-25：浏览器标签图标
+
+用户提供 32×32 PNG（圆角绿底、白色萌芽）。官方 `index.html` 固定 `favicon.svg` / `favicon-dark.svg`，没有可替换槽。工作台客户端在加载时换掉 `link[rel=icon]`，卸载时还原。源文件在 `assets/brand/praxis-favicon.png`。预览已重装并重启到 8517。未在浏览器里看标签页图标。
+
 ## 2026-09-25：产品 Web 服务默认端口 8517
 
 官方 `webserver` 在没有 `--port` 时回落到 3080。bundle 补丁把该回落改成 8517，并保留 host 与压缩配置；`ctx.webStartup.port` 仍优先，因此 `pnpm preview` 继续监听 18989。未重装 preview，未在 8517 上实测启动。未提交。

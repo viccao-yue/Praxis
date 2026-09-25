@@ -2,6 +2,7 @@
 
 - 适配 DeepSeek Harness 0.1.7-alpha.1、Cordis 4.0.3，更新精确依赖。
 - 产品 Web 服务在未传入 `--port` 时默认监听 8517；启动参数里的端口仍然优先。开发预览（`pnpm preview`）默认同为 8517，可用 `WORKDSH_PREVIEW_PORT` 覆盖。
+- 浏览器标签图标改用开物Praxis 提供的 32×32 图标，不再沿用官方 `favicon.svg`。标签标题里的产品名改为「开物Praxis」；官方布局会在加载后写回 DeepSeek Harness，客户端在其后替换，会话标题保留为「任务 — 开物Praxis」。
 
 # 0.1.0-alpha.47 — 2026-09-20
 
