@@ -1,6 +1,6 @@
 ## 2026-09-25 当前追加专项：视觉增强 VISION-01
 
-用户明确要求接入可启停的视觉增强插件。以 `workdsh-plugin-vision` 组合 `dsh-vision-plugin@1.4.0` 交付；`currentStep` 仍为 D04，本专项不标记专家完成。
+用户明确要求接入可启停的视觉增强插件。以 `Praxis-plugin-vision` 组合 `dsh-vision-plugin@1.4.0` 交付；`currentStep` 仍为 D04，本专项不标记专家完成。
 
 ## 2026-09-22 当前专项：DSH 0.1.7 原生优先升级
 
@@ -90,7 +90,7 @@ Review 必须核对未重复建立 Agent loop、Skill registry/解析器、模�
 ## 版本策略
 
 - 版本单位是模块；详见 [模块版本规划](MODULE-VERSIONS.md)。一个模块维护一条 `主版本.次版本` 能力线，模块内 Host、Client、Remote、资源和内置管理 Skill 同步归入该版本。页面、任务与开发切片不另起产品版本。
-- 功能插件与 provider 模块独立版本化；开始实际开发时在 `modules.json` 声明 `moduleVersion`。首个可评审切片建立 `0.1` 版本线，预览制品使用 `0.1.0-alpha.N`。当前技能模块明确为 `0.1`，其制品为 `workdsh-plugin-skills@0.1.0-alpha.22`。
+- 功能插件与 provider 模块独立版本化；开始实际开发时在 `modules.json` 声明 `moduleVersion`。首个可评审切片建立 `0.1` 版本线，预览制品使用 `0.1.0-alpha.N`。当前技能模块明确为 `0.1`，其制品为 `Praxis-plugin-skills@0.1.0-alpha.22`。
 - contracts、ui 独立版本；破坏性契约在 0.x 阶段也必须显式记录、升级兼容声明并验证消费者，不能因未到 1.0 而随意破坏。
 - bundle 有独立组合版本，交付物记录 Harness 与全部组成模块的精确制品版本及测试证据。bundle 版本不替代模块版本，也不要求未变化模块随组合包锁步升级。workspace 本地链接成功不等于发布包依赖正确。
 - 用户专家/技能/项目修订与 npm 包版本分离；插件升级不覆盖用户对象。数据 schemaVersion 另行管理；回退代码不等于能回退数据库。
@@ -111,7 +111,7 @@ D00 设计处理和用户批准的 Skill 0.1 提前切片均已完成。Skill �
 
 DOC-06 官方文档审查已完成 127/127；C01 的目录、正文、真实 Agent Session 调用、正常冷恢复和同名技能隔离已经通过。Skill exact Fetch 的认证、超时、传输中取消、原子提交边界与重试也已通过。发布版 Typert 对外部 workspace 的生成限制作为未来通用 Remote 的上游兼容项保留，不再阻塞本地 Skill 0.1。
 
-`workdsh-contracts`、local identity、access、audit 和 Session owner/runtime binding 已完成本地 `0.1` 基线，见 [ADR-0016](adr/0016-governance-contracts-first.md) 与 [D01 证据](evidence/d01-access-audit.md)。它们不复制 Harness User、Permission Preset、Approval、Sandbox、Session scope 或执行器。
+`Praxis-contracts`、local identity、access、audit 和 Session owner/runtime binding 已完成本地 `0.1` 基线，见 [ADR-0016](adr/0016-governance-contracts-first.md) 与 [D01 证据](evidence/d01-access-audit.md)。它们不复制 Harness User、Permission Preset、Approval、Sandbox、Session scope 或执行器。
 
 D02 已完成官方 Sidebar、Workspace、Session 与 Conversation 的增量组合及共享 UI 收口。当前按 P1-02 开始专家领域契约、Host 管理服务、原生任务交接和管理页面；不复制 Harness 的 preset、Session 或 Agent 执行器。
 

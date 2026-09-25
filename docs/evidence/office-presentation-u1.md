@@ -4,7 +4,7 @@
 
 验证命令：Node22.23.2、pnpm10.34.5。
 
-- `corepack pnpm --filter workdsh-plugin-office typecheck`：通过。
+- `corepack pnpm --filter Praxis-plugin-office typecheck`：通过。
 - `node --test tests/integration/office-presentation.test.mjs tests/integration/office-content.test.mjs`：11/11通过（PPT4、既有内容服务7）。
 - `git diff --check`：通过。
 

@@ -2,7 +2,7 @@
 
 Date: 2026-09-17
 
-Validated against the installed Preview Profile at `/?workdsh-view=projects` after building and installing `workdsh-plugin-projects`.
+Validated against the installed Preview Profile at `/?Praxis-view=projects` after building and installing `Praxis-plugin-projects`.
 
 Observed:
 
@@ -15,7 +15,7 @@ Observed:
 
 Automated checks:
 
-- `corepack pnpm --filter workdsh-contracts build`
-- `corepack pnpm --filter workdsh-plugin-projects typecheck`
-- `corepack pnpm --filter workdsh-plugin-projects test`
+- `corepack pnpm --filter Praxis-contracts build`
+- `corepack pnpm --filter Praxis-plugin-projects typecheck`
+- `corepack pnpm --filter Praxis-plugin-projects test`
 - `git diff --check`

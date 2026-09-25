@@ -1,6 +1,6 @@
 # Release screenshots / 发布截图
 
-Captured on 2026-09-12 from prebuilt `workdsh-plugin-skills@0.1.0-alpha.24` and optional `workdsh-bundle@0.1.0-alpha.39` in an isolated official Harness `0.1.5-rc.1` Web Profile. Chromium viewport: 1440 × 900, device scale factor 1.
+Captured on 2026-09-12 from prebuilt `Praxis-plugin-skills@0.1.0-alpha.24` and optional `Praxis-bundle@0.1.0-alpha.39` in an isolated official Harness `0.1.5-rc.1` Web Profile. Chromium viewport: 1440 × 900, device scale factor 1.
 
 - `skill-management.png`: Skill list with the Praxis presentation bundle.
 - `skill-detail.png`: a real local `outline` skill, complete document and reference-file controls.

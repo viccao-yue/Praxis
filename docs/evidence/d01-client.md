@@ -3,12 +3,12 @@
 > 2026-09-12 收口说明：本文记录的是早期 Client 探针；后续 Skill 与工作台证据已完成本地官方 Slot/Conversation/Connection 组合。生成的企业 Remote、长任务网络取消和多人入口移入 [企业版架构说明](../ENTERPRISE-EDITION.md)，不再阻塞本地 D01。
 
 
-日期：2026-09-11。当前候选包 workdsh-bundle@0.1.0-alpha.14，仅本地预构建 tarball；当前步骤仍为 D01。
+日期：2026-09-11。当前候选包 Praxis-bundle@0.1.0-alpha.14，仅本地预构建 tarball；当前步骤仍为 D01。
 
 ## 已通过
 
 - 官方 CLI 安装 tarball，Host 载入包根入口。
-- 官方 Client Modules 启动图包含且仅包含一个 workdsh-bundle 行；浏览器执行 ./client 构建产物。
+- 官方 Client Modules 启动图包含且仅包含一个 Praxis-bundle 行；浏览器执行 ./client 构建产物。
 - Harness 官方 Sidebar 保持唯一 owner；开物Praxis 只注册品牌 Slot，诊断参数启用时再通过 sidebar.panellist 增加独立验证入口。未替换 root、未创建第二套 React 根。
 - 实际浏览器确认官方新建会话、添加工作区、搜索、视图选项、工作区/会话树和设置均存在；官方 DOM 同时提供工作区与会话操作按钮。旧 开物Praxis 聚合入口和双侧栏往返入口均不存在。
 - 用户点击读取按钮，通过 ctx.remote.pluginInventory.list() 返回真实 Host 条目，断言 开物Praxis 条目 active。
@@ -20,7 +20,7 @@
 
 ## 实测发现与适配
 
-1. rc.1 的 Client 扫描未识别 workdsh-bundle/probe 包子路径；仅 Host 激活，Client 启动图无对应行。改用包根导出，保留 ./probe 供独立生命周期测试。没有修改上游。
+1. rc.1 的 Client 扫描未识别 Praxis-bundle/probe 包子路径；仅 Host 激活，Client 启动图无对应行。改用包根导出，保留 ./probe 供独立生命周期测试。没有修改上游。
 2. 调用 Remote 需要同时声明 remote 和 remote.pluginInventory 服务注入；只有其中之一均被 Cordis 拒绝。TypeScript 类型通过不能代替运行验证。
 3. 浏览器产物采用公开 ClientBundleRegistration 的 factory 协议。单文件源码通过 TypeScript 转为 CommonJS 再封装注册函数，仅允许平台 react require；新运行依赖必须显式扩展构建而不能静默打包 Host。
 4. dsh-client-ui-slots 作为直接类型依赖补入精确 override。业务包、浏览器模块及生成 Remote 是不同构建面。
@@ -65,7 +65,7 @@ probe:browser 创建隔离 DSH_HOME/Profile，保留测试产物，结束时关�
 
 通过公开 usePanelInfo hook 读取布局选择，shell.overlay 注册无视觉内容的观察组件；URL 只同步展示位置，不持久化 Session 或权限。`conversation`、无参数、旧 `home` 和无效值都返回原生 `main.conversation`；skills 与 diagnostics 仍进入对应 开物Praxis 面板。workbench alpha.5 删除自建首页输入器，“新建任务”调用官方 Session clear 后显示原生空会话，因此 `/`、`@`、附件、权限、模型及 preset 沿用官方 Conversation 提交链。
 
-alpha.13 本地预览实测：旧 `workdsh-view=home` 自动归一化为 `conversation`；输入 `/` 出现 compact/export/feedback/goal/permission/plan/model 及真实技能候选，输入 `@` 出现工作区目录、文件和会话候选。草稿随后清空，没有提交模型请求。
+alpha.13 本地预览实测：旧 `Praxis-view=home` 自动归一化为 `conversation`；输入 `/` 出现 compact/export/feedback/goal/permission/plan/model 及真实技能候选，输入 `@` 出现工作区目录、文件和会话候选。草稿随后清空，没有提交模型请求。
 
 此项只覆盖当前两个视图，不是业务路由系统；尚无浏览器前进后退栈、多业务页深链接或具体会话 ID 恢复验证。未执行模型请求。
 

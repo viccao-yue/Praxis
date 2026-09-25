@@ -1,6 +1,6 @@
 # 资料库 0.1.0-alpha.1 验收证据
 
-日期：2026-09-16。模块：`workdsh-plugin-library`。范围：D06 / P1-06。
+日期：2026-09-16。模块：`Praxis-plugin-library`。范围：D06 / P1-06。
 
 ## 已验证闭环
 
@@ -16,7 +16,7 @@
 ## 验证命令
 
 ```text
-corepack pnpm --filter workdsh-plugin-library test
+corepack pnpm --filter Praxis-plugin-library test
 corepack pnpm build
 corepack pnpm typecheck
 corepack pnpm check:plan
@@ -28,6 +28,6 @@ corepack pnpm release:library:pack
 
 ## 发布物
 
-发布候选位于 `.artifacts/library-release/`，包含 `workdsh-plugin-library-0.1.0-alpha.1.tgz`、`SHA256SUMS.txt` 和 `release-manifest.json`。本地个人空间、无扫描 PDF OCR、Office 原件预览需要可选 `workdsh-plugin-office`，均在 manifest/README 中说明。
+发布候选位于 `.artifacts/library-release/`，包含 `Praxis-plugin-library-0.1.0-alpha.1.tgz`、`SHA256SUMS.txt` 和 `release-manifest.json`。本地个人空间、无扫描 PDF OCR、Office 原件预览需要可选 `Praxis-plugin-office`，均在 manifest/README 中说明。
 
 资料库 0.1 不创建派生搜索索引：当前搜索直接读取不可变 `content.md`。因此不存在不可恢复的独立索引状态；未来加入索引时必须把它保持为可从修订重建的缓存。

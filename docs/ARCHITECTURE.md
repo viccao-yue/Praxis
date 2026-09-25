@@ -6,21 +6,21 @@
 
 ```text
 packages/plugins/skills/resources/skills/
-  workdsh-skill-creator/SKILL.md + references/
-  workdsh-ppt-design/SKILL.md + references/
-  workdsh-word-design/SKILL.md + references/
-  workdsh-excel-design/SKILL.md + references/
-  workdsh-web-design/SKILL.md + references/
+  Praxis-skill-creator/SKILL.md + references/
+  Praxis-ppt-design/SKILL.md + references/
+  Praxis-word-design/SKILL.md + references/
+  Praxis-excel-design/SKILL.md + references/
+  Praxis-web-design/SKILL.md + references/
 packages/plugins/experts/resources/skills/
-  workdsh-expert-manager/SKILL.md + references/ + runtime/
+  Praxis-expert-manager/SKILL.md + references/ + runtime/
 docs/workbuddyskills/                 # 原始研究资料，不是运行或打包来源
 ```
 
-SKILL.md 是入口、元数据与正文唯一可维护来源；references/assets/scripts按需并随所属插件交付。技能插件构建先用官方 filesystem Skill provider 解析工程资源，再单向生成注册内容；generated TypeScript不能独立编辑。专家管理技能继续从包内Markdown加载，路径统一。Office拥有编辑器和输出指令，Skill拥有设计方法；/office.ppt默认加载唯一内置 workdsh-ppt-design，采用合并后的设计方法，不另设 tencent-pptx 入口。
+SKILL.md 是入口、元数据与正文唯一可维护来源；references/assets/scripts按需并随所属插件交付。技能插件构建先用官方 filesystem Skill provider 解析工程资源，再单向生成注册内容；generated TypeScript不能独立编辑。专家管理技能继续从包内Markdown加载，路径统一。Office拥有编辑器和输出指令，Skill拥有设计方法；/office.ppt默认加载唯一内置 Praxis-ppt-design，采用合并后的设计方法，不另设 tencent-pptx 入口。
 
 用户发布目录保持官方 Agents/Profile根，由技能管理服务拥有草稿、发布和修订，不被迁移或覆盖。内置通过官方ctx.skills注册为bundled，技能页沿用现有只读保护；编辑内容回工程，随插件更新。当前只读条目不具备技能页独立停用功能，本次不声称该开关已实现。官方 filesystem/provider拥有发现和调用，不把位置推断当作用户创建来源。
 
-已有第三方插件提供的技能（如dsh-ppt-master）属于装配提供的内置能力，继续由其正式插件包管理，不复制其实现到用户技能或开物Praxis模块；版本、许可证和卸载按该插件。用户Agents根中的其他已有技能来源不明，不能按名字批量收进产品或自动搬走。本次明确迁移的用户根副本只有上轮直接集成的tencent-pptx，备份保留后撤出活动根；workdsh-import-test为测试资料，不计入产品内置。
+已有第三方插件提供的技能（如dsh-ppt-master）属于装配提供的内置能力，继续由其正式插件包管理，不复制其实现到用户技能或开物Praxis模块；版本、许可证和卸载按该插件。用户Agents根中的其他已有技能来源不明，不能按名字批量收进产品或自动搬走。本次明确迁移的用户根副本只有上轮直接集成的tencent-pptx，备份保留后撤出活动根；Praxis-import-test为测试资料，不计入产品内置。
 
 ## 核心模型
 
@@ -42,7 +42,7 @@ flowchart TB
 
 ## 运行与通信
 
-Office是独立`workdsh-plugin-office`功能插件，提供编辑工作副本服务，最终目标为六个content_*工具，Client接官方Tab。U1现已实现五个工具与原生Tiptap文档链路，export及其余七类待后续验收。八类模型共用提交规则，但不形成开物Praxis大核心。Host/工具/Connection通过官方子插件组合，具体[插件边界及生命周期](design/office/PLUGIN-ARCHITECTURE.md)遵循ADR-0018/0019。其多维表格是内容文档，不能接管tables业务数据库；HTML编辑不能接管pages发布；原件和正式资产仍归资源owner/library。
+Office是独立`Praxis-plugin-office`功能插件，提供编辑工作副本服务，最终目标为六个content_*工具，Client接官方Tab。U1现已实现五个工具与原生Tiptap文档链路，export及其余七类待后续验收。八类模型共用提交规则，但不形成开物Praxis大核心。Host/工具/Connection通过官方子插件组合，具体[插件边界及生命周期](design/office/PLUGIN-ARCHITECTURE.md)遵循ADR-0018/0019。其多维表格是内容文档，不能接管tables业务数据库；HTML编辑不能接管pages发布；原件和正式资产仍归资源owner/library。
 
 Host 拥有权威数据和变更顺序；Remote 暴露类型化操作；Client model 管理订阅和重连镜像；UI adapter 与 Slots 呈现。官方 Conversation、附件与 Sidebar 优先复用。工作台不直接依赖功能内部 React 实现。
 
@@ -83,7 +83,7 @@ Host 领域服务拥有权威状态，生成 Remote 负责传输，Client model 
 
 ### Cordis 插件生命周期约束
 
-- 自有服务使用 `workdsh*` 的唯一服务名，避免 Cordis 扁平服务命名空间冲突；contracts 声明类型和语义，provider 与 consumer 不直接相互 import。
+- 自有服务使用 `Praxis*` 的唯一服务名，避免 Cordis 扁平服务命名空间冲突；contracts 声明类型和语义，provider 与 consumer 不直接相互 import。
 - 每个 bundle 配置项使用稳定 `id`。缺少必需服务导致的 `PENDING`、配置或启动导致的 `FAILED` 必须由启动探针和管理端插件诊断显式展示；进程状态码 0、Client 导航存在或配置项存在都不表示插件处于 `ACTIVE`。
 - 服务提供方卸载或替换会让依赖插件重启。插件不得跨 Fiber 生命周期缓存服务句柄；Remote、订阅、连接、定时器、watcher、子进程和临时资源必须由当前 Fiber 的 effect 持有。
 - Cordis 自带注册 API 使用其 disposer；框架外资源放入带诊断标签的 `ctx.effect()`。dispose 必须等待工作停稳。需要顺序清理的异步步骤放在同一个 disposer 中串行等待。
@@ -96,7 +96,7 @@ Host 领域服务拥有权威状态，生成 Remote 负责传输，Client model 
 
 业务对象 ID 与发布修订分离，任务保存精确引用。公开定义不含凭据；连接实例持有凭据引用。项目 ID 不等于本地路径、Preset 或 Profile。
 
-业务对象通过官方 `ctx.storageDomain` 持久化，每个插件拥有唯一 `workdsh-*` DomainSpec 和类型化句柄；Profile 选择并路由官方 SQLite/JSON provider。领域所有权不要求每领域一个物理数据库，跨域仍只调用服务契约。资源、临时文件和日志分别管理；会话事件由官方 `sessionPersistence` 保存，开物Praxis 只记录业务关联，不复制或迁移其日志。见 [ADR-0011](adr/0011-use-official-storage-domains.md)。
+业务对象通过官方 `ctx.storageDomain` 持久化，每个插件拥有唯一 `Praxis-*` DomainSpec 和类型化句柄；Profile 选择并路由官方 SQLite/JSON provider。领域所有权不要求每领域一个物理数据库，跨域仍只调用服务契约。资源、临时文件和日志分别管理；会话事件由官方 `sessionPersistence` 保存，开物Praxis 只记录业务关联，不复制或迁移其日志。见 [ADR-0011](adr/0011-use-official-storage-domains.md)。
 
 产品任务只通过官方 Session Controller/Agent 生命周期创建；裸 `ctx.sessions.create()` 不作为 开物Praxis 任务入口。Session 作为追加式日志拥有模型消息、工具、步骤、原生审批、目标、工作流、子 Agent 和运行设置等执行事实；业务 Domain 拥有项目待办、自动化规则、企业组织、业务审批和资产修订。原生 todo、schedule、team、approval、deliverable 等近似事件不得直接冒充这些业务对象，完整分界见 [ADR-0012](adr/0012-session-and-business-fact-boundaries.md)。
 

@@ -32,6 +32,6 @@
 
 ## 项目主导航修复
 
-复用锁定版本官方 main key 与 layout.selectPanel（slots.md、发布包 layout service.d.ts），将 workdsh-projects 主页与 workdsh-project-detail 详情分开。侧栏仍由官方拥有；卡片与 lineage 显式进入详情，主页不恢复旧 project 查询参数。不拦截原生 DOM，不覆盖导航服务。验收：详情再次点侧栏返回列表、跨页面返回列表、lineage 进入所属详情。
+复用锁定版本官方 main key 与 layout.selectPanel（slots.md、发布包 layout service.d.ts），将 Praxis-projects 主页与 Praxis-project-detail 详情分开。侧栏仍由官方拥有；卡片与 lineage 显式进入详情，主页不恢复旧 project 查询参数。不拦截原生 DOM，不覆盖导航服务。验收：详情再次点侧栏返回列表、跨页面返回列表、lineage 进入所属详情。
 
 上述导航验收已在安装后的 18989 通过：scripts/probe-project-navigation.mjs，详情/会话返回主页、lineage 与刷新详情均通过，无 pageerror。项目/bundle build/typecheck 与 diff 检查通过。

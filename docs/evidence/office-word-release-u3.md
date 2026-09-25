@@ -2,7 +2,7 @@
 
 ## 交付范围
 
-独立 `workdsh-plugin-office@0.1.0-alpha.1` 预览制品；保留已决定的八类路线，首条完成功能按 Word 文本工作副本评估。README 中明确分批生成实时展示、同文档接续编辑、自动保存/跟随、DOCX下载、原生文件交付和插件按需组合，不宣称完整Word替代。
+独立 `Praxis-plugin-office@0.1.0-alpha.1` 预览制品；保留已决定的八类路线，首条完成功能按 Word 文本工作副本评估。README 中明确分批生成实时展示、同文档接续编辑、自动保存/跟随、DOCX下载、原生文件交付和插件按需组合，不宣称完整Word替代。
 
 ## 修复及复用
 
@@ -16,7 +16,7 @@ DOCX正文在独立文本副本编辑，文件预览背景的字体和white-spac
 - 内容/输入/导入/下载四个集成文件12项通过，其中新增Host卸载工具与guide→服务卸载→重装→内容/修订保留测试。
 - 确定性Word浏览器12项通过：创建自动右栏、分批写入、跟随/手动上滚、工具栏及样式下载、人工编辑/AI接续、保存、刷新、DOCX导入编辑/下载、原件逐字节不变及原始预览。
 - 真实模型15项通过：首个文档约2274ms出现，4420/6577ms观察到后续修订；原生present卡、刷新、文件打开/下载通过。保留officecli技能环境，但普通写作通过content工具。
-- 真实打包制品及卸载重装6项通过，`node scripts/probe-office-live.mjs --package-roundtrip`：外部临时home/独立官方Web Profile安装Office及显式治理依赖，不装专家/技能/工作台；Client热卸载后菜单/文档引用/预览/右栏注册撤销、旧标签发送失败；官方 `dsh plugin --profile office remove workdsh-plugin-office` 后冷启，工具与guide消失、接口404；再用实际tgz安装并冷启，六工具和原生/office恢复，卸载前真实写入的内容及修订保留。
+- 真实打包制品及卸载重装6项通过，`node scripts/probe-office-live.mjs --package-roundtrip`：外部临时home/独立官方Web Profile安装Office及显式治理依赖，不装专家/技能/工作台；Client热卸载后菜单/文档引用/预览/右栏注册撤销、旧标签发送失败；官方 `dsh plugin --profile office remove Praxis-plugin-office` 后冷启，工具与guide消失、接口404；再用实际tgz安装并冷启，六工具和原生/office恢复，卸载前真实写入的内容及修订保留。
 
 各browser result.json无pageerror。源码仓库不是运行时工作目录，制品不包含用户凭据或运行数据。候选安装包、SHA256SUMS及release-manifest位于 `.artifacts/office-release/`；包中包含Host、Client、cordis.patch、README、CHANGELOG和第三方许可说明。
 
@@ -34,4 +34,4 @@ DOCX正文在独立文本副本编辑，文件预览背景的字体和white-spac
 
 ## 实际发布回执
 
-源码 2c18bd79746381d9febb54ae4ef3f9ac4187d145 已推送 main；office-v0.1.0-alpha.1 指向该提交，GitHub [预览发布](https://github.com/techflag/workdsh/releases/tag/office-v0.1.0-alpha.1) 已公开。6个附件（4个tgz、摘要、manifest）逐一核对上传摘要与本地文件，Office Word-only包558347字节。未发布npm/Desktop，未改用户当前Profile或打断用户应用。
+源码 2c18bd79746381d9febb54ae4ef3f9ac4187d145 已推送 main；office-v0.1.0-alpha.1 指向该提交，GitHub 预览发布 已公开。6个附件（4个tgz、摘要、manifest）逐一核对上传摘要与本地文件，Office Word-only包558347字节。未发布npm/Desktop，未改用户当前Profile或打断用户应用。

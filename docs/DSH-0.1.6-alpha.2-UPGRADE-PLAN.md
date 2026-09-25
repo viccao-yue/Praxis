@@ -60,12 +60,12 @@
 
 | 文件 | 迁移点 | 设计 |
 | --- | --- | --- |
-| `projects/src/client.tsx` | L33-34 `current`；L46 `scope`；L62 `open` | current→推导；`startTask` 改 retain(`workdshProjectTaskStart`)→`await ready`（失败转「项目会话尚未就绪，请重试。」）→轮询 `reference.binding.ctx.get('conversation')`→send→`finally release`；openTask→`uiWorkspace.openSession` + 原重试 |
+| `projects/src/client.tsx` | L33-34 `current`；L46 `scope`；L62 `open` | current→推导；`startTask` 改 retain(`PraxisProjectTaskStart`)→`await ready`（失败转「项目会话尚未就绪，请重试。」）→轮询 `reference.binding.ctx.get('conversation')`→send→`finally release`；openTask→`uiWorkspace.openSession` + 原重试 |
 | `experts/src/client.tsx` | L55 `binding`；L76-80 `current`；L87/96/129 `open` | L55→`subagentAddress(...)?.parentSessionId ?? sessionId`；resolveWorkspace→推导；3 处 open→`uiWorkspace.openSession` |
 | `skills/src/client.tsx` | L45-49/78-80 `current`；L55/85 `open`；L62 `scope` | current→推导；open→`uiWorkspace.openSession`；L62 轮询保留（openSession 已触发 mainView retain） |
 | `library/src/client.tsx` | L43/139 `binding`；L56-60 `current`；L63 `open`；L126 `current` | binding 处均属当前会话（已 retain）保留；current→推导；open→`uiWorkspace.openSession` |
 | `office/src/client.tsx` | L138/171/179 `current` | 模块级推导函数（入参 sessions）；轮询比较改 `currentSessionId() !== sessionId` |
-| `activity/src/client.tsx` | L43 `binding`（当前会话，保留）；L100-104 `scope+binding` 成员会话 | 成员观测改 `sessions.retain(id,{source:'workdshActivityMember'})`（逐个 try/catch 容忍未知 id）；订阅/判相改走 `reference.binding`（访问 try/catch）；`ready.then` 后订阅并 refresh；cleanup 释放全部 reference |
+| `activity/src/client.tsx` | L43 `binding`（当前会话，保留）；L100-104 `scope+binding` 成员会话 | 成员观测改 `sessions.retain(id,{source:'PraxisActivityMember'})`（逐个 try/catch 容忍未知 id）；订阅/判相改走 `reference.binding`（访问 try/catch）；`ready.then` 后订阅并 refresh；cleanup 释放全部 reference |
 
 ## 5. 验证（P3）
 
@@ -108,7 +108,7 @@
 - [x] P0 备份 + 本计划落盘（2026-09-18）
 - [x] P1 依赖面 bump + install + check:versions（2026-09-18）：480 处替换（root 273 + 12 包 198 + scripts/tests 9）；新 override 9 条（预判 8 + install 暴露 `@deepseek-ai/dsh-lazy-require`）；`check:versions` PASS（513 条 lock 条目 α2、Cordis 4.0.2）；`check:plan` PASS。pnpm 警告 `dsh-subprocess-local` postinstall 被忽略：经核 node-pty spawn-helper 权限 755 正常，与 α1 同行为，无影响。
 - [x] P2 6 文件迁移 + 全仓 typecheck（2026-09-18）：
-  - 6 个 client 文件全部迁移完成：office（current 推导 ×3）、activity（成员观测 retain/ready/release 重写 + `workdshActivityMember` source）、skills（current 推导 + 2 处 openSession）、library（current 推导 + openSession + 保留 mainView 下 binding 借用）、experts（subagentAddress + 3 处 openSession）、projects（startTask retain(`workdshProjectTaskStart`)→ready→轮询 binding.ctx→send→finally release；openTask openSession + 重试）。
+  - 6 个 client 文件全部迁移完成：office（current 推导 ×3）、activity（成员观测 retain/ready/release 重写 + `PraxisActivityMember` source）、skills（current 推导 + 2 处 openSession）、library（current 推导 + openSession + 保留 mainView 下 binding 借用）、experts（subagentAddress + 3 处 openSession）、projects（startTask retain(`PraxisProjectTaskStart`)→ready→轮询 binding.ctx→send→finally release；openTask openSession + 重试）。
   - package.json：按各包既有模式补依赖——skills/experts 加 ui-session+ui-workspace 到 dev+inject；projects/library 加 peer+dev+inject；activity/office 的 ui-session 为既有依赖仅 bump（office 不调用 openSession，不新增 ui-workspace）。library 顺带修正 `sidebar-right` 0.1.5-rc.1→alpha.2 版本混搭。
   - 发现并修复 B5：`CsvDocument.tsx` 显式收窄三种 content 变体，`'renderer'`（渲染器自加载请求，CSV 无 loader）返回 null（官方 CodeBody 同款语义）。
   - `pnpm install` 增量链接（projects/experts 新依赖入 lock importer）；全仓 `pnpm typecheck` PASS（13 包含 bundle/workbench/ui）。
@@ -116,7 +116,7 @@
   - [x] P3-a build / P3-b preview:install（clean env）与 run3→run4 启动 PASS；数据完好（292 会话文件、项目 8 资产）。
   - [x] P3-c-1 chip 正/反例 PASS；attribution PASS：根因=探针历史状态——同名交付已累积 `(2)~(5).md`，占满 `NAME_ATTEMPTS=5` 重试槽位后放弃（`library/name-conflict`），非 alpha.2 回归。新文件名重跑全链 identity→taskContext→read→import→addAsset 通过，library `source=task`、`sourceTaskId` 正确（failures: []）。探针已改动态文件名防复发。
   - [x] P3-c-2 探针全过：connectors（工具/资源/禁用还原/多实例/会话选择隔离）、library（打包安装/两次冷启动/卸载保留/重装恢复）、presets（原生 picker/非blank 拒绝/双会话独立/重启重建/文件变更解析）、office（docx+xlsx 预览/编辑/导出/零外部请求）、team web 14 项（含修复探针 client 的 `sessions.open`→`uiWorkspace.openSession`，B1 影响探针工具链）。
-  - [x] P3-d startTask/openSession 专项 PASS：project-task-verify（打开任务→官方会话视图、返回恢复、composer 创建→原生 shell、消息在会话内）+ 重开历史完整。2026-09-18 复核修正：原重开探针 v1 存在假阳性——`hasText: 只回复` 的 `.first()` 匹配到 09-17 早期**空会话任务**（消息未送达时代的残留，会话文件解压仅 211B session 头、零消息），打开空会话显示 New Session hero（官方正常语义），而弱断言（`workdsh-view=conversation` 是主页默认参数、`body.includes('ok')` 命中侧栏文本）仍判 PASS。
+  - [x] P3-d startTask/openSession 专项 PASS：project-task-verify（打开任务→官方会话视图、返回恢复、composer 创建→原生 shell、消息在会话内）+ 重开历史完整。2026-09-18 复核修正：原重开探针 v1 存在假阳性——`hasText: 只回复` 的 `.first()` 匹配到 09-17 早期**空会话任务**（消息未送达时代的残留，会话文件解压仅 211B session 头、零消息），打开空会话显示 New Session hero（官方正常语义），而弱断言（`Praxis-view=conversation` 是主页默认参数、`body.includes('ok')` 命中侧栏文本）仍判 PASS。
   - [x] P3-d 复核 v2（强断言）PASS：精确点击最新 `只回复：ok` 任务（session-6f077069）+ 会话内断言（消息区「只回复：ok」、助手回合 `Ran for`、`.wd-activity` strip=1、composer、非空态、project 参数）；warm / warm2（同 context 重开）/ cold（全新 context 冷启动）三次全过 failures:[]，0 pageerror。逐行对照：task_5/13/36 与 sidebar 行打开均显示完整历史；task_1/2/4 为空会话（打开即 New Session，符合语义）。证据：p4/p3-reopen-v2.log、p3-reopen-dump*.log、p3-tasks-map.log、53-sessions-expanded.png、project-task/08-reopen-warm.png。
   - [x] 诊断副产物：cordis logger 的 warn 在 preview stdout 不可见（exporter 仅内存）；TEMP DEBUG 已移除并重建部署（run5 clean 启动，无 debug 输出）。
 - [x] P4 新能力与默认值核对

@@ -76,9 +76,9 @@ skills alpha.16 / bundle alpha.28 将 Client 的官方 Slot 装配、页面组�
 
 skills alpha.17 / bundle alpha.29 删除编辑、打开目录、启停和卸载对 `/skill-creator` 管理任务的占位交接。Client 通过 Harness Connection 的鉴权 exact Fetch route 调用 Host `SkillManager`：列表覆盖已启用、已停用与只读来源；详情读取完整 `SKILL.md` 和资源清单；编辑携带 SHA-256 revision 并原子替换；停用移至隔离目录；卸载移至带时间戳的回收目录。打开目录继续调用官方 `session.openWorkspacePath`，没有引入 shell 命令或浏览器文件 API。
 
-Exact Fetch route 是 rc.1/rc.2 外部包 Remote 生成失败期间的兼容适配。Host 使用公开 `connection.fetch.register` 注册 `/api/workdsh-skills`，继承官方浏览器认证与 Host/Origin 校验；Client 使用同源 `fetch`。Host 对 endpoint、名称、布尔状态、正文类型、请求体和 1 MiB 文档上限做运行时验证；错误不暴露堆栈或任意路径。技能插件不直接注入 `webServer`。生成器兼容外部包后迁移到生成 Remote。
+Exact Fetch route 是 rc.1/rc.2 外部包 Remote 生成失败期间的兼容适配。Host 使用公开 `connection.fetch.register` 注册 `/api/Praxis-skills`，继承官方浏览器认证与 Host/Origin 校验；Client 使用同源 `fetch`。Host 对 endpoint、名称、布尔状态、正文类型、请求体和 1 MiB 文档上限做运行时验证；错误不暴露堆栈或任意路径。技能插件不直接注入 `webServer`。生成器兼容外部包后迁移到生成 Remote。
 
-真实 Chromium 验收使用隔离的共享 Agents root 创建 `workdsh-browser-fixture`，验证全局列表发现、完整正文读取、编辑后原子保存并重新读取新正文、停用、重新启用、试用草稿、确认卸载及列表移除；随后完成 bundle 停服移除、Host 重启、Client 模块缺席和重新安装。集成测试 11/11、build、typecheck、规划与版本锁定检查通过。打开目录的产品动作直接调用官方 `session.openWorkspacePath({ action: 'reveal' })`；自动化未主动弹出系统 Finder。
+真实 Chromium 验收使用隔离的共享 Agents root 创建 `Praxis-browser-fixture`，验证全局列表发现、完整正文读取、编辑后原子保存并重新读取新正文、停用、重新启用、试用草稿、确认卸载及列表移除；随后完成 bundle 停服移除、Host 重启、Client 模块缺席和重新安装。集成测试 11/11、build、typecheck、规划与版本锁定检查通过。打开目录的产品动作直接调用官方 `session.openWorkspacePath({ action: 'reveal' })`；自动化未主动弹出系统 Finder。
 
 skills alpha.18 / bundle alpha.30 增加三层持久状态：跨进程技能锁、停用来源凭据和卸载回收凭据，全部位于共享 Agents home 的 开物Praxis 私有状态目录，不写入 `SKILL.md`。12/12 集成测试覆盖同 revision 并发写只允许一个成功、资源文件 revision、新资源、停用后原位恢复、卸载列表及恢复。官方 filesystem watcher 测试验证停用后运行目录撤销技能、重新启用后再次发现同一正文。完整 Chromium 验收覆盖新建资源、卸载、最近卸载列表、恢复、再次清理、插件移除后的 Host/Client 缺席与重新安装。
 
@@ -98,7 +98,7 @@ Client 支持 `.zip`、单个 `.md` 与文件夹选择，Host 预检通过后返
 
 `probe:browser` 在首次完整管理操作后保留隔离 Profile 与 Agents root，并执行两次新的 Host 冷启动：
 
-- 第一次重启后验证 `workdsh-import-fixture` 仍在全局列表；从“最近卸载”恢复 `workdsh-browser-fixture`，重新读取编辑后的 `SKILL.md` 和 `references/browser-check.md`，再停用技能。
+- 第一次重启后验证 `Praxis-import-fixture` 仍在全局列表；从“最近卸载”恢复 `Praxis-browser-fixture`，重新读取编辑后的 `SKILL.md` 和 `references/browser-check.md`，再停用技能。
 - 第二次重启后验证技能仍为停用状态，随后重新启用，并确认它回到原始受控根。
 - 之后继续执行原有 bundle 停服移除、重启后 Host/Client 缺席和重新安装，确保新增状态验收没有绕过发布包生命周期。
 
@@ -114,19 +114,19 @@ Host 在等待流数据时主动取消 reader，并在异常路径删除该请�
 
 skills alpha.26 把技能页从只读技能库升级为与 WorkBuddy 相同形态的一体式技能市场：真实分类标签、「可安装」与「已安装」分区、卡片品牌图标加中文名加中文描述，未安装条目「＋」直接安装。安装仍唯一经过官方 `SkillManager.installImport` 的全局名称锁、目标查重、指纹复核与原子发布，未新增第二套安装路径或 registry。
 
-Host 新增只读本地技能目录 `SkillCatalogStore`（默认 `~/.agents/.workdsh-catalog`，`WORKDSH_SKILL_CATALOG` 可覆盖；schema 1 / kind `workdsh-skill-catalog`）。`catalog` 与 `install-catalog` 复用既有 buffered 管理路由；图标交付为新增 exact Fetch GET 路由 `/api/workdsh-skills/icon`（URL 携带 sha256 前 12 位 revision，响应 private/immutable 缓存头）。目录缺失或损坏返回 `missing`/`invalid` 状态与 `skill/catalog-missing`/`skill/catalog-invalid` 诊断；超限条目保留展示并按生成端 `installLimits` 禁用「＋」，不伪造可安装性。
+Host 新增只读本地技能目录 `SkillCatalogStore`（默认 `~/.agents/.Praxis-catalog`，`Praxis_SKILL_CATALOG` 可覆盖；schema 1 / kind `Praxis-skill-catalog`）。`catalog` 与 `install-catalog` 复用既有 buffered 管理路由；图标交付为新增 exact Fetch GET 路由 `/api/Praxis-skills/icon`（URL 携带 sha256 前 12 位 revision，响应 private/immutable 缓存头）。目录缺失或损坏返回 `missing`/`invalid` 状态与 `skill/catalog-missing`/`skill/catalog-invalid` 诊断；超限条目保留展示并按生成端 `installLimits` 禁用「＋」，不伪造可安装性。
 
 目录数据由 `scripts/build-skill-catalog.mjs` 从本地市场镜像生成：170 条 / 13 分类 / 76 图标 / 169 可安装（sha256 8bedc968164c）；10 个技能因 frontmatter 非法 YAML 跳过（与官方解析器忽略行为一致），fbs-bookwriter 481 文件超 400 上限标记不可安装。
 
-验证（Node 22.23.2 / pnpm 10.34.5）：技能相关集成 20/20（`skill-plugin-lifecycle` 路由数期望值 2 改 3，即 buffered 管理、目录图标、streaming 导入三条官方路由）；`probe:skills` 7/7 段 PASS，含目录状态/元数据/图标路由/安装资格读真实 Host 事实、浏览器市场真实分类与「＋」安装走受管导入路径、缺失与损坏目录降级为诚实诊断；18989 活预览实测 pageerror 0，`GET /api/workdsh-skills/icon?name=cloudbase` 返回 200 `image/svg+xml`，截图 `.artifacts/skills-market-top.png` 与 `.artifacts/skills-market-installed.png`。
+验证（Node 22.23.2 / pnpm 10.34.5）：技能相关集成 20/20（`skill-plugin-lifecycle` 路由数期望值 2 改 3，即 buffered 管理、目录图标、streaming 导入三条官方路由）；`probe:skills` 7/7 段 PASS，含目录状态/元数据/图标路由/安装资格读真实 Host 事实、浏览器市场真实分类与「＋」安装走受管导入路径、缺失与损坏目录降级为诚实诊断；18989 活预览实测 pageerror 0，`GET /api/Praxis-skills/icon?name=cloudbase` 返回 200 `image/svg+xml`，截图 `.artifacts/skills-market-top.png` 与 `.artifacts/skills-market-installed.png`。
 
 官方能力复用记录：安装写入 = `SkillManager.installImport`；技能发现与重新发现 = `ctx.skills` 与 filesystem provider/watcher；传输与认证 = `dsh-client-connection` exact Fetch（新增一条 GET 路由，未接入 `webServer`）；Client 装配 = 官方 Web module graph；契约 `contractVersion: 1` 不变，仅追加可选字段（`SkillCatalogEntry/Summary/Icon`）与端点（`catalog`、`install-catalog`、icon GET）。
 
 ## 2026-09-13：技能弹框紧凑化（公共 Modal 外壳）
 
-用户反馈技能预览弹框过大（宽度近全屏、112px 图标、32px 标题）。开物Praxis 弹框为 `workdsh-ui` 公共 `Modal`（`.wd-dialog` 默认宽度 `min(1120px, calc(100vw - 56px))`，由技能/专家/连接器等面板共用），因此不改公共默认值，仅在技能插件 CSS 内用 `.wd-dialog.skill-detail-dialog`、`.wd-dialog.catalog-dialog` 等高特异性类收窄并紧凑化内部：目录预览 720px、技能详情 820px、确认 480px、回收站 560px、导入 720px；图标 64px、标题 24px、正文 15px、灰卡 padding 20/22、小节标题 16px。预览小节改名「基本信息」对齐 WorkBuddy，并修复「概述」标题使用的缺失图标 `icon('file')`（改为可用图标 `library`）。
+用户反馈技能预览弹框过大（宽度近全屏、112px 图标、32px 标题）。开物Praxis 弹框为 `Praxis-ui` 公共 `Modal`（`.wd-dialog` 默认宽度 `min(1120px, calc(100vw - 56px))`，由技能/专家/连接器等面板共用），因此不改公共默认值，仅在技能插件 CSS 内用 `.wd-dialog.skill-detail-dialog`、`.wd-dialog.catalog-dialog` 等高特异性类收窄并紧凑化内部：目录预览 720px、技能详情 820px、确认 480px、回收站 560px、导入 720px；图标 64px、标题 24px、正文 15px、灰卡 padding 20/22、小节标题 16px。预览小节改名「基本信息」对齐 WorkBuddy，并修复「概述」标题使用的缺失图标 `icon('file')`（改为可用图标 `library`）。
 
-回归：`probe:skills` 浏览器段新增弹框断言（`.wd-dialog.catalog-dialog` 宽度 ≤760、图标 64px、标题 24px、「基本信息」可见后关闭），7/7 段 PASS；18989 活预览实测预览弹框 720px、图标 64px、标题 24px、详情弹框 820px、pageerror 0。截图 `.artifacts/skills-market-preview.png`、`.artifacts/skills-market-detail.png`。官方能力复用记录：弹框继续使用 workdsh-ui 公共 `Modal`，焦点陷阱、Esc/遮罩关闭与 ARIA 行为未变，未新增第二套弹框实现；本轮修复仅涉及技能插件自身样式与标题图标。
+回归：`probe:skills` 浏览器段新增弹框断言（`.wd-dialog.catalog-dialog` 宽度 ≤760、图标 64px、标题 24px、「基本信息」可见后关闭），7/7 段 PASS；18989 活预览实测预览弹框 720px、图标 64px、标题 24px、详情弹框 820px、pageerror 0。截图 `.artifacts/skills-market-preview.png`、`.artifacts/skills-market-detail.png`。官方能力复用记录：弹框继续使用 Praxis-ui 公共 `Modal`，焦点陷阱、Esc/遮罩关闭与 ARIA 行为未变，未新增第二套弹框实现；本轮修复仅涉及技能插件自身样式与标题图标。
 
 ### 同日追加：市场卡片呼吸感对齐与预览按钮修复
 
@@ -142,7 +142,7 @@ Host 新增只读本地技能目录 `SkillCatalogStore`（默认 `~/.agents/.wor
 
 验证：`check-dist` 确认三规则进 `client.browser.js`（`min-height:152px`、`scrollbar-width:none`、`wd-dialog-close{top:28px;right:32px` 各 raw=1）；18989 实测卡片 152px×8、关闭按钮中心 206.73=标题中心 206.73、安装按钮文字完整、预览弹框 720px/pageerror 0；`probe:skills` 7/7 全 PASS。截图 `.artifacts/skills-market-top.png`、`.artifacts/skills-market-preview.png`。
 
-环境阻碍记录：本次 preview 重启被 office 层阻塞（`workdsh_office` 存储中一条旧 deck 模型文档与用户新版 blockIds/blocks schema 不兼容，属用户 PPT 开发中状态，非技能改动）。该记录已备份迁至 `.artifacts/office-documents-quarantine/`（未删除，可直接还原回 `.test-runtime/preview/storages/workdsh_office/documents/`）后预览正常启动。
+环境阻碍记录：本次 preview 重启被 office 层阻塞（`Praxis_office` 存储中一条旧 deck 模型文档与用户新版 blockIds/blocks schema 不兼容，属用户 PPT 开发中状态，非技能改动）。该记录已备份迁至 `.artifacts/office-documents-quarantine/`（未删除，可直接还原回 `.test-runtime/preview/storages/Praxis_office/documents/`）后预览正常启动。
 
 ### 同日追加：卡片再压至内容自然高度（对标 SkillHub）
 
@@ -157,18 +157,18 @@ Host 新增只读本地技能目录 `SkillCatalogStore`（默认 `~/.agents/.wor
 | 字段 | 内容 |
 | --- | --- |
 | 任务与范围 | P1-03 / D03 技能市场 UI 增量：市场页「我安装的 N」改为可点击入口，进入同一面板内的独立安装页（返回链接、标题计数、批量管理、页内搜索、已安装卡片网格）；市场页可安装/已安装分区与全部既有管理动作保持不变。 |
-| 官方能力 | `../dsh-v0.1.6-alpha.2/subsystems/slots.zh.md`（`ctx.slots.inject/register`、main 面板贡献与生命周期）；`../dsh-v0.1.6-alpha.2/subsystems/web-client.zh.md`（布局与面板选择）。锁定包 `@deepseek-ai/dsh-client-ui-slots@0.1.5-rc.1`（`PropsRuntime`/`InjectFace`）；面板注册键 `workdsh-skills` 与 URL 呈现（`workdsh-view=skills`）继续由 bundle `NavigationLocation` 承担。 |
-| 复用选择 | 直接复用：安装页是同一 main 面板内的视图状态（React 局部 UI 状态），不新增第二个 main 注册、不新增 URL/路由、不改 bundle 的 `workdsh-view` 映射；卡片批量、启停、菜单、详情弹框、卸载/恢复继续复用既有 `SkillManager` 客户端与管理契约。 |
+| 官方能力 | `../dsh-v0.1.6-alpha.2/subsystems/slots.zh.md`（`ctx.slots.inject/register`、main 面板贡献与生命周期）；`../dsh-v0.1.6-alpha.2/subsystems/web-client.zh.md`（布局与面板选择）。锁定包 `@deepseek-ai/dsh-client-ui-slots@0.1.5-rc.1`（`PropsRuntime`/`InjectFace`）；面板注册键 `Praxis-skills` 与 URL 呈现（`Praxis-view=skills`）继续由 bundle `NavigationLocation` 承担。 |
+| 复用选择 | 直接复用：安装页是同一 main 面板内的视图状态（React 局部 UI 状态），不新增第二个 main 注册、不新增 URL/路由、不改 bundle 的 `Praxis-view` 映射；卡片批量、启停、菜单、详情弹框、卸载/恢复继续复用既有 `SkillManager` 客户端与管理契约。 |
 | 自有边界 | 仅新增页面级展示状态与布局（`view=market/installed`、页内搜索、返回/标题/工具条），以及 `packages/ui` 图标集新增 `back` 路径。事实仍归官方与 `SkillManager`：已安装清单、启停、卸载、目录安装、watcher 重新发现均无第二套实现。 |
 | 证据与差异 | 既有 `scripts/probe-skills-package.mjs`（`probe:skills`）覆盖市场安装/编辑/启停/卸载/恢复与目录诊断；本轮在该探针新增安装页导航、页内搜索过滤与空结果、批量开关、返回与焦点断言。旧 `scripts/probe-browser.mjs` 技能段自 alpha.26 起已滞后（断言「技能库」标题与静态计数），不在本轮维护范围。 |
-| 验收 | 正例：点击「我安装的 N」进入安装页、面板滚动归零、返回后焦点回到入口；页内搜索过滤与空结果提示；批量开关选择真实可管理项；18989 人工预览对照 WorkBuddy 截图。反例：搜索无结果不显示卡片；只读技能不出现选择框与开关（既有约束）。未含：URL 深链（`workdsh-view` 不变）、跨会话记忆安装页状态。 |
+| 验收 | 正例：点击「我安装的 N」进入安装页、面板滚动归零、返回后焦点回到入口；页内搜索过滤与空结果提示；批量开关选择真实可管理项；18989 人工预览对照 WorkBuddy 截图。反例：搜索无结果不显示卡片；只读技能不出现选择框与开关（既有约束）。未含：URL 深链（`Praxis-view` 不变）、跨会话记忆安装页状态。 |
 
 ### 实现与结果
 
-skills 0.1.0-alpha.27（配套 ui 0.1.0-alpha.5）落地安装页视图：`SkillsPanel` 增加局部 `view=market|installed` 状态；市场头部「我安装的 N」由静态计数改为可点击入口，点击进入安装页。安装页含「全部技能」返回链接、计数标题（`data-testid="skills-installed"`）、「批量管理」与「搜索已安装的技能」页内搜索，卡片网格与批量操作栏复用市场同一 `renderSkillCard` 与管理逻辑（启停、详情、安装、选择行为一致，无第二套实现）。进入安装页与返回市场都把面板滚动归零，并把焦点分别迁移到返回链接与入口按钮（首次渲染跳过）。不新增第二个 main 注册、不改 bundle 的 `workdsh-view` URL 映射。`packages/ui` 图标集新增 `back` 路径（`M15 19l-7-7 7-7`，alpha.5）。
+skills 0.1.0-alpha.27（配套 ui 0.1.0-alpha.5）落地安装页视图：`SkillsPanel` 增加局部 `view=market|installed` 状态；市场头部「我安装的 N」由静态计数改为可点击入口，点击进入安装页。安装页含「全部技能」返回链接、计数标题（`data-testid="skills-installed"`）、「批量管理」与「搜索已安装的技能」页内搜索，卡片网格与批量操作栏复用市场同一 `renderSkillCard` 与管理逻辑（启停、详情、安装、选择行为一致，无第二套实现）。进入安装页与返回市场都把面板滚动归零，并把焦点分别迁移到返回链接与入口按钮（首次渲染跳过）。不新增第二个 main 注册、不改 bundle 的 `Praxis-view` URL 映射。`packages/ui` 图标集新增 `back` 路径（`M15 19l-7-7 7-7`，alpha.5）。
 
 验证（Node 22.23.2 / pnpm 10.34.5）：ui/skills build 与 typecheck 通过；`probe:skills` 8/8 段全部 PASS，新增浏览器断言覆盖入口可点击、安装页标题与市场标题互斥、返回链接获得焦点、滚动归零、页内搜索过滤与空结果、批量选择/退出、返回后焦点回到入口。截图 `.artifacts/skills-standalone/installed-page.png`。18989 人工预览（重装 alpha.27 后）：入口「我安装的 163」、安装页标题「我安装的 163」、返回链接聚焦、滚动归零、四列卡片网格、页内搜索过滤与空结果、批量选择（已选择 1 项）/退出、返回后焦点回入口，pageerror 0；browser-use 原生浏览器视图不可用，改用无头 Playwright 核对脚本 `.test-runtime/preview-check-18989.mjs` 并人工查看截图 `.artifacts/skills-standalone/18989-installed-page.png`、`18989-installed-search.png`、`18989-market-top.png`。
 
-探针附带修正：bundled 断言原检查未加前缀的 `skill-creator`（对应重命名前的旧构建），与本次 UI 改动无关；已修正为循环断言五个 `workdsh-` 前缀 bundled 技能各注册一次。经解包对比 alpha.26/alpha.27 tarball 确认差异来自上一轮 bundled 重命名工作。旧 `scripts/probe-browser.mjs` 技能段自 alpha.26 起滞后（断言「技能库」标题与静态计数），不在本轮维护范围；权威探针为 `scripts/probe-skills-package.mjs`。
+探针附带修正：bundled 断言原检查未加前缀的 `skill-creator`（对应重命名前的旧构建），与本次 UI 改动无关；已修正为循环断言五个 `Praxis-` 前缀 bundled 技能各注册一次。经解包对比 alpha.26/alpha.27 tarball 确认差异来自上一轮 bundled 重命名工作。旧 `scripts/probe-browser.mjs` 技能段自 alpha.26 起滞后（断言「技能库」标题与静态计数），不在本轮维护范围；权威探针为 `scripts/probe-skills-package.mjs`。
 
 未执行：URL 深链、安装页状态跨会话记忆、真实模型调用。

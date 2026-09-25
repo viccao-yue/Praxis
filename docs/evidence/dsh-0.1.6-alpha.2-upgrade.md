@@ -17,7 +17,7 @@
 
 命令：`corepack pnpm typecheck`（13 包）。
 
-- 6 个 client 文件全部迁移：`projects/src/client.tsx`（startTask 改 `retain('workdshProjectTaskStart')`→`await ready`→轮询 `reference.binding.ctx`→send→`finally release`；openTask 改 `uiWorkspace.openSession` + 原重试）、`experts/src/client.tsx`（成员判定改 `subagentAddress(...)?.parentSessionId`；3 处打开改 `uiWorkspace.openSession`）、`skills/src/client.tsx`（current 推导 + 2 处 openSession）、`library/src/client.tsx`（current 推导 + openSession；当前会话处的 `binding` 借用保留）、`office/src/client.tsx`（current 模块级推导函数 ×3）、`activity/src/client.tsx`（成员观测重写为 `retain('workdshActivityMember')`→`ready`→订阅/refresh→cleanup 全部 `release`）。
+- 6 个 client 文件全部迁移：`projects/src/client.tsx`（startTask 改 `retain('PraxisProjectTaskStart')`→`await ready`→轮询 `reference.binding.ctx`→send→`finally release`；openTask 改 `uiWorkspace.openSession` + 原重试）、`experts/src/client.tsx`（成员判定改 `subagentAddress(...)?.parentSessionId`；3 处打开改 `uiWorkspace.openSession`）、`skills/src/client.tsx`（current 推导 + 2 处 openSession）、`library/src/client.tsx`（current 推导 + openSession；当前会话处的 `binding` 借用保留）、`office/src/client.tsx`（current 模块级推导函数 ×3）、`activity/src/client.tsx`（成员观测重写为 `retain('PraxisActivityMember')`→`ready`→订阅/refresh→cleanup 全部 `release`）。
 - package.json 配套：skills/experts 加 `dsh-client-ui-session`+`dsh-client-ui-workspace`（dev+inject）；projects/library 加 peer+dev+inject；activity/office 的 ui-session 为既有依赖仅 bump；library 顺带修正 `sidebar-right` 0.1.5-rc.1→alpha.2 版本混搭。
 - B5 修复：`office/src/csv/CsvDocument.tsx` 显式收窄三种 content 变体，`'renderer'` 变体返回 null（官方 CodeBody 同款语义）。
 - 结果：全仓 `pnpm typecheck` 退出 0（13 包含 bundle/workbench/ui）。

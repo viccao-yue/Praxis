@@ -68,7 +68,7 @@
 已审 17 份：`cordis-primer.zh.md`，`cordis-api` 下 Context、Events、Fiber、Registry、Service 及仅有英文规范的 `inherited.md`，`cordis-tutorial` 的索引和 01—07，`defensive-patterns.zh.md`、`rescope.zh.md`。本波次形成以下强制实现规则：
 
 1. Cordis 配置项并发挂载，文件顺序不是依赖顺序。开物Praxis 插件对必需能力使用 `inject`；可选能力才使用默认严格模式的 `ctx.get()`，并返回结构化“未就绪/未安装”诊断。
-2. 服务名称位于扁平命名空间。开物Praxis 自有服务统一使用有辨识度的 `workdsh*` 名称；跨插件只依赖 contracts 声明的服务，不导入提供方实现。
+2. 服务名称位于扁平命名空间。开物Praxis 自有服务统一使用有辨识度的 `Praxis*` 名称；跨插件只依赖 contracts 声明的服务，不导入提供方实现。
 3. 缺少必需服务会让 Fiber 合法地停在 `PENDING`，可能不报错且以状态码 0 退出。启动、安装、配置更新和管理端插件页必须检查 Fiber 状态、缺失依赖及 `FAILED` 错误，不能把进程存活或页面存在当成加载成功。
 4. 服务提供方消失或被替换时，依赖方会卸载并在服务恢复后重启。业务插件不得缓存跨生命周期服务句柄；Remote、订阅、连接、定时器、watcher 和子插件都必须归属当前 Fiber。
 5. Cordis API 注册天然属于 effect；框架外资源必须用带标签的 `ctx.effect()` 包装并返回 disposer。卸载要等待完全停稳。有关联顺序的异步清理必须放入同一个 disposer 依次等待，不能依赖多个异步 disposer 的执行顺序。

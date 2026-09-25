@@ -36,7 +36,7 @@
 
 ### 开物Praxis 预置设计（对照已复核）
 
-现有 preview profile（.test-runtime/preview）已验证组合可平移：dependencies 7 个 开物Praxis 包，bundles = 内置两层 + workdsh-bundle + 6 个插件/提供方。桌面种子预置预期改动面（测试快照内）：prepare-package-set.ts 增加 开物Praxis 根与 tarball 输入；project-manager.ts 种子/项目元数据写入扩展后的 bundles 列表；品牌两行与 appId 环境。未实施，待用户决策 Apple 凭据与品牌。
+现有 preview profile（.test-runtime/preview）已验证组合可平移：dependencies 7 个 开物Praxis 包，bundles = 内置两层 + Praxis-bundle + 6 个插件/提供方。桌面种子预置预期改动面（测试快照内）：prepare-package-set.ts 增加 开物Praxis 根与 tarball 输入；project-manager.ts 种子/项目元数据写入扩展后的 bundles 列表；品牌两行与 appId 环境。未实施，待用户决策 Apple 凭据与品牌。
 
 ### 未执行
 
@@ -44,24 +44,24 @@
 
 ## 2026-09-12 第三轮：开物Praxis 未签名测试版打包与冒烟验证
 
-用户四项决策：① Apple 凭据暂无，先做未签名测试版（仅本机自用、不可分发）；② 品牌 开物Praxis；③ 预置全部 7 个 开物Praxis 包（与 preview profile 一致）；④ 应用 ID com.workdsh.app。
+用户四项决策：① Apple 凭据暂无，先做未签名测试版（仅本机自用、不可分发）；② 品牌 开物Praxis；③ 预置全部 7 个 开物Praxis 包（与 preview profile 一致）；④ 应用 ID com.Praxis.app。
 
-### 快照补丁（5 文件，全部标注 WORKDSH TEST PATCH，仅存在于隔离快照）
+### 快照补丁（5 文件，全部标注 Praxis TEST PATCH，仅存在于隔离快照）
 
-- src/project-manager.ts：新增 WORKDSH_PROFILE_BUNDLES（7 层，置于内置两层之后）；createSeedMetadata 的 dsh.profile.bundles 与 dependencies 扩展。dev 项目 metadata 刻意未改。
-- scripts/prepare-seed.ts：`WORKDSH_DESKTOP_UNSIGNED=1` 时跳过 darwin 种子签名门槛。
-- electron-builder.config.mjs（6 处）：productName '开物Praxis'、artifactName 'workdsh-${version}-…'；unsigned 时跳过签名/公证导入校验；mac.identity=null、forceCodeSigning/notarize=false；dmg.sign=false；afterSign/artifactBuildCompleted 钩子守卫。
-- scripts/desktop-build-paths.mjs 与 .d.mts：新增 packedWorkdsh 路径。
-- scripts/prepare-package-set.ts：WORKDSH_ROOT_PACKAGES 作为根加入闭包选择 + packedWorkdsh 作为默认输入。
+- src/project-manager.ts：新增 Praxis_PROFILE_BUNDLES（7 层，置于内置两层之后）；createSeedMetadata 的 dsh.profile.bundles 与 dependencies 扩展。dev 项目 metadata 刻意未改。
+- scripts/prepare-seed.ts：`Praxis_DESKTOP_UNSIGNED=1` 时跳过 darwin 种子签名门槛。
+- electron-builder.config.mjs（6 处）：productName '开物Praxis'、artifactName 'Praxis-${version}-…'；unsigned 时跳过签名/公证导入校验；mac.identity=null、forceCodeSigning/notarize=false；dmg.sign=false；afterSign/artifactBuildCompleted 钩子守卫。
+- scripts/desktop-build-paths.mjs 与 .d.mts：新增 packedPraxis 路径。
+- scripts/prepare-package-set.ts：Praxis_ROOT_PACKAGES 作为根加入闭包选择 + packedPraxis 作为默认输入。
 
 ### 构建与产物
 
-- 7 个 开物Praxis tarball 打包至 <build>/packed/workdsh（bundle alpha.40 / skills alpha.25 / access alpha.4 / audit alpha.3 / experts alpha.1 / office alpha.1 / identity-local alpha.4）。
+- 7 个 开物Praxis tarball 打包至 <build>/packed/Praxis（bundle alpha.40 / skills alpha.25 / access alpha.4 / audit alpha.3 / experts alpha.1 / office alpha.1 / identity-local alpha.4）。
 - prepare:packages 重建核心包集：248 包（241 官方 + 7 开物Praxis）。
-- prepare:seed（unsigned）：exit=0（prepare-seed-workdsh.log）。种子 bundles = 内置两层 + 7 层；248 dependencies；integrity.json 270 文件；无签名痕迹。
-- electron-builder（--dir, unsigned）：**exit=0**（electron-builder-workdsh.log）。首次运行卡在 GitHub release 直接下载（release-assets.githubusercontent.com 实测约 18KB/s），实测 npmmirror 镜像可用（HTTP 200，129.7MB）后中止进程并以 `ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/` 重启完成；日志确认 `skipped macOS code signing reason=identity explicitly is set to null` 与 `downloaded electron zip extracted successfully`。
+- prepare:seed（unsigned）：exit=0（prepare-seed-Praxis.log）。种子 bundles = 内置两层 + 7 层；248 dependencies；integrity.json 270 文件；无签名痕迹。
+- electron-builder（--dir, unsigned）：**exit=0**（electron-builder-Praxis.log）。首次运行卡在 GitHub release 直接下载（release-assets.githubusercontent.com 实测约 18KB/s），实测 npmmirror 镜像可用（HTTP 200，129.7MB）后中止进程并以 `ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/` 重启完成；日志确认 `skipped macOS code signing reason=identity explicitly is set to null` 与 `downloaded electron zip extracted successfully`。
 - 产物：.desktop-build/targets/mac-arm64/artifacts/mac-arm64/开物Praxis.app（总 1.0G）
-  - Info.plist：CFBundleName/CFBundleDisplayName=Praxis、CFBundleIdentifier=com.workdsh.app、CFBundleShortVersionString=0.1.5-rc.1。
+  - Info.plist：CFBundleName/CFBundleDisplayName=Praxis、CFBundleIdentifier=com.Praxis.app、CFBundleShortVersionString=0.1.5-rc.1。
   - Contents/Resources：app.asar、runtime（node 24.17.0 + pnpm 11.7.0）、seed（248 tarball + integrity.json + desktop-packages.json）。
   - 签名状态：`Signature=adhoc`（Electron 自带 linker-signed），无 Developer ID；无 quarantine 属性（com.apple.provenance 为系统溯源标记），本机可直接启动；内嵌 node 保持官方硬化签名。
   - 图标：开物Praxis 品牌 icns 已接线（详见下文「第四轮：应用图标接线」）。
@@ -69,8 +69,8 @@
 ### 本机冒烟验证（开物Praxis.app 未签名，macOS 26.3 arm64）
 
 - 前置处理：`~/.dsh/profiles/desktop` 存在旧测试残留（bundles=dsh-better-sidebar/dsh-plugin-ssh，无 desktop-release.json），不符合 desktop 项目格式且会阻断 releaseFile() 读取；已备份重命名为 `~/.dsh/profiles/desktop.test-residue-20260912`（保留数据，未删除）。
-- 首启（smoke-launch.sh，日志 smoke-launch.log）：种子校验 → mergeSeedPnpmState → 离线安装 248 包至 ~/.dsh/profiles/desktop → staging healthCheck → 激活 → 正式 backend。安装结果：desktop-release.json=0.1.5-rc.1、node_modules 含全部 7 个 workdsh 包、bundles 列表正确。healthCheck 证据链 `[workdsh:probe] activated → disposed → activated`（探测启动/dispose/正式启动，probe 来自 packages/bundle/src/probe.ts）。backend host 以打包的 runtime/node 运行 dsh-desktop-host。
-- 二次启动（--remote-debugging-port=19222，日志 smoke-launch3.log）：快路径直接激活（不重装）。CDP target：title「用deepseek-harness复刻workbuddy — DeepSeek Harness」，url `dsh-app://app/index.html?workdsh-view=conversation`。
+- 首启（smoke-launch.sh，日志 smoke-launch.log）：种子校验 → mergeSeedPnpmState → 离线安装 248 包至 ~/.dsh/profiles/desktop → staging healthCheck → 激活 → 正式 backend。安装结果：desktop-release.json=0.1.5-rc.1、node_modules 含全部 7 个 Praxis 包、bundles 列表正确。healthCheck 证据链 `[Praxis:probe] activated → disposed → activated`（探测启动/dispose/正式启动，probe 来自 packages/bundle/src/probe.ts）。backend host 以打包的 runtime/node 运行 dsh-desktop-host。
+- 二次启动（--remote-debugging-port=19222，日志 smoke-launch3.log）：快路径直接激活（不重装）。CDP target：title「用deepseek-harness复刻workbuddy — DeepSeek Harness」，url `dsh-app://app/index.html?Praxis-view=conversation`。
 - CDP 截图（smoke-ui.png，CDP Page.captureScreenshot 绕过屏幕录制权限）：开物Praxis 品牌 + 侧边导航（新会话/助理/项目/专家·技能·连接器/定时任务/资料库/工作区）+ 真实 session 轨迹（officecli skill 执行、运行统计 3 轮 15 步 · 218 tok/s · 缓存命中 82%）+ 右侧文件面板 + 模型选择 DeepSeek-V41-Flash High。这是 开物Praxis 插件页面在桌面壳中真实渲染的直接证据。
 - Electron 进程树完整：主进程 + gpu-process + renderer + utility 各 1；启动日志仅一条 IMKCFRunLoopWakeUpReliable 良性噪音，无其他 error/warn。
 - 结论：官方 rc.1 流水线在 开物Praxis 预置下从构建到「安装 → Host 启动 → 开物Praxis 层激活 → UI 渲染」全链路贯通，无 Apple 凭据也可完成本机测试验收。
@@ -80,12 +80,12 @@
 - 正式 Developer ID 签名、公证、DMG/ZIP release 制品（本轮 --dir 仅目录产物）、分发与安装升级、自动更新通道验证（DSH_DESKTOP_AUTO_UPDATE_ENV=production 仅满足配置校验）、长会话稳定性与真实业务端到端。
 - 本产物仅本机冒烟，不可对外分发；根 开物Praxis 依赖、Web 预览与既有 Profile 未触碰；无上传/发布。
 
-## 2026-09-12 第四轮：应用图标接线（WORKDSH TEST PATCH 扩展）
+## 2026-09-12 第四轮：应用图标接线（Praxis TEST PATCH 扩展）
 
 用户指出 Dock 显示 Electron 默认原子图标。修复过程：
 
-- 以品牌资产 assets/brand/workdsh-logo-concept.png（1254×1254）经 sips 生成 10 档 iconset（16–1024px，含 @2x）→ `iconutil -c icns` 生成 workdsh-icon.icns（1,549,686 字节，ic12 类型）。
-- 快照落盘 apps/desktop/workdsh-icon.icns；electron-builder.config.mjs 新增两处 WORKDSH TEST PATCH（`node:url` 导入 + `mac.icon` 指向该文件）。
+- 以品牌资产 assets/brand/Praxis-logo-concept.png（1254×1254）经 sips 生成 10 档 iconset（16–1024px，含 @2x）→ `iconutil -c icns` 生成 Praxis-icon.icns（1,549,686 字节，ic12 类型）。
+- 快照落盘 apps/desktop/Praxis-icon.icns；electron-builder.config.mjs 新增两处 Praxis TEST PATCH（`node:url` 导入 + `mac.icon` 指向该文件）。
 - 重新打包 exit=0（electron-builder-icon.log；Electron zip 命中镜像缓存，全流程约 3 分钟）。产物 `Contents/Resources/icon.icns` 与源 SHA-256 一致（af72f855…），Info.plist `CFBundleIconFile=icon.icns`；打包日志不再出现 `default Electron icon is used`。
 - icns 转回 PNG 人工复核：开物Praxis 品牌图（蓝色折叠 W + 青色火花 + 浅色圆角底座），非 Electron 默认图标。应用重启运行正常（本机 open 启动，host 正常激活）。
 - 若 Dock 仍显示旧图标属 LaunchServices 缓存：将图标从 Dock 移除后重新打开，或 `killall Dock` 刷新。
@@ -99,10 +99,10 @@
 - 官方 createWindow（apps/desktop/src/main.ts）未设置 titleBarStyle → macOS 显示原生标题栏（32px），web 内容被压缩（窗口 840 → 视口 808，`window.innerHeight=808`），浅色标题条与深色外壳割裂。
 - 官方 web UI（packages/client/ui-layout 等）为纯网页设计，无任何红绿灯留白或窗口拖拽区（-webkit-app-region）适配。
 
-### 补丁（WORKDSH TEST PATCH，快照 apps/desktop）
+### 补丁（Praxis TEST PATCH，快照 apps/desktop）
 
 - src/main.ts：`createWindow(preload, shellFrame=false)` 新增 shellFrame 参数，主窗口传 true 时 darwin 下 `titleBarStyle: 'hiddenInset'`；管理窗口（plugin-manager）保持默认标题栏（低频窗口，避免改动官方 shell HTML/CSS）。
-- src/preload-app.ts：注入 `style[data-workdsh-shell]` 适配样式（经 MutationObserver 在 documentElement 出现时立即插入，先于首帧，无闪烁；`document.documentElement.dataset.workdshShell='inset'` 作为可检测标记）：
+- src/preload-app.ts：注入 `style[data-Praxis-shell]` 适配样式（经 MutationObserver 在 documentElement 出现时立即插入，先于首帧，无闪烁；`document.documentElement.dataset.PraxisShell='inset'` 作为可检测标记）：
   - `[class$="_logoRow"]`：`padding-top: 48px !important; height: auto !important`（官方固定 height:60px border-box 会压瘪内容区，实测需覆盖）→ logoRow 高 84px，品牌行 y=56，与红绿灯（窗口 y≈20–32）间隙约 24px；`-webkit-app-region: drag` 恢复窗口拖动。
   - `header[class$="_header"]` 与其 `_titleRow`：drag 区；内部 button/a/input/nav/_headerActions/_headerUtilities/_headerCorner 显式 `no-drag` 保留交互。
   - 选择器用 CSS-modules 类名后缀（`_logoRow` 等稳定部分）而非构建哈希（`gHG9Wq_` 会随构建变化）；升级官方 web UI 后若失效需重验。
@@ -110,10 +110,10 @@
 ### 构建与验证
 
 - 首次重打包遗漏 `--config electron-builder.config.mjs`（package-target.ts:205 的必需参数），产物误落地 `apps/desktop/dist/`（默认图标、未跳过签名）；已删除误产物目录（dist/，18:00 生成，含 builder-debug.yml 与 @deepseek-aidsh-desktop.app），修正脚本后重跑（electron-builder-shell2/3.log，均 exit=0，`loaded configuration file=…electron-builder.config.mjs`、`skipped macOS code signing reason=identity explicitly is set to null`、无 `default Electron icon`）。
-- app.asar 静态核验：`lib/main.js` 含 hiddenInset/shellFrame，`lib/preload-app.cjs` 含 workdshShell/_logoRow。
+- app.asar 静态核验：`lib/main.js` 含 hiddenInset/shellFrame，`lib/preload-app.cjs` 含 PraxisShell/_logoRow。
 - 运行时核验（CDP，smoke-launch6.log）：
   - `window.innerWidth/Height = 1280×840 = outerWidth/Height`（补丁前 innerHeight=808）→ 原生标题栏已完全移除。
-  - `document.documentElement.dataset.workdshShell='inset'`、`style[data-workdsh-shell]` 存在。
+  - `document.documentElement.dataset.PraxisShell='inset'`、`style[data-Praxis-shell]` 存在。
   - logoRow h=84（padding-top=48px、height:auto 生效）、brand y=56、新会话按钮 y=98（原 74，整列下移 24px）；`header` y=0 h=76 `-webkit-app-region: drag`。
   - 截图 smoke-ui-shell.png：侧边栏顶部留白、品牌行下移、导航与内容区布局完好。
 - 待人工确认（CDP 无法截取系统红绿灯）：红绿灯实际落位（窗口 y≈20–32）与留白/品牌行的视觉间距；窗口拖动（拖侧边栏顶部空白或内容 header 空隙）；Dock 图标与窗口顶部是否已达到 WorkBuddy 式的融合效果。
@@ -128,10 +128,10 @@
 
 ### 交付
 
-- `scripts/desktop/pack-desktop.mjs`（一键打包，241 行）：Node 22 自举（shell 默认 v21 时自动切换 nvm v22）、corepack 直调 pnpm、快照与补丁存档 SHA-256 逐文件比对（防漂移，`--sync-patches` 可同步）、打包前停止运行中实例、`build:desktop → electron-builder --dir --config …`（内置 unsigned 环境变量与 ELECTRON_MIRROR）、产物断言（plist 三字段 / icon.icns 哈希 / app.asar 内 hiddenInset+shellFrame+workdshShell+_logoRow）、`--restart`。参数：`--skip-build/--check-only/--sync-patches/--restart`。
-- `scripts/desktop/patches/upstream/`：9 个补丁文件存档（8 源文件 + workdsh-icon.icns），按快照相对路径存放。
+- `scripts/desktop/pack-desktop.mjs`（一键打包，241 行）：Node 22 自举（shell 默认 v21 时自动切换 nvm v22）、corepack 直调 pnpm、快照与补丁存档 SHA-256 逐文件比对（防漂移，`--sync-patches` 可同步）、打包前停止运行中实例、`build:desktop → electron-builder --dir --config …`（内置 unsigned 环境变量与 ELECTRON_MIRROR）、产物断言（plist 三字段 / icon.icns 哈希 / app.asar 内 hiddenInset+shellFrame+PraxisShell+_logoRow）、`--restart`。参数：`--skip-build/--check-only/--sync-patches/--restart`。
+- `scripts/desktop/patches/upstream/`：9 个补丁文件存档（8 源文件 + Praxis-icon.icns），按快照相对路径存放。
 - `docs/DESKTOP-PACKAGING.md`：打包指南主体（用法、补丁用途表、快照重建步骤（含 7 包 tarball 重打路径）、Windows 说明、常见问题）——按用户要求打包资料集中 docs；`scripts/desktop/README.md` 保留为脚本目录速查并指向指南。
-- 技能：`.qoder/skills/workdsh-desktop-pack/SKILL.md` 保留为 Qoder 触发入口（内容指向 `docs/DESKTOP-PACKAGING.md`）；个人级 `~/.agents` 副本已移除，工程内 `.qoder/skills` 由 Qoder 直接发现。触发词覆盖“打包/重打 开物Praxis 桌面应用、开物Praxis.app、桌面测试版、Dock、Windows 桌面版”。
+- 技能：`.qoder/skills/Praxis-desktop-pack/SKILL.md` 保留为 Qoder 触发入口（内容指向 `docs/DESKTOP-PACKAGING.md`）；个人级 `~/.agents` 副本已移除，工程内 `.qoder/skills` 由 Qoder 直接发现。触发词覆盖“打包/重打 开物Praxis 桌面应用、开物Praxis.app、桌面测试版、Dock、Windows 桌面版”。
 
 ### 验证
 

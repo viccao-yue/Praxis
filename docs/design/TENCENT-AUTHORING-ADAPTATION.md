@@ -19,9 +19,9 @@
 
 ## 接入
 
-网页优先切片（2026-09-13）：再次对照 Ardot design-to-code workflow、landing-page 与 web-app guidelines，采用内容/视觉分离和任务状态设计；拒绝照搬固定画布、强制多轮确认与“不运行预览”的宿主限制。workdsh-web-design 新增 workflow-and-delivery 参考，覆盖现有工程修改、静态页、应用、设计稿转换四条路径，真实预览/源码/素材/运行说明/文件引用交付。继续复用官方 SkillRegistration/resourceBase 与原生文件/工程工具；没有新增HTML工具、服务器或发布服务。验收先检查注册、按需参考、独立包资源，再验证一个真实成品与视觉；模型成品未执行不能记通过。
+网页优先切片（2026-09-13）：再次对照 Ardot design-to-code workflow、landing-page 与 web-app guidelines，采用内容/视觉分离和任务状态设计；拒绝照搬固定画布、强制多轮确认与“不运行预览”的宿主限制。Praxis-web-design 新增 workflow-and-delivery 参考，覆盖现有工程修改、静态页、应用、设计稿转换四条路径，真实预览/源码/素材/运行说明/文件引用交付。继续复用官方 SkillRegistration/resourceBase 与原生文件/工程工具；没有新增HTML工具、服务器或发布服务。验收先检查注册、按需参考、独立包资源，再验证一个真实成品与视觉；模型成品未执行不能记通过。
 
-Skills插件新增四个独立可发现的 bundled只读指南：workdsh-ppt-design、workdsh-word-design、workdsh-excel-design、workdsh-web-design。准确描述使用范围；包内 references 通过 directory resourceBase 按需读取。Office默认引导在打开Word/PPT后使用相应设计建议，普通短文不强制加载全部参考。专家可通过真实技能目录选择这些指南；它们是专业方法，不替代底层编辑/数据能力。
+Skills插件新增四个独立可发现的 bundled只读指南：Praxis-ppt-design、Praxis-word-design、Praxis-excel-design、Praxis-web-design。准确描述使用范围；包内 references 通过 directory resourceBase 按需读取。Office默认引导在打开Word/PPT后使用相应设计建议，普通短文不强制加载全部参考。专家可通过真实技能目录选择这些指南；它们是专业方法，不替代底层编辑/数据能力。
 
 Word与PPT仍使用同一 content_* 权威服务和官方导出文件卡。统一 spreadsheet/html新建API未实现，指南明确不能猜分支或伪造成功；已有XLSX副本编辑、真实工程网页制作遵循当前工具。新指南不扩充编辑器格式保真或图表支持范围。不能把指南上线描述成Excel/HTML统一编辑器已完成。
 

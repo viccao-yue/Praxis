@@ -17,18 +17,18 @@ D04 专家模块的领域服务、Client、Agent 工具与集成测试已完成�
 
 ### 阻塞 1：可安装 Host 存在无法解析的 workspace 运行时依赖
 
-- `scripts/install-preview.mjs` 仅 pack `packages/plugins/skills`、`packages/plugins/experts`、`packages/bundle` 三个 tarball，经官方 CLI `plugin --profile preview add` 安装；**不 pack `workdsh-contracts`、不 pack 治理三包**。
-- `workdsh-contracts` 为 `private:true`、未发布，且不在 experts 的 `dependencies`（仅 `devDependencies: workspace:*`）。
-- experts Host 由 tsc 编译（`dist/*.js` 外部导入），运行时裸导入 contracts 值：`dist/services/experts-manager.js` `import { EXPERT_LIMITS, ExpertsError, actionAccess, assertActorContext }`；`dist/shared.js` `export * from 'workdsh-contracts/experts'`；`dist/runtime/confirmation.js`、`dist/services/portability.js`、`dist/services/connection-api.js` `import { ExpertsError }`；`dist/domain/definition.js` `import { EXPERT_LIMITS }`。源码层 10 个文件导入 contracts、约 170 处运行时值使用。
+- `scripts/install-preview.mjs` 仅 pack `packages/plugins/skills`、`packages/plugins/experts`、`packages/bundle` 三个 tarball，经官方 CLI `plugin --profile preview add` 安装；**不 pack `Praxis-contracts`、不 pack 治理三包**。
+- `Praxis-contracts` 为 `private:true`、未发布，且不在 experts 的 `dependencies`（仅 `devDependencies: workspace:*`）。
+- experts Host 由 tsc 编译（`dist/*.js` 外部导入），运行时裸导入 contracts 值：`dist/services/experts-manager.js` `import { EXPERT_LIMITS, ExpertsError, actionAccess, assertActorContext }`；`dist/shared.js` `export * from 'Praxis-contracts/experts'`；`dist/runtime/confirmation.js`、`dist/services/portability.js`、`dist/services/connection-api.js` `import { ExpertsError }`；`dist/domain/definition.js` `import { EXPERT_LIMITS }`。源码层 10 个文件导入 contracts、约 170 处运行时值使用。
 - 治理三包 Host dist 同样运行时导入 governance 原语：`access/dist/index.js` `import { assertActorContext, assertResourceOwner, GovernanceContractError }`；`audit/dist/index.js` `import { GovernanceContractError }`；`identity-local/dist/index.js` `import { assertActorContext, GovernanceContractError }`。
-- 对照已验证的 skills：`skills/src/shared.ts` 为 `export type * from 'workdsh-contracts/skills'`（仅类型），`skills/dist` 对 contracts **零运行时导入**，运行时值（错误码字符串、`maximumDocumentBytes` 等常量）在 Host 源码本地定义 → tarball 自包含、“不要求运行环境保留 workspace”（见 evidence/skills-standalone-package.md）。bundle Host `dist/probe.js` 同样无 workspace 运行时导入。
-- 结论：experts / 治理 Host 在安装态无法解析 `workdsh-contracts` → 模块加载即失败（Fiber FAILED，甚至早于 inject PENDING）。这直接违反 ADR-0018 第 54 行“制品能否解析……仅装进 node_modules 不算激活”的已采纳层一要求。
+- 对照已验证的 skills：`skills/src/shared.ts` 为 `export type * from 'Praxis-contracts/skills'`（仅类型），`skills/dist` 对 contracts **零运行时导入**，运行时值（错误码字符串、`maximumDocumentBytes` 等常量）在 Host 源码本地定义 → tarball 自包含、“不要求运行环境保留 workspace”（见 evidence/skills-standalone-package.md）。bundle Host `dist/probe.js` 同样无 workspace 运行时导入。
+- 结论：experts / 治理 Host 在安装态无法解析 `Praxis-contracts` → 模块加载即失败（Fiber FAILED，甚至早于 inject PENDING）。这直接违反 ADR-0018 第 54 行“制品能否解析……仅装进 node_modules 不算激活”的已采纳层一要求。
 
 ### 阻塞 2：治理栈从未在打包 Profile 中真实装配
 
-- identity-local / audit / access 为裸 Cordis `Service` 类（`super(ctx,'workdshXxx')` + `static inject`），无模块级 `name/apply/inject`、无 `dsh` 配置、无 `cordis.patch.yml`。按官方 publish 机制，无 `dsh.bundle` 声明的包只作普通依赖安装、不激活任何配置层。
+- identity-local / audit / access 为裸 Cordis `Service` 类（`super(ctx,'PraxisXxx')` + `static inject`），无模块级 `name/apply/inject`、无 `dsh` 配置、无 `cordis.patch.yml`。按官方 publish 机制，无 `dsh.bundle` 声明的包只作普通依赖安装、不激活任何配置层。
 - 治理服务当前仅在 `tests/integration/*.test.mjs` 中经 `ctx.plugin/ctx.provide` 实例化；`packages/`、`scripts/` 中无任何打包态实例化。D01 证据（d01-installation.md、d01-access-audit.md）表明治理只在 test:integration（真实 Cordis Context）层验证，从未作为 Profile 层安装。
-- experts Host `inject` 必需 `workdshIdentity/workdshAccess/workdshAudit/workdshSessionAccess`；即便修复阻塞 1，这些服务在打包 Profile 中无提供方 → experts Fiber 停在 PENDING（官方 06-composition：PENDING 是合法静默状态）。
+- experts Host `inject` 必需 `PraxisIdentity/PraxisAccess/PraxisAudit/PraxisSessionAccess`；即便修复阻塞 1，这些服务在打包 Profile 中无提供方 → experts Fiber 停在 PENDING（官方 06-composition：PENDING 是合法静默状态）。
 - ADR-0018 第 22-23 行已决定“identity/access/audit 是必需公共基础服务，默认组合按官方注册明确装配”，第 60 行“同一包内可含多个正式插件模块，由官方配置或 ctx.plugin 管理”，但第 66 行明确“以下是目标行为，不是当前实现已通过的声明”——装配从未实现。
 
 ### 未记录的决策缺口
@@ -37,9 +37,9 @@ ADR-0018 第 24 行称 contracts 提供“类型、校验”，与第 54 行“�
 
 ## 决策
 
-1. **可安装插件 Host 必须自包含。** 任何参与打包安装（`pnpm pack` → 官方 CLI Profile 层）的插件，其 Host `dist` 不得含对 workspace/private 包（`workdsh-contracts`、`workdsh-ui` 等）的运行时 `import`。允许：官方 `@deepseek-ai/*`、已在 `dependencies` 声明的真实发布 npm 包、Node 内置、以及编译期擦除的 `import type`。
-2. **contracts 对已安装 Host 是仅类型依赖。** contracts 可继续发布运行时校验，供 (a) Client bundle 经 esbuild 内联、(b) 测试、(c) 作为单一真源被各 Host 在**自有源码内**内建/复制；但已安装 Host `dist` 不得裸 `import ... from 'workdsh-contracts'` 运行时值。此规则形式化 skills 已验证模式，符合 AGENTS.md“contracts 不放业务实现”。
-3. **experts 侧（D04）自包含修正。** 将 experts 领域运行时值 `EXPERT_LIMITS`/`ExpertsError`/`actionAccess` 从 `contracts/src/experts.ts` 迁至 experts 自有源码（如 `src/domain/`），contracts 仅保留类型；`src/shared.ts` 改为 `export type * from 'workdsh-contracts/experts'` + 本地运行时再导出；Client 从 experts 源码导入（esbuild 内联）。actor 校验依赖注入的 `IdentityService`（其契约保证 Host 解析的可信 `ActorContext`），如需防御性结构校验则在 experts 源码内建最小 guard，不裸导入 `assertActorContext`。
+1. **可安装插件 Host 必须自包含。** 任何参与打包安装（`pnpm pack` → 官方 CLI Profile 层）的插件，其 Host `dist` 不得含对 workspace/private 包（`Praxis-contracts`、`Praxis-ui` 等）的运行时 `import`。允许：官方 `@deepseek-ai/*`、已在 `dependencies` 声明的真实发布 npm 包、Node 内置、以及编译期擦除的 `import type`。
+2. **contracts 对已安装 Host 是仅类型依赖。** contracts 可继续发布运行时校验，供 (a) Client bundle 经 esbuild 内联、(b) 测试、(c) 作为单一真源被各 Host 在**自有源码内**内建/复制；但已安装 Host `dist` 不得裸 `import ... from 'Praxis-contracts'` 运行时值。此规则形式化 skills 已验证模式，符合 AGENTS.md“contracts 不放业务实现”。
+3. **experts 侧（D04）自包含修正。** 将 experts 领域运行时值 `EXPERT_LIMITS`/`ExpertsError`/`actionAccess` 从 `contracts/src/experts.ts` 迁至 experts 自有源码（如 `src/domain/`），contracts 仅保留类型；`src/shared.ts` 改为 `export type * from 'Praxis-contracts/experts'` + 本地运行时再导出；Client 从 experts 源码导入（esbuild 内联）。actor 校验依赖注入的 `IdentityService`（其契约保证 Host 解析的可信 `ActorContext`），如需防御性结构校验则在 experts 源码内建最小 guard，不裸导入 `assertActorContext`。
 4. **治理真实装配（执行 ADR-0018）。** 默认本地组合经官方 `ctx.plugin` 明确装配：`LocalIdentityService`（固定本地配置 `principalId/organizationId/organizationName`）、`AuditJournal`、`AccessManager`、`SessionAccessBridge`、`ToolAccessBridge`；治理 Host 同样满足决策 1（governance 运行时原语迁至可安装位置或各治理包自有源码，contracts 仅类型）。装配落点见备选方案。
 5. **验证门槛。** experts/治理 `dist` 对 contracts 零运行时导入（脚本可核）；experts 集成保持 9/9、全量 42/42 绿；`preview:install` + `probe:browser` 确认 experts Host 为 ACTIVE（非 FAILED/PENDING）、治理服务有提供方、AT-18/19/20 闭环 + 两次冷重启 + 移除重装不回归 skills/workbench/工作台。
 

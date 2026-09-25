@@ -4,25 +4,25 @@
 
 ## 1. 插件身份与组成
 
-**Office操作由独立可安装的`workdsh-plugin-office`提供。** 它通过官方`dsh.bundle.patch`、Loader/Profile、Cordis服务/工具及Client模块接入Harness。开物Praxis默认组合只选择/配置这个包，不拥有其编辑、工具或数据实现。
+**Office操作由独立可安装的`Praxis-plugin-office`提供。** 它通过官方`dsh.bundle.patch`、Loader/Profile、Cordis服务/工具及Client模块接入Harness。开物Praxis默认组合只选择/配置这个包，不拥有其编辑、工具或数据实现。
 
 一个安装包可以包含多个正式Cordis插件模块。首版保留一个Office包，在包内按职责组合，不为八种文件强制建八个npm包，也不把每个文档变成代码插件。Tiptap/Univer/Konva等是该包使用的编辑基础库；它们各自的扩展机制不承担Harness插件安装/权限/生命周期。
 
 | 组成 | 归属与职责 | 装配与依赖 |
 | --- | --- | --- |
-| 根Host入口`.` | Office配置与正式子插件组合 | 保留稳定行`workdsh-office`；仅用`ctx.plugin`挂载模块，禁止直接`applyX(ctx)`；不内建其他业务插件 |
-| 内容服务插件 | 提供拟定`ctx.workdshOfficeContent`；拥有工作副本、纯数据操作、修订与收据 | 官方Service/具名服务；必需注入storageDomain及既有身份/授权/审计服务，缺失即停止相关操作；初始化未完成不得提供ready能力 |
+| 根Host入口`.` | Office配置与正式子插件组合 | 保留稳定行`Praxis-office`；仅用`ctx.plugin`挂载模块，禁止直接`applyX(ctx)`；不内建其他业务插件 |
+| 内容服务插件 | 提供拟定`ctx.PraxisOfficeContent`；拥有工作副本、纯数据操作、修订与收据 | 官方Service/具名服务；必需注入storageDomain及既有身份/授权/审计服务，缺失即停止相关操作；初始化未完成不得提供ready能力 |
 | 工具插件 | 注册六个`content_*`工具与必要的使用指导 | 注入`tools`及内容服务，复用官方工具策略/系统提示词/执行日志；服务未就绪不注册可写工具 |
 | Connection适配插件 | 将认证Client请求映射到同一服务 | 注入官方`connection`及内容服务；只管理Office领域路径，沿用rc.1已记录的exact Fetch例外 |
 | `./client`入口 | Client model、Tab/预览/工具卡片贡献及类型适配模块 | 官方`dsh.client`图与Cordis生命周期；UI只接model投影的状态/actions |
 | 八类adapter | 类型模型操作、编辑器事务映射、浏览器codec与资源 | 包内确定的类型映射、按需载入SDK；有运行副作用的模块用官方`ctx.plugin`/effect托管，不建立动态代码市场或自制PluginManager |
-| 公共契约 | 服务类型、版本化DTO、能力/错误语义 | 拟定`workdsh-contracts/office`仅声明契约；Host不能裸导入当前private contracts运行时值，校验/领域实现由Office源码拥有 |
+| 公共契约 | 服务类型、版本化DTO、能力/错误语义 | 拟定`Praxis-contracts/office`仅声明契约；Host不能裸导入当前private contracts运行时值，校验/领域实现由Office源码拥有 |
 
-U1 已以包内正式插件实现 ContentService/Tools/Connection，并注册五个工具；公开包入口仍为`.`、`./client`，契约通过 type-only `workdsh-contracts/office` 导出。表中六工具、八类和全生命周期仍是目标，实际子集见[U1 实施记录](U1-IMPLEMENTATION.md)。细分模块的`inject`名、公开包导出与props在U1按锁定发布包确认，禁止猜测并用全局变量补齐。
+U1 已以包内正式插件实现 ContentService/Tools/Connection，并注册五个工具；公开包入口仍为`.`、`./client`，契约通过 type-only `Praxis-contracts/office` 导出。表中六工具、八类和全生命周期仍是目标，实际子集见[U1 实施记录](U1-IMPLEMENTATION.md)。细分模块的`inject`名、公开包导出与props在U1按锁定发布包确认，禁止猜测并用全局变量补齐。
 
 ```mermaid
 flowchart TB
-  Profile[官方 Profile / 开物Praxis组合] --> Package[workdsh-plugin-office 安装包]
+  Profile[官方 Profile / 开物Praxis组合] --> Package[Praxis-plugin-office 安装包]
   Package --> Host[Host 根插件：ctx.plugin组合]
   Host --> Service[Office内容服务插件]
   Host --> Tools[Office工具插件：content_*]
@@ -75,7 +75,7 @@ U1检查服务名、工具wire name、route与Slot key是否冲突；冲突显�
 
 ## 4. 打包与商业使用约束
 
-制品沿用`workdsh-plugin-office@0.1.x`，包含Host/Client构建产物、`cordis.patch.yml`、README/CHANGELOG、必要CSS/字体/WASM/worker与LICENSE/NOTICE。只分发实际实现的能力。未来拆分独立提供方时另写ADR及包契约，本轮不生成空插件包。
+制品沿用`Praxis-plugin-office@0.1.x`，包含Host/Client构建产物、`cordis.patch.yml`、README/CHANGELOG、必要CSS/字体/WASM/worker与LICENSE/NOTICE。只分发实际实现的能力。未来拆分独立提供方时另写ADR及包契约，本轮不生成空插件包。
 
 - 发布前在构建环境生成完整产物；干净Profile安装`.tgz`不需要开物Praxis checkout、根`scripts`、开发node_modules或安装时拉取CDN。开发build脚本位于根目录不妨碍预构建tarball，但不能宣传当前源码安装已自包含。
 - Harness/Cordis/React运行边界按官方peer与Client inject/external声明；dev依赖锁定0.1.5-rc.1/4.0.2对应族。浏览器包不得引入Host/node:fs/child_process；Host包不得内联另一份Cordis框架。现有iframe探针不作为原生Client图兼容证据。

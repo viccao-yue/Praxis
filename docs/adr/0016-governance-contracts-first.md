@@ -8,7 +8,7 @@ Skill 0.1 已完成默认/本地管理闭环。下一阶段需要 identity、acc
 
 ## 决策
 
-建立无 UI、无数据库、无传输依赖的 `workdsh-contracts` 包。首个版本只发布治理对象、服务接口及必要运行时边界校验。ActorContext 只由 Host 上的 IdentityProvider 从受信证据解析，页面、Remote 参数、模型和工具输入都不能直接构造可信主体。
+建立无 UI、无数据库、无传输依赖的 `Praxis-contracts` 包。首个版本只发布治理对象、服务接口及必要运行时边界校验。ActorContext 只由 Host 上的 IdentityProvider 从受信证据解析，页面、Remote 参数、模型和工具输入都不能直接构造可信主体。
 
 ```mermaid
 flowchart LR

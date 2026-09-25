@@ -18,10 +18,10 @@
 纯 npm 外部工程的最小用例放在 `examples/remote-probe/packages/probe`，不纳入产品 workspace，不安装到任何产品 Profile。运行 `corepack pnpm probe:remote:generate` 返回非零：
 
 ```text
-TypertAnalysisError: typert(host): workdsh-remote-probe-fixture publishes Remote artifacts but has no Remote methods
+TypertAnalysisError: typert(host): Praxis-remote-probe-fixture publishes Remote artifacts but has no Remote methods
 ```
 
-公开 `WorkspaceAnalyzer.analyze()` 返回的模型包含 `workdshProbe` 服务、`state` / `wait` 方法及原始 decorator 文本，继承的 `TypertRemoteService` 是 npm external 引用，但方法没有 Remote 元数据。模型及错误分别保存到 `.artifacts/workdsh-typert-model.json` 和 `.artifacts/workdsh-typert-error.txt`。这是当前配置的可重复失败；尚未确认是生成器对外部包的限制还是仍缺少公开配置，不据此断言上游实现缺陷。
+公开 `WorkspaceAnalyzer.analyze()` 返回的模型包含 `PraxisProbe` 服务、`state` / `wait` 方法及原始 decorator 文本，继承的 `TypertRemoteService` 是 npm external 引用，但方法没有 Remote 元数据。模型及错误分别保存到 `.artifacts/Praxis-typert-model.json` 和 `.artifacts/Praxis-typert-error.txt`。这是当前配置的可重复失败；尚未确认是生成器对外部包的限制还是仍缺少公开配置，不据此断言上游实现缺陷。
 
 已排除的工程配置问题：类型出口从 `dist` 改为生成器可映射的 `lib/types`；`files` 显式列出各生成文件；Host aggregate 直接引用 package project；最小例采用 `packages/probe` 拓扑（放在 `tests/fixtures` 时未发现贡献包）。这些都只保留在隔离用例中，产品 bundle 的入口、版本和安装组合未变更。生成脚本在未发现 package 或 Remote 时必须失败，不降级到手写描述符或 SRC 运行时反射。
 

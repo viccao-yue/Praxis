@@ -42,7 +42,7 @@ Host 服务授权与 Remote 调用、技能运行注册/按需读取、真实 Se
 - 同一空白 Session 切到 Minimal 后，新的 `skills/list` 返回 0 项，两项 Cordis 技能消失；切回 Skills 后目录重新返回 15 项，证明官方选择事件触发了技能目录失效与重读。
 - 探针显式移除模型密钥；提交一条用户消息后，官方界面产生 `MISSING_CREDENTIAL` 本地错误并留下非空会话记录。随后对同一 Session 请求切到 Minimal，官方 Host 返回 `agent-preset/locked`，验证非空会话不能换组合。
 - 停止并以同一隔离 DSH_HOME 重启官方 Host 后，直接对原 Session 调用官方 `skills/list` 仍返回 15 项并包含两项 Cordis 技能，验证选择事件投影和技能组合可以跨 Host 重启恢复。
-- 停服后把同一 `workdsh-skills` ID 的组装文件替换为 Minimal，再次重启并查询原 Session，技能数变为 0；恢复原文件重启后又返回 15 项。这证明 Session 跨重启解析的是 ID 对应的当前文件，不是原组合的不可变快照。
+- 停服后把同一 `Praxis-skills` ID 的组装文件替换为 Minimal，再次重启并查询原 Session，技能数变为 0；恢复原文件重启后又返回 15 项。这证明 Session 跨重启解析的是 ID 对应的当前文件，不是原组合的不可变快照。
 - 在确认原文件恢复为 15 项后停服并删除该 preset，重启查询原 Session 时 `skills/list` 返回 `ok: true` 和空数组，而非明确的缺失错误。开物Praxis 不能依赖该响应保护历史任务。
 - 截图：`.artifacts/preset-skills.png`。它是官方浅色会话界面中的运行探针，不是 开物Praxis 最终 UI 设计稿。
 

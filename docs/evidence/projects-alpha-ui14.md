@@ -4,8 +4,8 @@ Date: 2026-09-17
 
 ## Automated checks
 
-- `corepack pnpm --filter workdsh-plugin-projects typecheck`
-- `corepack pnpm --filter workdsh-plugin-projects test`
+- `corepack pnpm --filter Praxis-plugin-projects typecheck`
+- `corepack pnpm --filter Praxis-plugin-projects test`
 - root `corepack pnpm typecheck`
 - `node scripts/check-plan.mjs`
 - `git diff --check`

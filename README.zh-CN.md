@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/brand/praxis-favicon.png" width="80" alt="开物Praxis"></p>
+<p align="center"><img src="assets/brand/praxis-logo.png" width="80" alt="开物Praxis"></p>
 <h1 align="center">开物Praxis</h1>
 <p align="center"><strong>把工作交给 AI，看清过程，拿到成果。</strong></p>
 <p align="center"><a href="README.md">English</a> · 简体中文</p>

@@ -34,7 +34,7 @@ flowchart LR
 
 ## 对当前代码的复用边界
 
-当前 `workdsh-contracts`、local identity、access、audit 和 Session owner binding 是企业版的领域基础，可以保留消费方接口。企业实施时需要增加服务器认证 provider、组织数据源、受控 Remote/API、执行节点同步和部署隔离；不会把本地配置身份直接升级为企业身份，也不会把当前内部 Host Service 当成已经完成的公网 API。
+当前 `Praxis-contracts`、local identity、access、audit 和 Session owner binding 是企业版的领域基础，可以保留消费方接口。企业实施时需要增加服务器认证 provider、组织数据源、受控 Remote/API、执行节点同步和部署隔离；不会把本地配置身份直接升级为企业身份，也不会把当前内部 Host Service 当成已经完成的公网 API。
 
 DeepSeek Harness 继续拥有模型调用、Session、Conversation、Skill 发现与加载、工具执行、Permission Preset、Approval、Sandbox 和 Credentials。企业服务只补充业务组织、资源授权、策略、审计和修订分发，不复制这些运行时。
 

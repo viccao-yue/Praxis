@@ -41,7 +41,7 @@ UI 与 project-manager 技能及工具调用同一服务。创建项目不自动
 6. 资料搜索在授权范围内进行；实际读取再次校验。记录本次读到的修订与出处；项目配置变化只影响新任务，撤权即时约束后续操作。
 7. 任务创建的资料引用是显式选择：只有用户在输入区勾选的资料修订经 `set-task-selection` 交资料库按会话生效；未勾选时不注入任何项目资产，没有「未选即全量」回退，输入区明示该范围。技能与待办以 `@项目/<名称>`、资料以 `@资料库/<名称>` 引用文本随首条消息提交，只表达本次引用意图。
 8. 技能引用是建议而非确定激活：alpha.2 公开面没有「任务创建时激活技能」的编程接口——模型调用由官方 `skill({name})` 工具按需加载（受 `modelInvocable` 策略约束），用户调用经官方 `/` 菜单，会话挂载由 preset 决定。项目技能绑定只固定修订与展示，加载与否由运行时决定；此差异记为已知降级，官方提供会话级激活能力后升级。
-9. 项目指令只经 `system-prompt/assemble` 公开注入通道进入模型输入（上下文名 `workdsh:project-task`），不拼入消息正文；历史会话回放与导出不出现指令正文，指令修订固定为任务创建时捕获的 ProjectConfigRevision，运行时变更不追溯旧任务。
+9. 项目指令只经 `system-prompt/assemble` 公开注入通道进入模型输入（上下文名 `Praxis:project-task`），不拼入消息正文；历史会话回放与导出不出现指令正文，指令修订固定为任务创建时捕获的 ProjectConfigRevision，运行时变更不追溯旧任务。
 
 项目任务 Session 的交付归属：模型经官方 present 工具成功交付的文件（`deliverables/presented`）在会话提交后由 Host 监听器反查项目任务绑定，命中时经 library 登记（source=task、sourceTaskId=会话）并以 (assetId, revisionId) 幂等关联为项目资产引用，与手动添加的资产平铺并列；文件正文归资料库唯一管理，项目只保存引用。边界：仅归属调用方 Session 的交付，子代理子会话交付不进入（官方语义边界）；无项目任务绑定、跨主体或缺少 cwd 的事件整体跳过；同一事件按路径去重；名称冲突自动加 " (n)" 后缀（至多 5 次）；支持格式采用资料库白名单（markdown/text/pdf/docx/pptx/html），超出格式跳过并记 warn，不产生假资产；单文件失败隔离不阻断同批其余文件；重启与 HMR 不重放历史事件、不补历史归属。
 
@@ -165,4 +165,4 @@ ProjectConnectorBinding 表示项目选择了某连接定义及授权方式，�
 连接绑定、交接清单及准备/领取重查、正文私有存储与受控副本、Host 自动化所有权遵循 [ADR-0007](adr/0007-execution-and-transfer-boundaries.md)。P1 交接界面只面向同主体，双主体服务测试不算真实多人功能交付。
 
 ## 2026-09-22 项目执行目录修正
-新建项目任务由 Host 为当前组织/主体/项目解析独立目录，并通过官方 workspaceController.create/rename 幂等登记为项目同名原生工作区。禁止回退到当前 Session 或第一个 Workspace。目录在 DSH_HOME/workdsh-projects 下（无 DSH_HOME 时 ~/.workdsh/workdsh-projects）；身份与项目 ID 的哈希隔离目录，名称仅作为展示名。同名冲突加项目短 ID，不重命名其他空间。原生 Sidebar/Session 继续拥有分组和执行；历史会话不自动搬迁或改变 cwd。任务列表按创建时间降序。
+新建项目任务由 Host 为当前组织/主体/项目解析独立目录，并通过官方 workspaceController.create/rename 幂等登记为项目同名原生工作区。禁止回退到当前 Session 或第一个 Workspace。目录在 DSH_HOME/Praxis-projects 下（无 DSH_HOME 时 ~/.Praxis/Praxis-projects）；身份与项目 ID 的哈希隔离目录，名称仅作为展示名。同名冲突加项目短 ID，不重命名其他空间。原生 Sidebar/Session 继续拥有分组和执行；历史会话不自动搬迁或改变 cwd。任务列表按创建时间降序。

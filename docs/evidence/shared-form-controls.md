@@ -11,7 +11,7 @@
 ## 实现
 - 公共 UI 导出 Button/Input/Select/Textarea；Button/Input 经官方公开入口加载，不复制上游实现。
 - 原生 alpha.1 不转发 ref；适配层以 React useId/useImperativeHandle 保持聚焦引用，不增加 DOM 包装。
-- 页面旧 CSS 放入 workdsh-business 层，原生控件和公共表单规则优先；保留业务布局与卡片/开关/导航样式。Input 的布局选择器同时匹配官方容器。
+- 页面旧 CSS 放入 Praxis-business 层，原生控件和公共表单规则优先；保留业务布局与卡片/开关/导航样式。Input 的布局选择器同时匹配官方容器。
 - 标准单行控件外框 36px，紧凑动作 28px；文本域随内容用途增高，技能源码编辑保留足够高度。
 - 业务模块声明原生 UI 精确依赖和 Client 注入，构建将原生包保持 external；公共 UI 标记无副作用，未使用控件的 bundle 不引入原生运行依赖。
 - 显式保留资料库搜索 submit 行为；不创建项目、不保存 MCP、不调用模型。

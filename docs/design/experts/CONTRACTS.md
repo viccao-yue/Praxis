@@ -4,7 +4,7 @@
 
 ## 1. 对象与字段
 
-TM-01新增已实现Host契约：`reserveDelegation`/`claimDelegation`及ExecutionBinding可选delegation（parentSessionId、parentCompositionDigest、admission=reserved|claimed）。它们只负责一次性业务准入，不是Team/SOP服务，不暴露Remote或模型工具；原生日志拥有执行状态。准确参数与边界见实施入口开头；历史表未重复列出增量。第五批在专家插件内部新增（尚未进入公共契约/Remote）：`workdsh_expert_teams`存储域与TeamRunsManager运行服务（open/delegate/review/abandon/deliver/authorizeDelegation，签收/交接/交付三闸门重读文件字节校验）、六项AI可调用工具`workdsh_expert_team_*`、插件托管的one-shot委派provider；运行事实仍归Harness日志，团队对象仅存业务修订/绑定/尝试/回执。
+TM-01新增已实现Host契约：`reserveDelegation`/`claimDelegation`及ExecutionBinding可选delegation（parentSessionId、parentCompositionDigest、admission=reserved|claimed）。它们只负责一次性业务准入，不是Team/SOP服务，不暴露Remote或模型工具；原生日志拥有执行状态。准确参数与边界见实施入口开头；历史表未重复列出增量。第五批在专家插件内部新增（尚未进入公共契约/Remote）：`Praxis_expert_teams`存储域与TeamRunsManager运行服务（open/delegate/review/abandon/deliver/authorizeDelegation，签收/交接/交付三闸门重读文件字节校验）、六项AI可调用工具`Praxis_expert_team_*`、插件托管的one-shot委派provider；运行事实仍归Harness日志，团队对象仅存业务修订/绑定/尝试/回执。
 
 | 对象 | 必须字段/语义 |
 |---|---|
@@ -120,7 +120,7 @@ expert.json
 assets/avatar.png       # 可选；仅允许已验证图片类型
 ```
 
-manifest 包含 `format: workdsh-expert`、`schemaVersion: 1`、expertFile、files[{path,size,sha256}]。expert.json 是 ExpertDefinition + source attribution，不含 owner、内部 preset ID、授予的权限、Session ID 或连接凭据。导入产生新个人草稿。默认模板可导出其可分发定义，但保留来源，不复制第三方版权资源。
+manifest 包含 `format: Praxis-expert`、`schemaVersion: 1`、expertFile、files[{path,size,sha256}]。expert.json 是 ExpertDefinition + source attribution，不含 owner、内部 preset ID、授予的权限、Session ID 或连接凭据。导入产生新个人草稿。默认模板可导出其可分发定义，但保留来源，不复制第三方版权资源。
 
 预检默认限制：压缩包≤10MiB、总解压≤20MiB、单文件≤2MiB、文件≤64、深度≤3；不支持嵌套压缩包。拒绝 `..`、绝对路径、符号/硬链接、重复条目、大小写/Unicode 规范化碰撞、未列清单文件、无效 JSON、未知 schema major、摘要不符及非许可图片。JSON 重复关键字需检测或使用拒绝重复键解析器，不能静默后值覆盖校验字段。
 

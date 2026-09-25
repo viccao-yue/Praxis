@@ -28,4 +28,4 @@ Microsoft Word、真实操作系统IME、多端390px/1920px完整应用与完整
 
 ## alpha.2 已发布收据
 
-用户授权后已发布 https://github.com/techflag/workdsh/releases/tag/office-v0.1.0-alpha.2 ，prerelease、非draft；源码/标签 e2d138b283c20f065bc0112abb1491583d3f9c1b。6附件（Office及沿用治理配套3包、SHA256SUMS、manifest）状态uploaded、远端大小及服务器SHA256 digest与本地逐一相等，发布tgz编译Host/Client与验收构建字节一致。Git HTTPS smart transport超时，改用GitHub Git Data公开API上传相同blob/tree/commit，逐级SHA核对后非force更新main和轻量标签，未改写历史。最终发布Office附件 676812字节、SHA f6c9d1d78824f80b34dfdc9ccccd6a3a326eb784da51b8269b714875d4e4ad87，manifest记录源提交及既有检查。未发npm。用户之后明确停止Word后续开发，Word待办暂停、下一阶段PPT优先，计划回填main，release标签保持发布源码。
+用户授权后已发布  ，prerelease、非draft；源码/标签 e2d138b283c20f065bc0112abb1491583d3f9c1b。6附件（Office及沿用治理配套3包、SHA256SUMS、manifest）状态uploaded、远端大小及服务器SHA256 digest与本地逐一相等，发布tgz编译Host/Client与验收构建字节一致。Git HTTPS smart transport超时，改用GitHub Git Data公开API上传相同blob/tree/commit，逐级SHA核对后非force更新main和轻量标签，未改写历史。最终发布Office附件 676812字节、SHA f6c9d1d78824f80b34dfdc9ccccd6a3a326eb784da51b8269b714875d4e4ad87，manifest记录源提交及既有检查。未发npm。用户之后明确停止Word后续开发，Word待办暂停、下一阶段PPT优先，计划回填main，release标签保持发布源码。

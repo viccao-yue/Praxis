@@ -9,7 +9,7 @@
 | 服务/依赖/生命周期 | `@deepseek-ai/cordis@4.0.2` Service、ctx.plugin、ctx.effect | Office 内容工作副本；治理服务强制注入 |
 | 原子存储 | `@deepseek-ai/dsh-storage-domain@0.1.5-rc.1` defineDomain、KvTable.update | 状态、修订、幂等收据在一个记录中提交 |
 | AI 工具 | `@deepseek-ai/dsh-tools@0.1.5-rc.1` defineTool、ToolRunContext.agent/signal | 五个 content_* 工具；export 未实现前不注册 |
-| 认证通信 | `@deepseek-ai/dsh-client-connection@0.1.5-rc.1` HostConnectionHandle.fetch.register | `/api/workdsh-office`，复用既有 rc.1 exact Fetch 例外 |
+| 认证通信 | `@deepseek-ai/dsh-client-connection@0.1.5-rc.1` HostConnectionHandle.fetch.register | `/api/Praxis-office`，复用既有 rc.1 exact Fetch 例外 |
 | 右侧原生页 | `@deepseek-ai/dsh-client-ui-sidebar-right/client@0.1.5-rc.1` sidebarRightTabs、openTabIn、useTabInfo | 每个 Session 一个 Office 工作副本页，通过 params 切换文档；不伪造 file Resource |
 | 编辑器 | Tiptap core/pm/starter-kit 3.31.0（MIT） | 官方 React owner 下的原生编辑 DOM；无第二个 React root |
 
@@ -35,7 +35,7 @@ U1 开始阶段只注册五个工具：content_open/read/capabilities/edit/prese
 
 ## U2 自然语言默认写作流程
 
-用户日志第二轮显示 content_* 已在真实模型请求中，模型却加载 officecli。Office 插件新增 lifecycle-managed `systemPrompt.section` 工作流引导（`workdsh:office-authoring`，使用公开 TOOL_REPORT placement，不覆盖 persona）。新建/首段提交先于长规划及字体研究，小批次写入；界面提供默认样式。仍尊重未实现的表格/DOCX 边界，禁止将工作副本宣称为 Word 文件。标准模式真实模型验收显式选择，沿用公开 Agent.send/Session/原生 Client 页面；无第二 loop。完整 Word 交付的表格/导出仍需后续 U3 实现。
+用户日志第二轮显示 content_* 已在真实模型请求中，模型却加载 officecli。Office 插件新增 lifecycle-managed `systemPrompt.section` 工作流引导（`Praxis:office-authoring`，使用公开 TOOL_REPORT placement，不覆盖 persona）。新建/首段提交先于长规划及字体研究，小批次写入；界面提供默认样式。仍尊重未实现的表格/DOCX 边界，禁止将工作副本宣称为 Word 文件。标准模式真实模型验收显式选择，沿用公开 Agent.send/Session/原生 Client 页面；无第二 loop。完整 Word 交付的表格/导出仍需后续 U3 实现。
 
 ## U2 成果入口、跟随阅读与浏览器下载
 

@@ -15,9 +15,9 @@
 
 2026-09-15 使用锁定的 `@deepseek-ai/dsh-mcp-client@0.1.6-alpha.1` 和 `@deepseek-ai/dsh-mcp-resources@0.1.6-alpha.1`，启动本地无凭据 stdio MCP fixture，并通过 `ctx.tools.execute` 调用官方共享工具。fixture 只用于验收，不进入正式 Profile，也不取代用户配置的真实 MCP Server。
 
-- fixture 的第一页返回 `workdsh://guide/start` 和 `nextCursor`，第二页返回 `workdsh://guide/second-page`；官方 MCP SDK 自动追取并聚合两页，模型工具一次调用得到两个资源且不再暴露 cursor。服务不声明 tools 能力，证明无工具 MCP Server 仍可提供资源。
-- `list_mcp_resource_templates` 返回 `workdsh://guide/{topic}`。
-- `read_mcp_resource` 读取固定 URI 后返回 `开物Praxis MCP resources are ready.`，读取展开 URI `workdsh://guide/presentation` 后返回对应 topic。
+- fixture 的第一页返回 `Praxis://guide/start` 和 `nextCursor`，第二页返回 `Praxis://guide/second-page`；官方 MCP SDK 自动追取并聚合两页，模型工具一次调用得到两个资源且不再暴露 cursor。服务不声明 tools 能力，证明无工具 MCP Server 仍可提供资源。
+- `list_mcp_resource_templates` 返回 `Praxis://guide/{topic}`。
+- `read_mcp_resource` 读取固定 URI 后返回 `开物Praxis MCP resources are ready.`，读取展开 URI `Praxis://guide/presentation` 后返回对应 topic。
 - 可复现命令：`corepack pnpm probe:mcp:resources`；探针同时断言三个工具在调用 Agent 的作用域中可见，并在结束时关闭 MCP 子进程。
 - 边界：本轮证明普通调用作用域内的分页发现、无工具服务器、固定读取与模板读取。断连重连、错误专家作用域和 Streamable HTTP 尚未完成，因此 F05 仍为 partial；正式产品不会默认连接测试服务。
 

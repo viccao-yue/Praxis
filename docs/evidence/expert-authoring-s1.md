@@ -21,9 +21,9 @@
 |---|---|
 | 正文逐字节迁移 | 新 `SKILL.md` 正文 3439 字符，与迁移前 dist `expertManagerSkillContent` 完全一致（脚本比对 `byte-identical: true`）；文件 sha256 `3eb6e7db932f3ba57a70456d587a3a01df8dd76e59bc9ed939fcc97a842452f1` |
 | frontmatter 三字段 | `name`/`description`/`when-to-use` 与迁移前 `index.ts` 注册文案逐字一致（YAML 解析后严格比较，三项均 `identical: true`） |
-| 安装包资源可读 | `pnpm --filter workdsh-plugin-experts pack` 后 tgz 含 `package/resources/expert-manager/SKILL.md` 与 `references/material-and-methods.md`、`references/trial-and-delivery.md`；源文件与包内文件 sha256 相同 |
+| 安装包资源可读 | `pnpm --filter Praxis-plugin-experts pack` 后 tgz 含 `package/resources/expert-manager/SKILL.md` 与 `references/material-and-methods.md`、`references/trial-and-delivery.md`；源文件与包内文件 sha256 相同 |
 | 解包安装读取 | 从解包目录加载 `dist/authoring/guide.js`：成功读取包内 SKILL.md，content 与包内正文一致、meta 解析正确、body 长度 3439（`UNPACKED_DIST_READS_PACKAGED_MD: true`） |
-| 注册路径 | 真实 `SkillRegistry`：`list()` 可见 `workdsh-expert-manager`（`source=bundled`、description/whenToUse 与 meta 一致）；`resourceBase` 指向包内真实目录（SKILL.md 与两份 references 存在）；`get()` 返回正文与文件一致；dispose 后技能撤销 |
+| 注册路径 | 真实 `SkillRegistry`：`list()` 可见 `Praxis-expert-manager`（`source=bundled`、description/whenToUse 与 meta 一致）；`resourceBase` 指向包内真实目录（SKILL.md 与两份 references 存在）；`get()` 返回正文与文件一致；dispose 后技能撤销 |
 | 普通任务不注入 | catalog 摘要不含正文（测试断言 `JSON.stringify(list) 不含正文前缀`）；正文仅经官方按需加载（skill 工具/用户显式调用）渲染，本插件注册不发送任何会话消息；官方按需路径既有验证见 `tests/integration/skill-loading.test.mjs` |
 | 回归 | Node 22.23.2：专家包 build（contracts/ui/tsc/esbuild client）EXIT=0、typecheck EXIT=0；新测试 2/2；全量集成 90/90（原 88 + 新 2，13.6s）；未跑全根 build 与 check:plan 之外的项目（见“未执行”） |
 

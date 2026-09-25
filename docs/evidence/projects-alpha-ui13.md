@@ -4,8 +4,8 @@ Date: 2026-09-17
 
 ## Automated checks
 
-- `corepack pnpm --filter workdsh-plugin-projects typecheck`
-- `corepack pnpm --filter workdsh-plugin-projects test`
+- `corepack pnpm --filter Praxis-plugin-projects typecheck`
+- `corepack pnpm --filter Praxis-plugin-projects test`
 - root `corepack pnpm typecheck`
 - `node scripts/check-plan.mjs`
 - `git diff --check`
@@ -14,7 +14,7 @@ All commands passed after the project client, Host integration lifecycle, and pl
 
 ## Runtime observations
 
-The packaged preview was installed with `corepack pnpm preview:install`, restarted with an isolated `WORKDSH_PREVIEW_HOME`, and opened in a fresh browser tab.
+The packaged preview was installed with `corepack pnpm preview:install`, restarted with an isolated `Praxis_PREVIEW_HOME`, and opened in a fresh browser tab.
 
 - The project center loaded the persisted empty project `Host持久化验证` from the Host service after restart. Browser-local fallback storage is no longer used.
 - Opening that project showed four distinct project tabs and the persistent project composer/configuration frame.

@@ -10,13 +10,13 @@
 
 ## 原始验证
 
-日期：2026-09-12。包：workdsh-plugin-skills@0.1.0-alpha.23。Node 22.23.2、pnpm 10.34.5、DSH 0.1.5-rc.1。
+日期：2026-09-12。包：Praxis-plugin-skills@0.1.0-alpha.23。Node 22.23.2、pnpm 10.34.5、DSH 0.1.5-rc.1。
 
 ## 目的与结论
 
 用户要求按官方打包、发布、安装流程判断 Skill 是否是真正的独立插件。此次验证原有包，不修改 manifest 来掩盖当前结果。
 
-**构建和打包通过，作为普通依赖的安装通过；独立配置层激活未通过。** 当前有可加载的 Host apply 模块和真实管理功能，但产品安装方式仍依附 workdsh-bundle，不能宣称 Skill 已作为独立可安装发行品交付。
+**构建和打包通过，作为普通依赖的安装通过；独立配置层激活未通过。** 当前有可加载的 Host apply 模块和真实管理功能，但产品安装方式仍依附 Praxis-bundle，不能宣称 Skill 已作为独立可安装发行品交付。
 
 ## 官方依据
 
@@ -27,15 +27,15 @@
 在 开物Praxis 根目录执行：
 
 ```sh
-corepack pnpm --filter workdsh-plugin-skills build
-corepack pnpm --filter workdsh-plugin-skills pack --pack-destination .artifacts/skill-package-audit
+corepack pnpm --filter Praxis-plugin-skills build
+corepack pnpm --filter Praxis-plugin-skills pack --pack-destination .artifacts/skill-package-audit
 ```
 
 随后由 Node 启动仓库锁定的官方 dsh CLI；仅本次子进程使用新建的 DSH_HOME 和 DSH_AGENTS_HOME：
 
 ```text
 dsh --profile skill-audit --from-default-profile web --dump-config
-dsh plugin --profile skill-audit add <绝对路径>/workdsh-plugin-skills-0.1.0-alpha.23.tgz --offline --config.auto-install-peers=false
+dsh plugin --profile skill-audit add <绝对路径>/Praxis-plugin-skills-0.1.0-alpha.23.tgz --offline --config.auto-install-peers=false
 dsh --profile skill-audit --dump-config
 ```
 
@@ -55,13 +55,13 @@ dsh --profile skill-audit --dump-config
 
 CLI 明确提示缺少 dsh.bundle，因此只安装为普通依赖，不作为 Profile layer。原始结构化结果在 `.artifacts/skill-package-audit/result.json`；该结果仅含测试目录、包状态和提示，不含会话凭据。
 
-制品路径为 `.artifacts/skill-package-audit/workdsh-plugin-skills-0.1.0-alpha.23.tgz`。它是**用于验证缺口的原状打包制品**，不能作为“安装即用的 Skill 独立发行版”推广。
+制品路径为 `.artifacts/skill-package-audit/Praxis-plugin-skills-0.1.0-alpha.23.tgz`。它是**用于验证缺口的原状打包制品**，不能作为“安装即用的 Skill 独立发行版”推广。
 
 ## 修正范围
 
 1. 补 Skill 安装组合 manifest 与 patch，使用标准独立 Host 插件行。
 2. 补官方 Client manifest、可发现的 Client 入口与正确浏览器产物，声明独立 inject。
-3. 完整处理预构建制品的运行依赖，不能依赖开发仓库中的 workdsh-ui 或 workspace 偶然存在。
+3. 完整处理预构建制品的运行依赖，不能依赖开发仓库中的 Praxis-ui 或 workspace 偶然存在。
 4. 默认 bundle 改为规范组合，避免直接初始化造成没有独立 Fiber，或同时安装时重复注册。
 5. 分别验收独立安装、Host/Client 激活、实际管理操作、移除及重装；移除 Skill 后其他功能仍可运行。
 6. 确认公开发布目标、权限和发行元数据后再发布；打包成功不能代替发行与安装激活证明。
@@ -86,7 +86,7 @@ CLI 明确提示缺少 dsh.bundle，因此只安装为普通依赖，不作为 P
 
 - Skill 有独立 Host `apply/inject`、`dsh.bundle` 配置层和 `dsh.client` 标准入口；通过官方 ModuleLoader facade 注册预构建浏览器产物，不自建加载器。依赖锁定 Harness rc.1 / Cordis 4.0.2；React 共享官方 renderer 实例。
 - 默认 bundle alpha.39 不导入、不编译也不调用 Skill 初始化；`preview:install` 使用官方 CLI 显式装配 Skill 与展示包两个层。Workbench alpha.10 使用 `ctx.plugin` 注册正式子插件，但尚未独立分发。
-- `workdsh-contracts/skills` 提供本地 `SkillManagementService` v1；Skill 消费单一类型源，tarball 内嵌所需声明，不要求运行环境保留 workspace。专家只应注入公开服务，不导入 SkillManager 内部实现。
+- `Praxis-contracts/skills` 提供本地 `SkillManagementService` v1；Skill 消费单一类型源，tarball 内嵌所需声明，不要求运行环境保留 workspace。专家只应注入公开服务，不导入 SkillManager 内部实现。
 - Host effect 撤销 exact routes、取消并排空在途上传；Client 请求和任务框等待绑定自己的生命周期。用户文件、草稿、停用来源、回收凭据的数据格式未改变。
 
 ### 实际验收
@@ -113,9 +113,9 @@ CLI 明确提示缺少 dsh.bundle，因此只安装为普通依赖，不作为 P
 
 产物与证据：
 
-- `.artifacts/skills-standalone/workdsh-plugin-skills-0.1.0-alpha.24.tgz`
+- `.artifacts/skills-standalone/Praxis-plugin-skills-0.1.0-alpha.24.tgz`
 - `.artifacts/skills-standalone/result.json` 与 `standalone.png`
-- `.artifacts/workdsh-bundle-0.1.0-alpha.39.tgz`
+- `.artifacts/Praxis-bundle-0.1.0-alpha.39.tgz`
 - `.artifacts/client-probe-skills-1440.png`、`client-probe-skills-1920.png`、`client-probe-skills-390.png`
 - `tests/integration/skill-plugin-lifecycle.test.mjs`、`scripts/probe-skills-package.mjs`、`scripts/probe-install.mjs`
 

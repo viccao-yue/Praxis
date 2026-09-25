@@ -2,7 +2,7 @@
 
 参考用户提供的 WorkBuddy 明暗截图，保留 开物Praxis 现有项目领域能力。移除标题区厚边框、渐变和大表情；标题区使用线性项目/文件/任务图标组合。卡片使用统一项目图标，标题/次要时间层级清晰，模板说明单行省略，搜索与状态筛选保留。页面使用容器断点响应布局。
 
-公开能力复用：原生 main 插槽页面不变，按钮与输入框继续复用 workdsh-ui 的官方基础组件，配色使用 Harness 语义变量。不改上游 Sidebar、Conversation 或项目存储。仅主页展示调整。
+公开能力复用：原生 main 插槽页面不变，按钮与输入框继续复用 Praxis-ui 的官方基础组件，配色使用 Harness 语义变量。不改上游 Sidebar、Conversation 或项目存储。仅主页展示调整。
 
 验证脚本：scripts/probe-project-home.mjs。截图：.artifacts/project-home/。不涉及真实模型任务。
 

@@ -1,6 +1,6 @@
 # Office U2 普通自然语言写作验收
 
-2026-09-12，workdsh-plugin-office 0.1.0-alpha.1，Harness rc.1。
+2026-09-12，Praxis-plugin-office 0.1.0-alpha.1，Harness rc.1。
 
 用户日志第一轮工具缺失、第二轮工具已可见但加载 officecli，因此补 Office 自身的公开 systemPrompt.section 增量写作规则（非 persona 替换）。对应决策 ADR-0024 修订5，复用记录 U1-IMPLEMENTATION 的 U2 段。无新 Agent loop、模型路由或 MCP。
 

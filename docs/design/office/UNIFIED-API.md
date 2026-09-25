@@ -32,9 +32,9 @@ Host 负责领域数据的提交和持久化，浏览器负责交互/渲染/格�
 
 ### 1.1 本接口属于Office插件
 
-实施必须遵循[插件架构](PLUGIN-ARCHITECTURE.md)。`workdsh-plugin-office`是独立安装制品：根Host用`ctx.plugin`组合内容服务、工具与认证Connection适配；Client用官方模块图组合model、Tab与八类adapter。拟定`ctx.workdshOfficeContent`是该插件提供的领域服务，不是开物Praxis全局内核或第二套插件系统。六个工具是服务消费者，原生页面通过Client/Connection调用同服务；默认开物Praxis组合不得直接初始化Office内部实现。
+实施必须遵循[插件架构](PLUGIN-ARCHITECTURE.md)。`Praxis-plugin-office`是独立安装制品：根Host用`ctx.plugin`组合内容服务、工具与认证Connection适配；Client用官方模块图组合model、Tab与八类adapter。拟定`ctx.PraxisOfficeContent`是该插件提供的领域服务，不是开物Praxis全局内核或第二套插件系统。六个工具是服务消费者，原生页面通过Client/Connection调用同服务；默认开物Praxis组合不得直接初始化Office内部实现。
 
-公共契约`workdsh-contracts/office`现已导出 U1 文档子集的类型；完整八类仍是目标设计。遵守ADR-0019的Host自包含要求，领域运行值/校验由Office拥有，不裸import private workspace contracts值。必需身份/授权/存储服务用官方inject；optional编辑器失败不能牵连全部页面。具体包与公开service名称在U1验证，不能以这段设计声明接口已存在。
+公共契约`Praxis-contracts/office`现已导出 U1 文档子集的类型；完整八类仍是目标设计。遵守ADR-0019的Host自包含要求，领域运行值/校验由Office拥有，不裸import private workspace contracts值。必需身份/授权/存储服务用官方inject；optional编辑器失败不能牵连全部页面。具体包与公开service名称在U1验证，不能以这段设计声明接口已存在。
 
 `database`代表Office独立多维表格内容文档，关系和事务限定在document内部；不等于P3 tables业务数据库。`html`代表内容编辑/隔离预览，不等于pages发布。后续连接这些插件须通过公开契约且保持唯一数据owner，首版不复制同一业务数据为另一份可写真源。
 
@@ -185,7 +185,7 @@ PDFium真正文本/图片编辑新增为目标能力：浏览器及字体往返�
 
 ## 7. 同步、会话路由与显示回执（R04）
 
-首版锁定0.1.5-rc.1，复用已验证的官方Connection认证exact Fetch扩展面，拟定Office专属路径 `/api/workdsh-office`。只承载严格领域DTO，不是通用RPC/自制WebSocket/新端口；不导入专家内部适配器。Remote生成缺口及迁移门槛见 [集成决策](HARNESS-INTEGRATION.md)，不能假设ctx.remote.office存在。
+首版锁定0.1.5-rc.1，复用已验证的官方Connection认证exact Fetch扩展面，拟定Office专属路径 `/api/Praxis-office`。只承载严格领域DTO，不是通用RPC/自制WebSocket/新端口；不导入专家内部适配器。Remote生成缺口及迁移门槛见 [集成决策](HARNESS-INTEGRATION.md)，不能假设ctx.remote.office存在。
 
 Office Client model管理以下流程，React只消费snapshot/actions：
 

@@ -1,6 +1,6 @@
 # Skill 0.1 — Independent Harness plugin / 独立技能管理插件
 
-Package: **`workdsh-plugin-skills@0.1.0-alpha.24`**. Tag: `skills-v0.1.0-alpha.24`.
+Package: **`Praxis-plugin-skills@0.1.0-alpha.24`**. Tag: `skills-v0.1.0-alpha.24`.
 
 ## 本次交付
 
@@ -19,12 +19,12 @@ Includes local discovery, full documents and resources, editing with conflict de
 Use the official Harness **`0.1.5-rc.1` Web Profile**, Cordis `4.0.2`, and pnpm `10.34.5`. Stop the target Profile before changing packages. Download the named `.tgz`, not the source archive.
 
 ```sh
-dsh --profile workdsh --from-default-profile web --dump-config
-dsh plugin --profile workdsh add /absolute/path/workdsh-plugin-skills-0.1.0-alpha.24.tgz
-dsh --profile workdsh
+dsh --profile Praxis --from-default-profile web --dump-config
+dsh plugin --profile Praxis add /absolute/path/Praxis-plugin-skills-0.1.0-alpha.24.tgz
+dsh --profile Praxis
 ```
 
-Open **专家 · 技能 · 连接器 → 技能**. 开物Praxis branding is optional and supplied by the separate [presentation bundle](https://github.com/techflag/workdsh/releases/tag/bundle-v0.1.0-alpha.39).
+Open **专家 · 技能 · 连接器 → 技能**. 开物Praxis branding is optional and supplied by the separate presentation bundle.
 
 ## 已知限制 / Known limitations
 
@@ -37,4 +37,4 @@ Open **专家 · 技能 · 连接器 → 技能**. 开物Praxis branding is opti
 
 Build, typecheck, **33/33 integration tests**, **2/2 planning tests**, dependency checks, and both standalone and composed packaged-browser probes passed. Real temporary files were edited and restored; removal/reinstallation and composed cold restarts passed. Tests use isolated homes.
 
-Assets: module `.tgz`, `SHA256SUMS`, and `release-manifest.json` with source commit and compatibility metadata. [Module guide](https://github.com/techflag/workdsh/blob/skills-v0.1.0-alpha.24/docs/RELEASES.md) · [Verification evidence](https://github.com/techflag/workdsh/blob/skills-v0.1.0-alpha.24/docs/evidence/skills-standalone-package.md).
+Assets: module `.tgz`, `SHA256SUMS`, and `release-manifest.json` with source commit and compatibility metadata. Module guide · Verification evidence.

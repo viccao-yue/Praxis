@@ -4,7 +4,7 @@
 核对日期：2026-09-12。源码基线：开物Praxis `5225e42`（含未提交设计文档）。
 锁定版本：`@deepseek-ai/dsh@0.1.5-rc.1`、`@deepseek-ai/cordis@4.0.2`、Node 22.23.2、pnpm 10.34.5。
 
-本文件只记录**已安装发布包的 exports / `.d.ts` 声明**与**可重复运行证据**。拟新增的 `workdshExperts`、修订存储、preset 编译器与运行绑定 guard 在实现前均为拟议能力；实现后在对应 EP 回填运行证据。物理路径仅用于核对声明，产品代码一律从包公开 exports 导入。
+本文件只记录**已安装发布包的 exports / `.d.ts` 声明**与**可重复运行证据**。拟新增的 `PraxisExperts`、修订存储、preset 编译器与运行绑定 guard 在实现前均为拟议能力；实现后在对应 EP 回填运行证据。物理路径仅用于核对声明，产品代码一律从包公开 exports 导入。
 
 ## 采用次序
 
@@ -39,15 +39,15 @@
 
 | 项 | 证据 |
 |---|---|
-| 锁定包 | `@deepseek-ai/dsh-skill-filesystem@0.1.5-rc.1`、`@deepseek-ai/dsh-skill@0.1.5-rc.1`、本仓库 `workdsh-plugin-skills@0.1.0-alpha.23` |
+| 锁定包 | `@deepseek-ai/dsh-skill-filesystem@0.1.5-rc.1`、`@deepseek-ai/dsh-skill@0.1.5-rc.1`、本仓库 `Praxis-plugin-skills@0.1.0-alpha.23` |
 | skill-filesystem Config | `lib/types/index.d.ts`：`providerName?`、`includeDefaultRoots?`（project/user 根是否围绕 custom 根包含）、`dshHome?`、`agentsHome?`、`customSkillDirs?: string[]`（project 根之后、user 根之前扫描）、`watch?`、`bundledSkillDir?` 等 |
-| 现有 Skill 受控根 | `SkillManager` 构造：`activeRoots=[<agentsHome>/skills, <dshHome>/skills]`、`disabledRoot=<agentsHome>/.workdsh-disabled/skills`、`trashRoot`、`stateRoot=<agentsHome>/.workdsh-state/skills`（含 locks/origins/receipts/drafts/imports） |
+| 现有 Skill 受控根 | `SkillManager` 构造：`activeRoots=[<agentsHome>/skills, <dshHome>/skills]`、`disabledRoot=<agentsHome>/.Praxis-disabled/skills`、`trashRoot`、`stateRoot=<agentsHome>/.Praxis-state/skills`（含 locks/origins/receipts/drafts/imports） |
 | 现有依赖影响 | `SkillManager.registerDependencyInspector(inspector)`、`dependencyImpact(name)`、`uninstall(name, expectedImpactRevision)` 已存在 |
 
 **结论（需补公共适配，属 D04 依赖工作）**：
 1. 隔离机制确定：每个专家 preset 的 `@deepseek-ai/dsh-skill-filesystem` 行配置 `customSkillDirs:[<retained snapshot dirs>]`、`watch:false`。快照目录由 Skill owner 新增的 `retainRevision` 在 `<stateRoot>/retained-revisions/<skillRevisionId>/` 下创建，每个目录含一个 skill bundle（`<skillName>/SKILL.md` + 资源），恰好贡献一个冻结 skill。两个专家同名 skill 不同快照 → 不同 `skillRevisionId` 目录 → 内容/资源隔离（AT-07）。
 2. 不回退全局同名：`includeDefaultRoots` 保留全局动态能力池（未声明 skill 仍可用）；声明 skill 的冻结快照位于 custom 根（user 根之前），且**运行绑定 guard 在每次执行前校验快照存在性与摘要**，缺失/停用/漂移即拒绝执行，不回落 user 根同名实现（AT-08/AT-09）。该 guard 是 G02 与 G03 的共同落点。
-3. 须新增 Skill owner 公共契约：`resolveRevision(skillId, expectedDigest?)`、`retainRevision(ref, consumerRef)`、`checkRevision(ref, actor)`、`releaseReference(ref, consumerRef)`，并复用既有 `dependencyImpact`。不能把现有文件编辑 digest 当持久修订 ID，不调用不存在的 `skills/revisions` 导出。EP-03 在 `workdsh-plugin-skills` 实现并经 `workdsh-contracts/skill-revisions` 暴露，专家插件不遍历另一插件私有目录。
+3. 须新增 Skill owner 公共契约：`resolveRevision(skillId, expectedDigest?)`、`retainRevision(ref, consumerRef)`、`checkRevision(ref, actor)`、`releaseReference(ref, consumerRef)`，并复用既有 `dependencyImpact`。不能把现有文件编辑 digest 当持久修订 ID，不调用不存在的 `skills/revisions` 导出。EP-03 在 `Praxis-plugin-skills` 实现并经 `Praxis-contracts/skill-revisions` 暴露，专家插件不遍历另一插件私有目录。
 
 ---
 
@@ -65,7 +65,7 @@
 
 **结论（部分可行，存在公开 seam 缺口，须如实记录）**：
 1. 绑定记录可行：experts 领域 `bindings` 表保存 `sessionId → expertRevisionRef/presetRevisionRef/compositionDigest/skillRevisionRefs/owner/creationOperationId`，创建前保留、不可重绑定。
-2. 创建路径可校验：`prepareExecution`/`createExecution` 经 `workdshSessionAccess.create({sessionId, workspaceId, agentPreset})`，创建前校验发布构件、快照、可用性、授权与依赖健康。
+2. 创建路径可校验：`prepareExecution`/`createExecution` 经 `PraxisSessionAccess.create({sessionId, workspaceId, agentPreset})`，创建前校验发布构件、快照、可用性、授权与依赖健康。
 3. **缺口**：rc.1 未公开“拦截每个绑定 Session 首次提示词及每轮执行前”的官方 seam。`sessionController.prompt` 无插件前置钩子；`agentPresets.mount` 仅在 agent factory `setup` 调用；`select`/`recompose` 限空会话。因此“所有受管 Session 每轮执行前校验固定绑定”**不能仅靠公开 Remote 拦截保证**。
 4. 处理（不改上游、不绕过原生权限）：
    - 在公开 seam 内最大化保护：preset 构件不可变 + 摘要记录；冷恢复/重新打开/`resolveAgent` 路径经绑定 guard 校验构件与快照完整性，篡改/删除即显式拒绝（AT-08 的“同 preset ID 篡改内容或删除文件时显式拒绝”在 guard 校验点成立）。
@@ -85,7 +85,7 @@
 | 草稿交接 | E05：`conversation.input.overlay` Slot + `inputActions.setDraft(draft)` 已用于 Skill 草稿（`packages/plugins/skills/src/client/drafts.tsx`，`PropsRuntime<'conversation.input.overlay'>` + `useEffect` 从 sessionStorage 应用一次） |
 
 **结论（可行）**：
-1. 召唤/示例/制作专家只准备目标任务草稿：`prepareExecution` 解析固定版本/工作区/模型可用性/权限/依赖健康并创建短期计划；用户确认后 `createExecution` 用独立 operationId，先保留随机唯一 SessionId + 绑定 + owner，再 `workdshSessionAccess.create({sessionId, workspaceId, agentPreset})`。
+1. 召唤/示例/制作专家只准备目标任务草稿：`prepareExecution` 解析固定版本/工作区/模型可用性/权限/依赖健康并创建短期计划；用户确认后 `createExecution` 用独立 operationId，先保留随机唯一 SessionId + 绑定 + owner，再 `PraxisSessionAccess.create({sessionId, workspaceId, agentPreset})`。
 2. 创建无 signal：超时/取消只标结果待确认，用 `inspect(sessionId)` 对账；不承诺已撤销创建（AT-17）。
 3. 模型选择走原生 `selectModel`，保留用户当前明确设置；不支持返回错误不回退（AT-13）。
 4. 草稿一次性交接：保存 `handoffId+sessionId+expectedDraftVersion+text+expiry`，Client 在正确 Session 且原草稿未变化时经 `inputActions.setDraft` 应用一次；导航失败/组件未就绪可重试同一 handoff；不覆盖用户已有草稿、不自动发送（AT-03/AT-12）。多任务草稿用 session-targeted 键，复制 E05 单键机制时升级为按 SessionId 命名空间。
@@ -96,13 +96,13 @@
 
 | 项 | 证据 |
 |---|---|
-| Typert 生成探针 | `corepack pnpm probe:remote:generate` 复现非零：`TypertAnalysisError: typert(host): workdsh-remote-probe-fixture publishes Remote artifacts but has no Remote methods`（`.artifacts/workdsh-typert-error.txt`、`docs/evidence/d01-remote.md`） |
+| Typert 生成探针 | `corepack pnpm probe:remote:generate` 复现非零：`TypertAnalysisError: typert(host): Praxis-remote-probe-fixture publishes Remote artifacts but has no Remote methods`（`.artifacts/Praxis-typert-error.txt`、`docs/evidence/d01-remote.md`） |
 | 根因定位 | rc.1 生成器 decorator 识别要求符号所属声明来自已登记为 `@deepseek-ai/dsh-typert-protocol` 的 **workspace 工程包**（真实路径位于 `packages/` 下）或该名称的 ambient module；npm 安装的 protocol `.d.ts` 位于 node_modules，是外部 ESM 声明，不满足条件。公开 analyzer/generator 无外部 protocol 身份映射项 |
 | Typert 服务公开面 | `TypertRemoteService`、`@Remote(name)` 装饰器、`RemoteError(code,message,details)` 运行时可用；`tests/remote/lifecycle.test.mjs` 验证协作式取消与 dispose（Host 生命周期 3/3），但**网络 Gateway/Client 端到端未完成** |
-| Connection exact Fetch | 本仓库 `workdsh-plugin-skills` 已验证：`connection.fetch.register({path, methods:['POST'], requestBody:'buffered'|'streaming', fetch})`，响应 `ConnectionRpcResult<T>={ok:true,value}|{ok:false,error:{code,message,details}}`；客户端 `fetch(path,{method:'POST',credentials:'same-origin',body:JSON.stringify({endpoint,payload})})` |
+| Connection exact Fetch | 本仓库 `Praxis-plugin-skills` 已验证：`connection.fetch.register({path, methods:['POST'], requestBody:'buffered'|'streaming', fetch})`，响应 `ConnectionRpcResult<T>={ok:true,value}|{ok:false,error:{code,message,details}}`；客户端 `fetch(path,{method:'POST',credentials:'same-origin',body:JSON.stringify({endpoint,payload})})` |
 
 **结论（transport ADR 确认）**：
-- 首选官方 Typert Remote 在 rc.1 对**外部 npm 包**存在可复现生成缺口（非本工程配置问题，已排除 dist/lib、files、拓扑等）。按 ADR-0017 第 7 条与 HLD 第 7 节，**专家插件采用官方 Connection 认证 exact Fetch 路由作为审定的本地例外**，新增专家专属路由 `/api/workdsh-experts`（buffered JSON）与 `/api/workdsh-experts/import`（streaming 上传），与 Skill 兼容路径同构但独立命名空间，不共用私有 wire、不新造 WebSocket/全局 window RPC/未认证端口、不升级 DSH。
+- 首选官方 Typert Remote 在 rc.1 对**外部 npm 包**存在可复现生成缺口（非本工程配置问题，已排除 dist/lib、files、拓扑等）。按 ADR-0017 第 7 条与 HLD 第 7 节，**专家插件采用官方 Connection 认证 exact Fetch 路由作为审定的本地例外**，新增专家专属路由 `/api/Praxis-experts`（buffered JSON）与 `/api/Praxis-experts/import`（streaming 上传），与 Skill 兼容路径同构但独立命名空间，不共用私有 wire、不新造 WebSocket/全局 window RPC/未认证端口、不升级 DSH。
 - 两种实现共享同一 DTO/service；最终只启用 Connection exact Fetch。Typert 生成缺口保留为后期兼容项，待公开接口解决或有独立升级兼容证据后再评估自有 Remote 网络接入。
 - 取消语义：读取可中止（fetch signal）；草稿提交前可取消；发布提交点后返回已提交事实；Session 创建无 signal → 查询结果对账。requestId 追踪、operationId 持久幂等，二者不混用。
 
@@ -116,10 +116,10 @@
 | 公开面 | `defineDomain(spec)`、`domainTable<K,V>(zodSchema)`、`DomainSpec{name, version, layout?:'single'|'per-record', compatibleVersions?, invalidRecords?:'backup-and-skip', global?, tables}`、`ctx.storageDomain.open(spec)` → `Domain{name, global, table(name), close()}` |
 | KvTable | `get(key):V|undefined`（同步内存）、`entries()`/`keys()`（快照迭代）、`size`、`put(key,value):Promise<void>`、`delete(key):Promise<boolean>`、`update(key, fn:(current:V)=>V):Promise<V>`（域写链上原子 read-modify-write，缺失键 reject `missing-key`） |
 | 写序 | 每写排队于域写链，先 backend 持久→再改内存→再发 `domain/changed`；backend 写被拒则内存不变。`close()` 拒新写、排空已排队写、释放 unit、幂等 |
-| 既有用法 | `workdsh_access`/`workdsh_runtime_binding`/`workdsh_identity_local`/`workdsh_audit` 均用 `defineDomain`+`Service.init` 开域+`ctx.effect(()=>()=>domain.close())`；AccessManager 用 `mutationTail` 串行化跨记录序列 |
+| 既有用法 | `Praxis_access`/`Praxis_runtime_binding`/`Praxis_identity_local`/`Praxis_audit` 均用 `defineDomain`+`Service.init` 开域+`ctx.effect(()=>()=>domain.close())`；AccessManager 用 `mutationTail` 串行化跨记录序列 |
 
 **结论（可行）**：
-1. 专家领域 `workdsh_experts`（schema version 1，`layout:'per-record'`，权威表默认 `invalidRecords` 拒绝坏记录不静默跳过）：表 `experts`/`revisions`/`bindings`/`preferences`/`operations`。
+1. 专家领域 `Praxis_experts`（schema version 1，`layout:'per-record'`，权威表默认 `invalidRecords` 拒绝坏记录不静默跳过）：表 `experts`/`revisions`/`bindings`/`preferences`/`operations`。
 2. CAS：`KvTable.update(key, fn)` 在 `fn` 内比较 `expectedRevision` 后整体替换，不先读再无条件 put；同对象 CAS 与发布头原子更新在单次 `update` 内完成。
 3. 跨构件/发布头/Session 非单一事务：先写可恢复 `operation`（phase=prepared/applying/committed/failed/reconciling/cancelled），失败暂存不被目录发现，未被发布头引用的构件按操作记录回收；已提交发布头后不因响应丢失报告“未发布”。发布头更新与提交回执/outbox 放在同一原子 `update`；独立 operations 索引可重建。
 4. 审计：稳定 eventId，重试不重复追加；汇出失败显示 audit pending（committed + auditDelivery=pending），不回滚已提交业务事实；变更前授权/审计服务不可用则拒绝开始。
@@ -149,5 +149,5 @@
 ## EP-07 更新（2026-09-12）
 
 - 上文 EP-01 列为“未执行”的 AT-07/AT-08/AT-16 等，现已在**真实 Host 集成层**（真实 Cordis Context + 官方 Storage Domain + 真实 AccessManager/AuditJournal，identity/session 为替身）通过：AT-01/04/05/06/07/08/14/15/16/17/22 见 `expert-manager.test.mjs` 9/9、全量集成 42/42。分层矩阵见 [EP-07 验证](d04-experts-ep07-verification.md)。
-- **真实打包 Web 浏览器探针（AT-18/19/20）仍阻塞**，根因经经验确认：experts/治理 Host 的 tsc `dist` 运行时裸导入 private 的 `workdsh-contracts`（`install-preview.mjs` 不 pack contracts），且治理三包从未在打包 Profile 装配。已录入 [ADR-0019](../adr/0019-installable-host-self-containment-and-governance-assembly.md)，待批准后按 ADR 收口。
+- **真实打包 Web 浏览器探针（AT-18/19/20）仍阻塞**，根因经经验确认：experts/治理 Host 的 tsc `dist` 运行时裸导入 private 的 `Praxis-contracts`（`install-preview.mjs` 不 pack contracts），且治理三包从未在打包 Profile 装配。已录入 [ADR-0019](../adr/0019-installable-host-self-containment-and-governance-assembly.md)，待批准后按 ADR 收口。
 - **未执行**：AT-13/AT-23 真实模型与真实 Host persona 运行探针；AT-09/AT-21 跨插件停用/卸载影响与导入导出反例的端到端验证。

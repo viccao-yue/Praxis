@@ -2,7 +2,7 @@
 
 日期：2026-09-13。PPT 已按用户确认切换为当前中文原生编辑器，其他 PPT 实现全部退出；八类长期范围保留。
 
-复审已补[Office插件架构](PLUGIN-ARCHITECTURE.md)与[问题处置](ARCHITECTURE-REVIEW.md)。选定的基础库由独立`workdsh-plugin-office`封装为Harness能力；默认组合只装配插件，不能接管其工具/数据实现。
+复审已补[Office插件架构](PLUGIN-ARCHITECTURE.md)与[问题处置](ARCHITECTURE-REVIEW.md)。选定的基础库由独立`Praxis-plugin-office`封装为Harness能力；默认组合只装配插件，不能接管其工具/数据实现。
 
 ## 1. 用户决定
 

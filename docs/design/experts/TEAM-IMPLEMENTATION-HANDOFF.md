@@ -17,12 +17,12 @@
 
 ## 0. 发给接手 AI 的指令
 
-当前成果还在本地未提交工作区。接手目录是 `/Users/techflag/project/workdsh`，不是 `dsh-ssh-desktop`。同机接手可直接读取完整现状；换机器或只从GitHub克隆时，必须同时移交未提交修改和新增文件。其中本交接文件与 `docs/evidence/expert-team-tm01.md` 被仓库忽略规则覆盖，提交交接包时需显式纳入。不要将本机绝对路径当作跨机器可访问的链接。
+当前成果还在本地未提交工作区。接手目录是 `/Users/techflag/project/Praxis`，不是 `dsh-ssh-desktop`。同机接手可直接读取完整现状；换机器或只从GitHub克隆时，必须同时移交未提交修改和新增文件。其中本交接文件与 `docs/evidence/expert-team-tm01.md` 被仓库忽略规则覆盖，提交交接包时需显式纳入。不要将本机绝对路径当作跨机器可访问的链接。
 
 可直接复制以下内容：
 
 ```text
-请接手 /Users/techflag/project/workdsh 的专家团 TM-02 开发。先检查 git status，保留现有修改以及无关的 lefthook.yml、scripts/desktop/；按本仓库 AGENTS.md 工作。
+请接手 /Users/techflag/project/Praxis 的专家团 TM-02 开发。先检查 git status，保留现有修改以及无关的 lefthook.yml、scripts/desktop/；按本仓库 AGENTS.md 工作。
 
 依次阅读 docs/STATUS.md、docs/development-order.json、docs/design/experts/TEAM-IMPLEMENTATION-HANDOFF.md、docs/evidence/expert-team-tm01.md。以顶部最新实测为准。TM-01 五批验证均已通过：公开one-shot成员适配、有限SOP、目标Profile组合/文件版本回执/中断对账、运行接入（插件托管provider + 六项AI工具 + 签收/交接/交付三闸门，`--team`退出0）；先复跑最小回归核对证据，再按用户验收结论决定是否启动 TM-02。
 
@@ -34,7 +34,7 @@ TM-02 目标：团队定义与发布（成员选择、唯一主持人、职责�
 最小回归入口（在仓库根目录，Node 22.19+ / 24+、pnpm 10.34.5，其他被引用的工作区包需已构建）：
 
 ```sh
-corepack pnpm --filter workdsh-plugin-experts build
+corepack pnpm --filter Praxis-plugin-experts build
 node --test tests/integration/expert-manager.test.mjs tests/integration/expert-sop-policy.test.mjs
 node scripts/probe-expert-team.mjs --adapter
 node scripts/probe-expert-team.mjs --sop
@@ -80,7 +80,7 @@ corepack pnpm check:plan
 
 ## 3. 团队领域契约（拟新增，不是官方 API）
 
-扩展现有 `workdsh-contracts/experts` 公共契约与专家 Host 服务。以下字段是实现目标；TM-01 只负责证明原生映射，不提前发布假服务。
+扩展现有 `Praxis-contracts/experts` 公共契约与专家 Host 服务。以下字段是实现目标；TM-01 只负责证明原生映射，不提前发布假服务。
 
 ```ts
 // 复用现有 ExpertRevisionRef、ResourceOwner、MutationContext、ActorContext。

@@ -18,7 +18,7 @@ Word 文本工作副本预览版：对话里提出要求，AI 创建文档后自
 ```bash
 DSH_HOME="$PWD/.test-runtime/preview" \
   corepack pnpm exec dsh plugin --profile preview add \
-  /绝对路径/workdsh-plugin-office-0.1.0-alpha.1.tgz
+  /绝对路径/Praxis-plugin-office-0.1.0-alpha.1.tgz
 corepack pnpm preview
 ```
 

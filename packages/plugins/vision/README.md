@@ -14,7 +14,7 @@
 
 ## 启停
 
-1. **推荐**：设置 → 插件 → 找到 `workdsh-vision` / 开物视觉增强 → 关闭或打开 `enabled`。
+1. **推荐**：设置 → 插件 → 找到 `praxis-vision` / 开物视觉增强 → 关闭或打开 `enabled`。
 2. 也可在 Profile 的 `cordis.patch.yml` 将本行设为 `disabled: true`（整行卸载，含设置页）。
 
 默认 `enabled: true`。关闭后不挂 `llm/stream` 转写，也不注册 `vision_analyze`。

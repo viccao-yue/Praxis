@@ -1,6 +1,6 @@
 # 开物Praxis 专家与专家团制作：需求与技术实施交接
 
-日期：2026-09-13。目标工程：/Users/techflag/project/workdsh。状态：可交给开发 AI 实施的设计，不是实现完成声明。
+日期：2026-09-13。目标工程：/Users/techflag/project/Praxis。状态：可交给开发 AI 实施的设计，不是实现完成声明。
 
 ## 0. 接手要求
 
@@ -26,7 +26,7 @@ WorkBuddy 来源：/Applications/WorkBuddy.app/Contents/Resources/app.asar.unpac
 ## 2. 当前代码与差异
 
 现有创建提示词：packages/plugins/experts/src/authoring/guide.ts。
-注册入口：packages/plugins/experts/src/index.ts 的 workdsh-expert-manager，resourceBase 指向 resources/expert-manager。
+注册入口：packages/plugins/experts/src/index.ts 的 Praxis-expert-manager，resourceBase 指向 resources/expert-manager。
 参考资源：resources/expert-manager/references/material-and-methods.md、trial-and-delivery.md。
 resources/templates 当前仅占位，没有可用角色模板。
 单专家定义在 contracts 的 ExpertDefinition 中，role/methodology/boundaries/deliverables 等文字由用户/AI 写入 Host 数据；不是全部写死在 TS。
@@ -115,7 +115,7 @@ MD 导入经 Host 解析到同一草稿与 expectedRevision；更新成功后重
 复用现有公开 Agent/Loop/Session/Skill/Preset/Storage、专家修订与受控 one-shot provider。业务执行绑定每位成员自己的专家修订，TeamRuns 管 SOP/成果/评审。
 官方实验 Agent Teams 的默认 fresh/fork 成员继承主专家；目前独立探针没有证明不同已有专家能加入同一官方名册。不得虚构 preset 参数、adopt 接口或更换官方 factory。
 当前选择产品专家团编排与官方 subagent 执行时，准确说明技术身份，不冒充官方 continuable Team。该路线仍要核对现有 ADR 与正式实现，不能用本文替换现行所有权设计。
-工具执行测试发现全局 Team tools 与非成员 one-shot 的工具后步骤存在冲突。不要盲目把实验 Team tools 混进产品 preset；现有独立证据在 /tmp/workdsh-team-verify.OlMk3U/REPORT.md。
+工具执行测试发现全局 Team tools 与非成员 one-shot 的工具后步骤存在冲突。不要盲目把实验 Team tools 混进产品 preset；现有独立证据在 /tmp/Praxis-team-verify.OlMk3U/REPORT.md。
 工作流模板与可执行计划不同：输入/成果规范、主持人说明先经严格转换为运行服务支持的 plan，运行事实仍以官方日志为准。恢复读取绑定/回执/既有成果，不自动重启所有任务。
 
 ## 8. 实施批次与文件责任

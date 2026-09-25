@@ -1,11 +1,11 @@
 # Office U1：独立插件与原生文档编辑证据
 
-日期：2026-09-12；Office 模块 0.1，开发包 `workdsh-plugin-office@0.1.0-alpha.1`。本次是 U1 最小链路及 U2 确定性工具/UI 场景，不是八类最终交付。
+日期：2026-09-12；Office 模块 0.1，开发包 `Praxis-plugin-office@0.1.0-alpha.1`。本次是 U1 最小链路及 U2 确定性工具/UI 场景，不是八类最终交付。
 
 ## 已落地
 
 - 根 Host 用 `ctx.plugin` 装配 ContentService、Connection、Tools；必需治理依赖显式声明。安装不需要 experts、skills、workbench 或默认 开物Praxis bundle。
-- `workdsh-contracts/office` 只导出 TypeScript 类型；Host 构建不内联 Cordis/Harness，也不引用 private contracts 运行值。
+- `Praxis-contracts/office` 只导出 TypeScript 类型；Host 构建不内联 Cordis/Harness，也不引用 private contracts 运行值。
 - 一个 StorageDomain 文档记录拥有内容、修订、幂等收据和审计 outbox；同工作区可信 Session / owner 授权。审计临时失败不把已提交内容谎报为未提交。
 - 注册五个原生工具 `content_open/read/capabilities/edit/present`。新建/重开、严格段落操作、最新修订读取与 Session 定向展示可用。`content_export` 未实现，不注册空工具。
 - 官方右侧 Tab + Tiptap 3.31.0 原生正文编辑；Client model 负责轮询、编辑租约、暂存事务和修订镜像；React 展示组件接收状态/actions，不持有 Cordis Context 或通用 RPC。
@@ -25,7 +25,7 @@
 | 输入组合 | 浏览器模拟 compositionstart/end 分支通过：组合中不提交，结束后保存；不是 macOS/Windows 真 IME 验收 |
 | 浏览器错误 | 探针收集 pageerror 为空；截图已检查，正文/原生工具条可见且未出现旧式文字片段表单 |
 
-运行原始结果：`.artifacts/office-live/result.json`；截图：`.artifacts/office-live/live-document.png`；本地插件包：`.artifacts/office-live/workdsh-plugin-office-0.1.0-alpha.1.tgz`。这些是测试制品，不是 GitHub/npm 发布。
+运行原始结果：`.artifacts/office-live/result.json`；截图：`.artifacts/office-live/live-document.png`；本地插件包：`.artifacts/office-live/Praxis-plugin-office-0.1.0-alpha.1.tgz`。这些是测试制品，不是 GitHub/npm 发布。
 
 另经 9 份文档的链接/围栏与 JSON 检查、规划检查、git diff 空白检查；Host 构建不含 private contracts 运行时导入。工具重名会拒绝注册；服务卸载后依赖工具撤销已在集成用例验证。
 

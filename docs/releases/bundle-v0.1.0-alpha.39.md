@@ -1,6 +1,6 @@
 # 开物Praxis presentation — Optional Harness composition / 可选展示组合包
 
-Package: **`workdsh-bundle@0.1.0-alpha.39`**. Tag: `bundle-v0.1.0-alpha.39`.
+Package: **`Praxis-bundle@0.1.0-alpha.39`**. Tag: `bundle-v0.1.0-alpha.39`.
 
 ## 本次交付
 
@@ -16,13 +16,13 @@ Skill is a separate installable module and is not initialized or bundled by this
 
 ## 安装 / Installation
 
-Use the official Harness **`0.1.5-rc.1` Web Profile**. Stop the target Profile before changing packages. For Skill management, download and install the [Skill plugin](https://github.com/techflag/workdsh/releases/tag/skills-v0.1.0-alpha.24) as a separate layer.
+Use the official Harness **`0.1.5-rc.1` Web Profile**. Stop the target Profile before changing packages. For Skill management, download and install the Skill plugin as a separate layer.
 
 ```sh
-dsh --profile workdsh --from-default-profile web --dump-config
-dsh plugin --profile workdsh add /absolute/path/workdsh-plugin-skills-0.1.0-alpha.24.tgz
-dsh plugin --profile workdsh add /absolute/path/workdsh-bundle-0.1.0-alpha.39.tgz
-dsh --profile workdsh
+dsh --profile Praxis --from-default-profile web --dump-config
+dsh plugin --profile Praxis add /absolute/path/Praxis-plugin-skills-0.1.0-alpha.24.tgz
+dsh plugin --profile Praxis add /absolute/path/Praxis-bundle-0.1.0-alpha.39.tgz
+dsh --profile Praxis
 ```
 
 The first `plugin add` is optional if no Skill management is needed. Removing the presentation bundle preserves the separately installed Skill module and native Harness interface.
@@ -33,4 +33,4 @@ Build, typecheck, **33 integration tests**, planning and dependency checks, and 
 
 **Not a fix for the older Harness `0.1.2-rc.1` desktop navigation issue.** Other desktop/OS combinations, real-model execution, and complete live CLI hot-unload are not verified. No enterprise server, public Skill catalog, or npm publication is included.
 
-Assets: this module's `.tgz`, `SHA256SUMS`, and `release-manifest.json`. [Module guide](https://github.com/techflag/workdsh/blob/bundle-v0.1.0-alpha.39/docs/RELEASES.md).
+Assets: this module's `.tgz`, `SHA256SUMS`, and `release-manifest.json`. Module guide.

@@ -15,7 +15,7 @@
 
 ## 验收与下一步
 
-`AccessManager` 注入 `storageDomain`、统一 `workdshIdentity` 和 `workdshAudit`，只从 IdentityService 查询成员资格。资源 owner 在有效成员关系下拥有操作权，其他成员必须命中同组织、同资源、同操作的显式 grant。grant 更新和撤销在插件内串行，并校验 expectedRevision；授权状态通过成员与相关 grant revision 的摘要返回。
+`AccessManager` 注入 `storageDomain`、统一 `praxisIdentity` 和 `praxisAudit`，只从 IdentityService 查询成员资格。资源 owner 在有效成员关系下拥有操作权，其他成员必须命中同组织、同资源、同操作的显式 grant。grant 更新和撤销在插件内串行，并校验 expectedRevision；授权状态通过成员与相关 grant revision 的摘要返回。
 
 `ToolAccessBridge` 使用官方 `tools/pre-execute` 做异步授权，并用最终 `tools/result` 形成结果审计；`session/flush` 和插件卸载会等待审计排空。个人 Profile 可在首次工具调用时绑定 Session，企业组合必须关闭该选项并在受信创建入口显式调用 `bindSession()`。
 

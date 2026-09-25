@@ -41,7 +41,7 @@ probe:office:native：在独立临时 Home/Agents/工作区，由官方 CLI 安�
 
 用户反馈右侧面板打开 CSV 只有溢出纯文本，长行不可读。官方复用记录：任务 P1-01 / OFFICE-AI-01 右侧展示增量；官方文档 `docs/dsh-v0.1.6-alpha.2/subsystems/sidebar-right.zh.md` 的“文档渲染器”节；锁定发布包 `@deepseek-ai/dsh-client-ui-sidebar-documentpreview@0.1.6-alpha.1` 的 `./client` 公开 `ctx.documentPreviews`（`DocumentPreviewDefinition`：extensions/title/loading/wrap/priority）与 `sidebar.right.tab.document` keyed slot。复用同一注册方式：`ctx.effect` 拥有注册注销，`slots.inject` 等待官方 owner；不新增 Tab kind、传输、文件读取或状态真源。文件授权、字节读取、刷新、渲染器下拉与换行控件继续由官方所有者管理；未知扩展仍回退官方纯文本。
 
-开物Praxis 差异只在业务呈现：新增定义 `workdsh-office-csv`（extensions=["csv"]、loading=bytes-complete、wrap=true）与只读表格组件 `src/csv/CsvDocument.tsx`（表头、行号、单元格网格线、冻结表头/行号列、UTF-8/GB18030/UTF-16 识别、逗号/分号/制表符识别、超限截断提示）；既有 xlsx/docx/pptx 定义不变。空字节时可直接切换到官方“纯文本”，不替换回退实现。
+开物Praxis 差异只在业务呈现：新增定义 `Praxis-office-csv`（extensions=["csv"]、loading=bytes-complete、wrap=true）与只读表格组件 `src/csv/CsvDocument.tsx`（表头、行号、单元格网格线、冻结表头/行号列、UTF-8/GB18030/UTF-16 识别、逗号/分号/制表符识别、超限截断提示）；既有 xlsx/docx/pptx 定义不变。空字节时可直接切换到官方“纯文本”，不替换回退实现。
 
 解析依赖登记（2026-09-17 用户选定）：RFC 4180 解析、引号/嵌入换行字段与分隔符识别改用 PapaParse 5.7.0（MIT，`dependencies` 精确锁定；`@types/papaparse` 5.5.2 仅开发期类型）。字节解码与 1500 行/120 列/24000 单元格显示上限仍为 开物Praxis 自有的业务差异。解析以 `preview: 上限行数 + 1` 提前停止，用实际多出的那一行证明“确实溢出”，规避 `meta.truncated` 在文件恰好等于上限且带结尾换行时的假阳性；换行风格按 Papa 首个出现的 LF/CRLF/CR 决定，单一风格文件均支持，混用换行的非规范文件不做额外归一化。许可文本已随 office build 自动收集进 dist/THIRD-PARTY-LICENSES.txt（MIT 全文完整）与 bundled-dependencies.json，license-review.json 既有 10 项缺文本清单不变，papaparse 不在缺文本清单。
 
@@ -56,6 +56,6 @@ probe:office:native：在独立临时 Home/Agents/工作区，由官方 CLI 安�
 1. 页面打开后 create-execution 必被拒：Web 客户端页面加载必消耗首个激活槽（无会话→自动建 blank；有会话→恢复最近者）；此后任何 create（UI 召唤或 API）均为第二次激活——`prepare-execution succeeded → access.session-bind succeeded → session.create failed gateway/internal → experts/internal`，会话空壳落盘但不激活、无绑定。失败尝试遗留的「未激活会话空壳」已按会话 createdAt 与 audit session-bind 精确对齐取证。
 2. 探针适配（不改上游）：首创建改在页面加载前经插件 API 发出（与 UI 召唤同一 prepare/create 业务服务）——第一激活成功并留下真实绑定会话，页面加载恢复它；四类 Office 验收全部运行在绑定会话上，修复 fallback 到页面自建 blank 时 DOCX 导入 FORBIDDEN（content service `sessionOwner` 绑定检查）的问题。页面内 UI 召唤降级为容错金丝雀：拒绝时 result.json diagnostics 记录真实错误码且不阻塞，上游修复后自动翻回严格 PASS（verify-binding 断言）。
 3. `sidebarRight.openTabIn` 静默 no-op：未被面板 adopt 的会话不生效（官方 client.js `actionsFor` undefined 直接返回；侧栏折叠时面板未 mount）。探针改走「展开右栏 + 官方 Start 引导页 Workspace files 卡片」UI 原生路径（debug7 实证），openTabIn 保留兜底。
-4. fresh-load UI 竞态：全新 Home 首次加载后短窗口内 pointer 点击可持续超时且无任何请求；探针以「重试 + DOM click 兜底 + 条件诊断」容忍（详见 STATUS 2026-09-19 条目）。待查：`/api/workdsh-office` 每 500ms 轮询。
+4. fresh-load UI 竞态：全新 Home 首次加载后短窗口内 pointer 点击可持续超时且无任何请求；探针以「重试 + DOM click 兜底 + 条件诊断」容忍（详见 STATUS 2026-09-19 条目）。待查：`/api/Praxis-office` 每 500ms 轮询。
 
 本轮不签收范围不变：完整 WYSIWYG、Host 覆盖保存/冲突检测、解压总量限制、生产硬化等；探针不发送模型消息，复杂用户文档保真仍待验收。

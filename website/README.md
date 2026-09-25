@@ -13,10 +13,10 @@ No build, model credentials, API service or remote font is required. Open either
 
 ## Published website
 
-- Chinese: https://techflag.github.io/workdsh/zh-CN.html
-- English: https://techflag.github.io/workdsh/
-- Chinese changelog: https://techflag.github.io/workdsh/changelog.zh-CN.html
-- English changelog: https://techflag.github.io/workdsh/changelog.html
+- Chinese: 
+- English: 
+- Chinese changelog: 
+- English changelog: 
 
 Push changes under `website/` to `main` to run `.github/workflows/pages.yml`. The workflow publishes this directory to GitHub Pages; it does not build or deploy the Praxis application. The folder is also self-contained for deployment to another static host.
 
@@ -36,8 +36,8 @@ WorkBuddy compatibility covers package reuse: skills can be imported as ZIPs con
 
 The open-source navigation contains exactly two destinations:
 
-- https://github.com/techflag/workdsh
-- https://gitee.com/techflag/workdsh
+- 
+- 
 
 The sidebar tour is an editorial feature guide, not an embedded running application. Assistants, Projects, Scheduled Tasks and Library are explicitly marked as in development, matching the current `BusinessPanel` implementation. Experts/Skills/Connectors distinguish implemented and planned portions. No full feature parity or affiliation with Tencent/WorkBuddy is claimed.
 

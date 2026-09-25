@@ -1,10 +1,10 @@
 # 开物Praxis 公开契约草案
 
-状态：本地 `0.1` 治理契约基线完成。`workdsh-contracts@0.1.0-alpha.5` 已实现 Host identity/access/audit 与 Session owner/runtime binding 契约；未进入该包的领域接口仍是拟定义草案，不是声称已存在的 Harness API。企业服务器与受控 Remote 见[后期企业版说明](ENTERPRISE-EDITION.md)。架构决策见 [ADR-0016](adr/0016-governance-contracts-first.md)。
+状态：本地 `0.1` 治理契约基线完成。`Praxis-contracts@0.1.0-alpha.5` 已实现 Host identity/access/audit 与 Session owner/runtime binding 契约；未进入该包的领域接口仍是拟定义草案，不是声称已存在的 Harness API。企业服务器与受控 Remote 见[后期企业版说明](ENTERPRISE-EDITION.md)。架构决策见 [ADR-0016](adr/0016-governance-contracts-first.md)。
 
 ## 已实现的本地 Skill 契约
 
-`workdsh-contracts/skills` 导出 `SkillManagementService`（`contractVersion: 1`）、管理 DTO 与 `SkillDependencyInspector`。独立 Skill Host 提供 `ctx.workdshSkills`；消费者只导入公共类型，使用 `inject: ['workdshSkills']` 声明服务依赖，并以 `ctx.effect()` 托管依赖检查注册。用法见[Skill README](../packages/plugins/skills/README.md)。
+`Praxis-contracts/skills` 导出 `SkillManagementService`（`contractVersion: 1`）、管理 DTO 与 `SkillDependencyInspector`。独立 Skill Host 提供 `ctx.PraxisSkills`；消费者只导入公共类型，使用 `inject: ['PraxisSkills']` 声明服务依赖，并以 `ctx.effect()` 托管依赖检查注册。用法见[Skill README](../packages/plugins/skills/README.md)。
 
 它覆盖现有本地目录、完整正文/资源、冲突保存、导入/草稿发布、启停、卸载影响及恢复。官方 Connection 承载浏览器请求；同 Host 插件协作直接注入服务，不新增网络层。两个消费者共享、服务缺失/恢复和清理已有测试。
 
@@ -30,7 +30,7 @@ SessionOwnerBinding 是 Session 的持久业务 owner 事实，创建后不能�
 
 ## 分领域接口与消费方
 
-Office已导出`workdsh-contracts/office`的 U1 文档类型，并注册`ctx.workdshOfficeContent`服务。六个工具及原生页面共用文档工作副本，content_export 已支持受限 DOCX 文件交付，其余七类接口仍为后续目标，见[运行证据](evidence/office-live-u1.md)。工作副本的open/read/capabilities/edit/present/export供原生工具与认证Client共同消费，详见[统一接口](design/office/UNIFIED-API.md)和[插件架构](design/office/PLUGIN-ARCHITECTURE.md)。契约不放运行服务或依赖其他插件内部类；Office自有运行校验/实现，Host不裸导入private contracts运行值。现有tables/pages/library领域保留唯一所有权。
+Office已导出`Praxis-contracts/office`的 U1 文档类型，并注册`ctx.PraxisOfficeContent`服务。六个工具及原生页面共用文档工作副本，content_export 已支持受限 DOCX 文件交付，其余七类接口仍为后续目标，见[运行证据](evidence/office-live-u1.md)。工作副本的open/read/capabilities/edit/present/export供原生工具与认证Client共同消费，详见[统一接口](design/office/UNIFIED-API.md)和[插件架构](design/office/PLUGIN-ARCHITECTURE.md)。契约不放运行服务或依赖其他插件内部类；Office自有运行校验/实现，Host不裸导入private contracts运行值。现有tables/pages/library领域保留唯一所有权。
 
 | 领域 | 最小能力 | 消费方 |
 | --- | --- | --- |
@@ -152,4 +152,4 @@ Office 契约新增 kind=pdf 的分页/文本/矩形状态及 pdf.insertPage/upd
 
 ### 活动展示身份（2026-09-14）
 
-workdsh-contracts/activity的ActivityIdentity新增可选teamName及members，只表示绑定固定修订的团队名称和组成，不授予权限、不表示成员执行；活动插件用原生子任务状态单独确定高亮。旧提供方无需实现新字段。
+Praxis-contracts/activity的ActivityIdentity新增可选teamName及members，只表示绑定固定修订的团队名称和组成，不授予权限、不表示成员执行；活动插件用原生子任务状态单独确定高亮。旧提供方无需实现新字段。

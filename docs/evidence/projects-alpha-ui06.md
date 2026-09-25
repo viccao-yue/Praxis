@@ -8,7 +8,7 @@
 
 ## 自动验证
 
-- `corepack pnpm --filter workdsh-plugin-projects test`：通过。覆盖项目创建、配置修订、计划新增/更新、资产关联/移除和任务创建产生持久化活动事件；重启 Host 后记录仍存在。
+- `corepack pnpm --filter Praxis-plugin-projects test`：通过。覆盖项目创建、配置修订、计划新增/更新、资产关联/移除和任务创建产生持久化活动事件；重启 Host 后记录仍存在。
 - `corepack pnpm typecheck`：通过。
 - `node scripts/check-plan.mjs`：通过。
 - `git diff --check`：通过。

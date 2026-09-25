@@ -14,7 +14,7 @@
 | Client / Host | ../../dsh-v0.1.6-alpha.2/subsystems/web-client.zh.md、../../HARNESS-OFFICIAL-DEVELOPMENT.md | 官方生成 Remote；现有外部生成兼容缺口的 Connection exact Fetch route | 继续复用现有 Office 通信和同一授权/CAS/审计服务 |
 | Client Resources | ../../dsh-v0.1.6-alpha.2/subsystems/client-resources.zh.md | ctx.resources、useResource、source | 地址式资源是官方能力；资源流与组件生命周期不同，不为接编辑器复制资源框架 |
 
-文档镜像不能自动当作锁定版本 API：本次同时核对发布包声明。现有 Office 已注册 workdsh-office-live 类型及 keyed body，Tab API 可用；不需要为了 Vue 更换 Harness Renderer。
+文档镜像不能自动当作锁定版本 API：本次同时核对发布包声明。现有 Office 已注册 Praxis-office-live 类型及 keyed body，Tab API 可用；不需要为了 Vue 更换 Harness Renderer。
 
 检索本地文档中的 iframe/webview/Vue/shadow DOM，未找到专用编辑器嵌入契约（Vue 的命中为翻译规范）。这只能说明未找到官方专用方案，不代表官方禁止组件使用浏览器 iframe，也不代表官方已经承诺该方案兼容。
 

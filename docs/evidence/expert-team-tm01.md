@@ -9,9 +9,9 @@
 | 字段 | 内容 |
 |---|---|
 | 任务与范围 | TM-01 收口运行接入：a) 将探针 one-shot 适配迁入专家插件正式生命周期，由插件托管 provider 注册、取消与清理；b) 新增 AI 可调用受控委派工具，复用同一专家业务服务，按 SOP 选择成员、检查前置验收与尝试限额；c) 审核签收、阶段交接、最终文件交付三处自动校验文件版本，漂移即拒绝继续；d) 用实际应用配置验证两位已有专家协作生成/审核/交付，并覆盖跳步、文件漂移、取消、重复调用反例 |
-| 官方能力 | 文档：`docs/dsh-v0.1.6-alpha.2/subsystems/subagent.md`、`tool-catalog.md`、`persistence-catalog.md`；锁定包 `@deepseek-ai/dsh-subagent` / `dsh-agent` / `dsh-llm`（0.1.5-rc.1）；公开入口：`ctx.subagents.registerProvider`（返回 Cordis effect disposer）、`ctx.agents.create`、`resolveChildDepth` / `resolveChildAgentOptions` / `childSessionMeta` / `captureDelegatedPolicyOverrides` / `appendDelegatedPolicyOverrides` / `finalAssistantOutput`、`createMessage`、`ctx.tools.register`、`agent/pre-step`、既有 `ctx.workdshExperts` 与 `team-sop.ts` 纯策略 |
+| 官方能力 | 文档：`docs/dsh-v0.1.6-alpha.2/subsystems/subagent.md`、`tool-catalog.md`、`persistence-catalog.md`；锁定包 `@deepseek-ai/dsh-subagent` / `dsh-agent` / `dsh-llm`（0.1.5-rc.1）；公开入口：`ctx.subagents.registerProvider`（返回 Cordis effect disposer）、`ctx.agents.create`、`resolveChildDepth` / `resolveChildAgentOptions` / `childSessionMeta` / `captureDelegatedPolicyOverrides` / `appendDelegatedPolicyOverrides` / `finalAssistantOutput`、`createMessage`、`ctx.tools.register`、`agent/pre-step`、既有 `ctx.PraxisExperts` 与 `team-sop.ts` 纯策略 |
 | 复用选择 | provider 注册与撤销经 `ctx.effect` 挂接插件生命周期（插件卸载即注销并清理活动运行）；AI 工具用官方 `defineTool` 注册，执行统一走既有 `ExpertsManager` 业务服务；SOP 准入/回执/校验直接调用既有纯策略 `team-sop.ts`，不新建流程引擎；文件版本校验只重读官方 fs 写入产生的路径记录（write/edit/present），不新增文件服务或字节存储；运行事实仍以 Harness 日志为准 |
-| 自有边界 | 仅新增：专家团运行对象与其独立存储域（workdsh_expert_teams v1）、受控委派工具集、三处版本闸门服务方法；不新增执行器/调度循环/第二套运行状态；不修改 Harness 与上游包 |
+| 自有边界 | 仅新增：专家团运行对象与其独立存储域（Praxis_expert_teams v1）、受控委派工具集、三处版本闸门服务方法；不新增执行器/调度循环/第二套运行状态；不修改 Harness 与上游包 |
 | 证据与差异 | 既有 `--adapter` / `--sop` / `--integration` 三探针改为引用插件 dist 中迁移后的 provider，保持回归口径；新增 `--team` 模式经生产路径（插件 TeamRunsManager + provider + 工具 + 确定性模型）实际驱动；差异：身份解析与 Session 创建传输仍为 fixture，Agent Teams 创建页面不在本批范围 |
 | 验收 | 正例：两位已有专家在应用配置下协作生成文件、评审并交付，最终交付文件与审核通过版本同一 sha256；反例：跳步、文件漂移（签收/交接/交付三处）、取消、重复调用均被拒绝且不产生假成功；命令：三探针回归 + `--team`；未覆盖范围在结果中列明 |
 
@@ -23,7 +23,7 @@
 
 | 验证 | 实测结果 |
 |---|---|
-| 生产入口装载 | 10 项工具可见（六项 `workdsh_expert_team_*` + fs/present 等）；provider `workdsh-expert` 已注册；成员启动授权统一走 `ctx.workdshTeamRuns.admission`（`authorizeDelegation`），非探针私有路径 |
+| 生产入口装载 | 10 项工具可见（六项 `Praxis_expert_team_*` + fs/present 等）；provider `Praxis-expert` 已注册；成员启动授权统一走 `ctx.PraxisTeamRuns.admission`（`authorizeDelegation`），非探针私有路径 |
 | 两位已有专家协作生成、审核并交付 | 主持人（真实 host 会话，确定性模型）经工具完成 6 次委派：`draft` 由专家 A 生成由 B 评审 accepted，`publish` 由 B 生成由 A 评审 accepted；三处 pin（draft 输出、publish 输出、delivery）sha256 全部等于盘上文件字节（`15c02643…`）；交付后重复 `deliver` 与重复 `delegate` 分别被 `already-delivered` / `sop/attempt-not-retryable` 拒绝；跳步（前置未验收先派 publish）在预留前被 `sop/predecessor-not-accepted` 拒绝且不留尝试 |
 | 文件漂移三闸门 | 外部改写文件后：签收拒绝（`stale-artifact`，不附 decision）；交接拒绝且 `publish` 尝试数=0、无预留；交付拒绝且 `delivery` 保持未定义；每次回写同字节后复过。最终 `acceptedVersion === deliveredVersion`（`96cf23a8…`），盘上内容与验收字节一致 |
 | 取消与重试 | 成员写入副作用已存在时用户取消主持人回合：host 与成员原生 `turn/end` 均为 `aborted`（reason user），尝试被弃置（`执行成员被取消`）且无输出记录；随后重试新尝试完成并评审 accepted（`retriedAttempts=2`） |
@@ -34,7 +34,7 @@
 
 - `runtime/delegation-provider.ts`：one-shot 成员 provider 迁入插件生命周期，经 `ctx.effect` 托管注册与撤销，插件卸载即注销并清理活动运行；取消挂接原生 signal。
 - `tools/team-tools.ts`：六项 AI 可调用受控工具（status/open/delegate/review/abandon/deliver），执行统一走 `TeamRunsManager` 业务服务，成员启动复用同一 provider。
-- `services/team-runs.ts` + `storage/team-domain.ts`：团队运行对象与独立存储域（`workdsh_expert_teams` v1），签收/交接/交付三闸门版本校验在此汇聚；`domain/team-sop.ts` 继续作为唯一纯策略。
+- `services/team-runs.ts` + `storage/team-domain.ts`：团队运行对象与独立存储域（`Praxis_expert_teams` v1），签收/交接/交付三闸门版本校验在此汇聚；`domain/team-sop.ts` 继续作为唯一纯策略。
 - `runtime/execution-guard.ts`、`services/experts-manager.ts`、`contracts/experts.ts`：既有预留/领取与 pre-step 校验扩展 delegation 绑定。
 - 主探针 `--team` 模式与 `scripts/probe-expert-production.mjs`（本批核心交付物）。
 
@@ -49,10 +49,10 @@
 | 字段 | 内容 |
 |---|---|
 | 任务与范围 | TM-01 剩余集成验证：a) 在隔离 home 按实际目标 Profile 组合核对委派工具、审批/沙箱与文件写入路径；b) 真实文件成果的不可变版本回执与评审/交接/交付一致；c) 取消与不确定派发的对账规则，禁止重复执行 |
-| 官方能力 | 文档：`docs/dsh-v0.1.6-alpha.2/tool-catalog.md`（present/subagent）、`persistence-catalog.md`（deliverables/presented）、`subsystems/subagent.md`；锁定包 `@deepseek-ai/dsh@0.1.5-rc.1` 同版本组件；公开入口：`ctx.tools.register/guard`、`SubagentRuntime.start`、`AgentRegistry.create`、`Session.snapshotEvents`、`StorageDomain`、`agent/pre-step` 与现有 `ctx.workdshExperts` 契约 |
+| 官方能力 | 文档：`docs/dsh-v0.1.6-alpha.2/tool-catalog.md`（present/subagent）、`persistence-catalog.md`（deliverables/presented）、`subsystems/subagent.md`；锁定包 `@deepseek-ai/dsh@0.1.5-rc.1` 同版本组件；公开入口：`ctx.tools.register/guard`、`SubagentRuntime.start`、`AgentRegistry.create`、`Session.snapshotEvents`、`StorageDomain`、`agent/pre-step` 与现有 `ctx.PraxisExperts` 契约 |
 | 复用选择 | 直接复用官方工具与运行时（fs/bash/present 工具、sandbox/approval 策略栈、原生 subagent provider）；仅对专家插件内部 SOP 收据做最小扩展以绑定文件字节摘要，不新增执行器、文件服务或运行状态 |
 | 自有边界 | 仅新增：`SopReceipt.artifacts`（路径/sha256/字节数）与 `verifySopArtifacts` 校验；文件读写仍归官方 fs/bash/present；运行事实仍归 Harness 日志 |
-| 证据与差异 | 目标 Profile 以 `.test-runtime/preview`（bundle：dsh-base + dsh-web-app + workdsh-*）只读盘点；探针仅在隔离 home 镜像其相关行。差异：探针身份与 Session 创建传输为 fixture，preview 安装的 workdsh 包版本与仓库当前 dist 分别记录 |
+| 证据与差异 | 目标 Profile 以 `.test-runtime/preview`（bundle：dsh-base + dsh-web-app + Praxis-*）只读盘点；探针仅在隔离 home 镜像其相关行。差异：探针身份与 Session 创建传输为 fixture，preview 安装的 Praxis 包版本与仓库当前 dist 分别记录 |
 | 验收 | 正例：两位成员的真实文件经评审→交接→交付保持同一 sha256；反例：改字节拒绝签收与交付、取消不产生验收、重复派发被拒并走新 operation；命令：`node scripts/probe-expert-team.mjs --integration`；未覆盖范围在结果中列明 |
 
 以下为第四批实测结果（编码与运行完成后回填）——
@@ -65,7 +65,7 @@
 | 原生委派工具（设计性缺口） | 专家父任务下 stock `subagent` 工具被既有 guard 在子模型首个步骤前拦截：子任务真实创建、继承主持人preset、模型请求0、输出0；父任务3个请求（工具调用步、收尾文本步、官方 `subagent-settled` 通知唤醒步，第三条经断言确认）。拦截符合绕行防护设计；缺口为实际组合暂无可用的受控委派工具，本批不给可用性结论 |
 | 文件版本生成→评审→交接→交付 | 真实文件 v1（`15c02643…`）经指定评审返工（意见文件 review-1.md 同被 pin）→v2（`c3f99a97…`）→publish 阶段经官方 `present` 真实交付（`deliverables/presented`）并 pin 同一 v2 字节→发布评审 accepted；两阶段全部 pin 由 Host 重读同字节；`appendFile` 漂移后 `stale-artifact` 拒绝、回写同字节复过 |
 | 取消与不确定派发对账 | 取消：写入副作用已存在时 abort，原生 `aborted`+dispose+无输出记录；同 label 再次 start 拒绝（`experts/conflict`）；同 operation 重放返回同 binding、异载荷 `experts/idempotency-conflict`；`abandon` 后旧尝试补记拒绝（`output-immutable`）且模型请求数不变；新 operation 第2次尝试完成并复评审 accepted。不确定：completed 先经操作日志重放对账（不重派、请求数与 live agent 不变）再记录一次，二次记录拒绝（`output-immutable`） |
-| 跨进程冷读 | 独立进程重开 storage domain `workdsh_integration_probe`：14份session、10份专家子历史与原生记录一致；`integrationRestored` 8项全 true（draft已验收、交接同字节、pinned字节重读、篡改拒绝、取消尝试已遗弃、新尝试已验收、对账只记录一次、`executionResumed=false` 不自动恢复） |
+| 跨进程冷读 | 独立进程重开 storage domain `Praxis_integration_probe`：14份session、10份专家子历史与原生记录一致；`integrationRestored` 8项全 true（draft已验收、交接同字节、pinned字节重读、篡改拒绝、取消尝试已遗弃、新尝试已验收、对账只记录一次、`executionResumed=false` 不自动恢复） |
 
 新增/修订代码：`packages/plugins/experts/src/domain/team-sop.ts` 增加 `SopReceipt.artifacts`（路径/sha256/字节数）与 `verifySopArtifacts` 重读校验（覆盖 output 与 decision.receipt 两侧 pin）；`scripts/probe-expert-integration.mjs` 第四批三节探针；`scripts/probe-expert-team.mjs` 增加 `--integration` 模式与独立进程冷读分支。文件读写、present、沙箱/审批与运行事实全部复用官方，未新增执行器、文件服务或第二套运行状态。
 

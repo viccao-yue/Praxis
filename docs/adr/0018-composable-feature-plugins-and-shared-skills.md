@@ -88,7 +88,7 @@ Fiber 是生命周期边界，不是进程或安全沙箱。插件仍需托管 e
 
 ## 现状与有限实施范围
 
-2026-09-12 已完成 Skill alpha.24 独立交付：标准 Host/Client、配置 patch、预构建浏览器产物、workdsh-contracts/skills v1、本地共享消费者生命周期及独立/组合浏览器验收。默认 bundle alpha.39 不再初始化 Skill，预览安装脚本显式装配两个 Profile 层。[独立打包实测](../evidence/skills-standalone-package.md)同时保留 alpha.23 的原始失败记录与修复结果。Workbench 已用 ctx.plugin 注册子插件但未独立分发；专家仍为规划模块。
+2026-09-12 已完成 Skill alpha.24 独立交付：标准 Host/Client、配置 patch、预构建浏览器产物、Praxis-contracts/skills v1、本地共享消费者生命周期及独立/组合浏览器验收。默认 bundle alpha.39 不再初始化 Skill，预览安装脚本显式装配两个 Profile 层。[独立打包实测](../evidence/skills-standalone-package.md)同时保留 alpha.23 的原始失败记录与修复结果。Workbench 已用 ctx.plugin 注册子插件但未独立分发；专家仍为规划模块。
 
 实施纳入既有 EP-01/G05 与 EP-07/AT-20，不增加一个新产品版本或企业项目：
 

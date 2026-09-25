@@ -1,6 +1,6 @@
 # 开物Praxis 数字员工插件 / Experts plugin
 
-一个插件管理多个数字员工与数字员工团配置。当前源码候选为 `workdsh-plugin-experts@0.1.0-alpha.8`，面向 **DeepSeek Harness 0.1.6-alpha.2 / Cordis 4.0.2**；候选代码与已经发布的安装包分别验收。
+一个插件管理多个数字员工与数字员工团配置。当前源码候选为 `praxis-plugin-experts@0.1.0-alpha.8`，面向 **DeepSeek Harness 0.1.6-alpha.2 / Cordis 4.0.2**；候选代码与已经发布的安装包分别验收。
 
 Praxis manages authored expert assets and immutable revisions. Team execution, messaging, tasks and the Web team panel use the official DSH Agent Teams plugins.
 
@@ -29,11 +29,11 @@ Praxis manages authored expert assets and immutable revisions. Team execution, m
 
 ## 旧版迁移边界
 
-已删除自建 `TeamRunsManager`、SOP 运行状态机、`workdsh_expert_team_*` 工具及 `workdsh-expert` 委派 provider。构建前清理 `dist`，防止旧执行器残留在新安装包里。
+已删除自建 `TeamRunsManager`、SOP 运行状态机、`praxis_expert_team_*` 工具及 `praxis-expert` 委派 provider。构建前清理 `dist`，防止旧执行器残留在新安装包里。
 
 用户的数字员工、技能、发布修订、文件和旧任务历史保留。旧版委派子任务不再续跑旧调度器，应从数字员工团重新召唤官方 Team 任务。旧团队运行表不会转写成伪造的官方执行记录。团队配置仍可复用，不要求重建用户作品。
 
-原 WorkBuddy 规范与许可证归属保留在资源目录；平台适配说明维护在 `resources/skills/workdsh-expert-manager/references/authoring-api.md`，团队运行指引维护在 `runtime/team-lead.md`。
+原 WorkBuddy 规范与许可证归属保留在资源目录；平台适配说明维护在 `resources/skills/praxis-expert-manager/references/authoring-api.md`，团队运行指引维护在 `runtime/team-lead.md`。
 
 ## 构建与验证
 
@@ -66,13 +66,13 @@ corepack pnpm probe:experts:team:real
 新候选依赖 DSH 0.1.6-alpha.2，应使用同一次构建产出的配套 tgz；不要把旧 Release 的安装包当作已含本次迁移。先在独立 Profile 验证，再部署实际使用的 Profile：
 
 ```sh
-dsh --profile workdsh --from-default-profile web --dump-config
-dsh plugin --profile workdsh add /absolute/path/release/workdsh-provider-identity-local-0.1.0-alpha.5.tgz \
-  /absolute/path/release/workdsh-plugin-audit-0.1.0-alpha.4.tgz \
-  /absolute/path/release/workdsh-plugin-access-0.1.0-alpha.5.tgz \
-  /absolute/path/release/workdsh-plugin-skills-0.1.0-alpha.30.tgz \
-  /absolute/path/release/workdsh-plugin-experts-0.1.0-alpha.5.tgz
-dsh --profile workdsh
+dsh --profile praxis --from-default-profile web --dump-config
+dsh plugin --profile praxis add /absolute/path/release/praxis-provider-identity-local-0.1.0-alpha.5.tgz \
+  /absolute/path/release/praxis-plugin-audit-0.1.0-alpha.4.tgz \
+  /absolute/path/release/praxis-plugin-access-0.1.0-alpha.5.tgz \
+  /absolute/path/release/praxis-plugin-skills-0.1.0-alpha.30.tgz \
+  /absolute/path/release/praxis-plugin-experts-0.1.0-alpha.5.tgz
+dsh --profile praxis
 ```
 
 在数字员工入口保存、校验、预览并确认发布，然后召唤。示例只填入原生草稿，发送后才执行；模型与账号在 Harness 中配置。

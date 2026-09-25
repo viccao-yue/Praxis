@@ -1,6 +1,6 @@
 # 资料库 0.1 开发计划
 
-日期：2026-09-16。模块：`workdsh-plugin-library`。主任务：D06 / P1-06。
+日期：2026-09-16。模块：`Praxis-plugin-library`。主任务：D06 / P1-06。
 
 ## 1. 目标
 
@@ -70,7 +70,7 @@
 
 | 切片 | 工作 | 退出条件 |
 | --- | --- | --- |
-| L0 契约与存储 | 增加 `workdsh-contracts/library`；实现 Space、Node、Asset、Revision、Draft、Reference；本地目录、原子写入、哈希、配额和恢复 | 文件夹创建/移动/重命名与资产创建/读取/冲突/越权/重启测试通过；索引删除后可重建 |
+| L0 契约与存储 | 增加 `Praxis-contracts/library`；实现 Space、Node、Asset、Revision、Draft、Reference；本地目录、原子写入、哈希、配额和恢复 | 文件夹创建/移动/重命名与资产创建/读取/冲突/越权/重启测试通过；索引删除后可重建 |
 | L1 导入与转换 | 复用已验证的认证流式上传；支持 MD/TXT/PDF/DOCX/PPTX；生成统一 `content.md` 与 `conversion.json`；目录树、详情、来源、当前修订和转换状态 | 五类真实样本导入指定目录并回读原件；Markdown 结构和位置可复核；超限、伪类型、压缩炸弹、路径逃逸和取消被拒绝 |
 | L2 检索 | 标题和正文关键词检索；中文/英文基础切词；类型、来源、时间过滤；返回带页码/段落/幻灯片的片段 | 命中内容、来源、位置和 revisionId 可复核；无权资料不进入结果 |
 | L3 对话引用 | 在官方输入来源中贡献 `@资料库`；可选择一个文件或目录；显示资料名称；提交固定修订引用；提供 `library_search`、`library_read` | 新会话默认不选资料；显式选择后模型只读授权修订；目录引用展开为有界清单；撤权和停用即时生效 |
@@ -124,7 +124,7 @@ L0 到 L6 顺序执行。L1 可以并行准备各格式样本，但 L2 不在修
 
 ## 9. 版本与交付
 
-- 首个可安装包：`workdsh-plugin-library@0.1.0-alpha.1`。
+- 首个可安装包：`Praxis-plugin-library@0.1.0-alpha.1`。
 - 只在实际代码开始时把 `docs/modules.json` 的资料库状态改为实施中，并建立 package manifest；计划文档本身不代表功能完成。
 - Alpha.1 必须提供独立 `.tgz`、SHA-256、manifest、安装说明、迁移/卸载边界和真实样本证据。
 - 本地数据 schema 单独维护 `schemaVersion`；插件包升级不得覆盖用户资产。

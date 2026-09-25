@@ -72,7 +72,7 @@
 
 “新建任务”直接使用 Harness 原生 `main.conversation` 空会话与 `EmptyHero/InputBar`，不注册 开物Praxis 自建首页输入器。该入口必须原样继承 `/` 指令、`@` 文件或对话引用、附件、权限、模型、Agent preset、发送和取消管线；任何 开物Praxis 业务快捷入口只允许把内容或稳定引用交给这些公开接口，不能复制编辑器或绕过官方提交链。
 
-工作区列表位于左侧并按官方 Workspace/Session 关系分组；工作区行负责展开或收起，会话行打开已有原生 Session。点击“新建任务”清除当前 Session 后进入官方空会话，由原生 WorkspaceChip 选择工作区，因此创建前仍可切换目录。旧 `workdsh-view=home` 地址只作兼容入口并归一化为 `workdsh-view=conversation`。
+工作区列表位于左侧并按官方 Workspace/Session 关系分组；工作区行负责展开或收起，会话行打开已有原生 Session。点击“新建任务”清除当前 Session 后进入官方空会话，由原生 WorkspaceChip 选择工作区，因此创建前仍可切换目录。旧 `Praxis-view=home` 地址只作兼容入口并归一化为 `Praxis-view=conversation`。
 
 参考图中的日常办公、代码开发、设计创意、快捷能力和案例属于后续业务发现层。只有在它们能通过公开 preset、command、skill 或 draft 接口接入同一原生编辑器后才实现，不得先放置无真实能力的平行输入框。
 

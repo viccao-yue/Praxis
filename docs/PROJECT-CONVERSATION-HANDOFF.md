@@ -2,7 +2,7 @@
 
 更新时间：2026-09-17  
 分支：`codex/dsh-0.1.6-upgrade`  
-仓库：`/Users/techflag/project/workdsh`
+仓库：`/Users/techflag/project/Praxis`
 
 ## 用户目标
 
@@ -75,14 +75,14 @@ project ▱ 项目 / Host持久化验证
 - 右侧项目配置继续保留。
 - 中间显示本轮引用、用户消息、助手文本、错误状态和运行状态。
 - 底部可继续发送后续消息。
-- 打开任务时 URL 保持 `?workdsh-view=projects`。
+- 打开任务时 URL 保持 `?Praxis-view=projects`。
 
 一次运行时验证结果：
 
 ```text
 tasks 9
 inside 1
-url http://127.0.0.1:18989/?workdsh-view=projects
+url http://127.0.0.1:18989/?Praxis-view=projects
 ```
 
 对应脚本（忽略文件）：`.artifacts/check-project-task-view.mjs`  
@@ -96,8 +96,8 @@ url http://127.0.0.1:18989/?workdsh-view=projects
 
 修复（`packages/plugins/projects/src/client.tsx` + `src/client/ProjectsPanel.tsx`）：
 
-- `openTask` 保留 `sessions.open` + `selectPanel('workdsh-projects')`，增加 25×200ms 重试与 `onReady`/`onFailed` 回调；实测不会切回通用会话。
-- URL 持久化 `?workdsh-view=projects&project=<projectId>&task=<sessionId>`（`replaceState`，与官方 NavigationLocation 不冲突），面板挂载时恢复项目/任务；`openTask` 成功后才恢复会话视图，失败则清除 `task` 参数并提示。
+- `openTask` 保留 `sessions.open` + `selectPanel('Praxis-projects')`，增加 25×200ms 重试与 `onReady`/`onFailed` 回调；实测不会切回通用会话。
+- URL 持久化 `?Praxis-view=projects&project=<projectId>&task=<sessionId>`（`replaceState`，与官方 NavigationLocation 不冲突），面板挂载时恢复项目/任务；`openTask` 成功后才恢复会话视图，失败则清除 `task` 参数并提示。
 - 新增 `ProjectConversationHost` 包裹 binding 调用（try/catch + 随 session list 更新自动重试）：刷新恢复期间不再因 `uiConversation.binding: unknown session` crash 整个面板。
 
 运行时验证（preview 18989）：有消息任务正确显示 user/assistant 历史（1/1、1/6、1/2）；空任务显示诚实空态；刷新恢复 `inside=1 user=1 assistant=1`，控制台无错误。脚本 `.artifacts/verify-project-task-fix.mjs`，截图 `.artifacts/verify-project-task-reload.png`。
@@ -118,7 +118,7 @@ url http://127.0.0.1:18989/?workdsh-view=projects
 
 - 新任务是否在项目页内直接进入运行界面；
 - 用户消息是否显示引用名称；
-- `system-prompt/assemble` 是否同时出现 `workdsh:project-task` 和 `workdsh:library-selection`；
+- `system-prompt/assemble` 是否同时出现 `Praxis:project-task` 和 `Praxis:library-selection`；
 - 模型是否直接使用资料正文，不再用 Bash/Glob 查找“资料库/文件名”；
 - 任务失败时，已提前写入的 ProjectTaskLink 是否需要标记失败或回滚。
 
@@ -238,7 +238,7 @@ git status --short
 
 ```bash
 export PATH=/Users/techflag/.nvm/versions/node/v22.23.2/bin:$PATH
-corepack pnpm --filter workdsh-plugin-projects test
+corepack pnpm --filter Praxis-plugin-projects test
 corepack pnpm typecheck
 node scripts/check-plan.mjs
 git diff --check

@@ -96,7 +96,7 @@
 
 ## 7. 公共组件和代码边界
 
-复用现有 `workdsh-ui` 的 `Modal`、`Icon`、导航与 tokens。拟新增可复用 `DetailHeader`、`PromptExampleList`、`StatusNotice`、`ConfirmActionDialog`，只在确有第二消费方或稳定公共语义时提升到 UI 包；专家字段和服务调用留在专家插件。
+复用现有 `Praxis-ui` 的 `Modal`、`Icon`、导航与 tokens。拟新增可复用 `DetailHeader`、`PromptExampleList`、`StatusNotice`、`ConfirmActionDialog`，只在确有第二消费方或稳定公共语义时提升到 UI 包；专家字段和服务调用留在专家插件。
 
 组件用 `.tsx`，`index.ts`/`client.ts` 仅导出与装配；不在入口堆叠 `h('div', …)`、HTML 字符串或业务 CSS。Props 传数据和回调，组件不直接访问 Cordis Context、fetch 或文件系统。优先现有令牌；新增 CSS Modules 支持需先验证打包，不凭空假设配置已有。
 
@@ -127,4 +127,4 @@
 
 ## 对话创建与发布前使用预览：C候选实现
 
-制作专家仍进入原生任务框，草稿补目标/经验/预期成果；指南要求信息足够先起草，只追问影响判断的缺口，不虚构用户履历。模型可通过workdsh_expert_list_skills查询目标可编辑专家的真实目录，仍由同一Host鉴权。发布前预览使用已保存且与validate草稿修订一致的Host定义，完整展示简介、领域、六项以内示例、固定技能及完整专业设定；预览仅展示，不召唤/发送，取消回到草稿，摘要变化须重新预览。公共Modal外壳不重复实现，760px上限、820px高度与内部滚动、底部确认固定。真实对话内容质量归D场景验收，不从指南文案宣称通过。
+制作专家仍进入原生任务框，草稿补目标/经验/预期成果；指南要求信息足够先起草，只追问影响判断的缺口，不虚构用户履历。模型可通过Praxis_expert_list_skills查询目标可编辑专家的真实目录，仍由同一Host鉴权。发布前预览使用已保存且与validate草稿修订一致的Host定义，完整展示简介、领域、六项以内示例、固定技能及完整专业设定；预览仅展示，不召唤/发送，取消回到草稿，摘要变化须重新预览。公共Modal外壳不重复实现，760px上限、820px高度与内部滚动、底部确认固定。真实对话内容质量归D场景验收，不从指南文案宣称通过。

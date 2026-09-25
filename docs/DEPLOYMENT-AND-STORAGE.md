@@ -41,7 +41,7 @@ flowchart TD
 
 ## 3. 首期落地约束
 
-业务对象通过官方 `ctx.storageDomain` 持久化。每个领域插件声明唯一的 `workdsh-*` DomainSpec，并只持有自己的类型化 Domain 句柄；Profile 负责把领域路由到官方 SQLite 或 JSON provider。一个后端可以承载多个 unit，因此不把“领域所有权”误写成“每领域必须有一个物理 SQLite 文件”。管理端与用户端共享同一权威领域数据，跨领域只调用服务契约。
+业务对象通过官方 `ctx.storageDomain` 持久化。每个领域插件声明唯一的 `Praxis-*` DomainSpec，并只持有自己的类型化 Domain 句柄；Profile 负责把领域路由到官方 SQLite 或 JSON provider。一个后端可以承载多个 unit，因此不把“领域所有权”误写成“每领域必须有一个物理 SQLite 文件”。管理端与用户端共享同一权威领域数据，跨领域只调用服务契约。
 
 后端路由、DomainSpec 版本、校验、并发写入和关闭行为在 P0-04/D02 验证；首次领域实现必须具备 schema/version、组织与所有者字段、约束、预期修订更新及重启持久化测试。写入只有在 provider 持久化成功并更新内存后才视为提交；`domain/changed` 是提交后的进程内通知，不是事务参与者或跨进程同步机制。浏览器刷新不是数据保存机制。
 

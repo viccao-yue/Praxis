@@ -1,6 +1,6 @@
 ## 2026-09-15：官方 Team 替换自有专家团（用户明确授权）
 
-用户要求直接废弃自有专家团执行实现。当前专项改为：移除 TeamRunsManager、SOP 运行状态机、workdsh_expert_team_* 工具和 workdsh-expert one-shot provider；以 0.1.6-alpha.1 官方 Agent Teams、九项工具及官方 Web 团队面板实现。角色/技能/WorkBuddy 导入和已发布专家内容保留为资产配置，协作场景作为工作指导，运行事实仅由官方 Session 日志和 Team 拥有。旧运行数据保留原地，不再续跑旧调度器；新任务使用官方 Team。公开查询缺陷单独实测和修复，不再作为保留旧执行器的理由。
+用户要求直接废弃自有专家团执行实现。当前专项改为：移除 TeamRunsManager、SOP 运行状态机、Praxis_expert_team_* 工具和 Praxis-expert one-shot provider；以 0.1.6-alpha.1 官方 Agent Teams、九项工具及官方 Web 团队面板实现。角色/技能/WorkBuddy 导入和已发布专家内容保留为资产配置，协作场景作为工作指导，运行事实仅由官方 Session 日志和 Team 拥有。旧运行数据保留原地，不再续跑旧调度器；新任务使用官方 Team。公开查询缺陷单独实测和修复，不再作为保留旧执行器的理由。
 
 复用：发布包 @deepseek-ai/dsh-experimental-agent-team、dsh-experimental-tool-agent-team、dsh-experimental-client-ui-agent-team；公开 agent/created、agentTeams.tryMembership 和 Agent 局部 persona/skill-filesystem 组合。已有 V1 证据包含并行、角色/技能隔离、fresh/fork、未知成员拒绝、中断和冷恢复；本次必须补生产插件测试，不能用独立探针替代。保持原有资产授权，禁止复制上游实现或增加团队运行表。未验收完整真实模型业务，不对其宣称完成。
 
@@ -26,7 +26,7 @@
 
 日期：2026-09-12 · 设计基线：1.1 · 状态：方案已整理，待实施验证。**不是功能已交付声明。**
 
-本包面向接手 开物Praxis 的开发者及其他编程工具。用户要求参考 WorkBuddy 的专家详情、专家团详情和对话式制作专家，同时遵守 DeepSeek Harness 官方规范。本文档属于 **`workdsh` 仓库**，不属于 `dsh-ssh-desktop`；两者包管理器、上游接入方式不同，不能混用。
+本包面向接手 开物Praxis 的开发者及其他编程工具。用户要求参考 WorkBuddy 的专家详情、专家团详情和对话式制作专家，同时遵守 DeepSeek Harness 官方规范。本文档属于 **`Praxis` 仓库**，不属于 `dsh-ssh-desktop`；两者包管理器、上游接入方式不同，不能混用。
 
 当前实施状态补充（2026-09-12）：D04 A+B的真实配备技能/使用详情和C的对话创建指南/完整已保存发布前预览已有候选实现；47/47集成、真实独立包浏览器与两次冷重启通过。D实际模型专业场景及E稳定性收尾仍未完成。见[当前状态](../../STATUS.md)与[修复证据](../../evidence/d04-experts-review-fixes.md)。下表及后文“本次不修改业务实现”等陈述属于原始设计交接时点，不覆盖当前实施状态。
 
@@ -66,7 +66,7 @@
 本次核对源码基线为 `5225e42`。接手者需重新检查 `git status` 与 HEAD，不能假设后续没有变化。
 
 - 专家目录只有规划 README，没有可加载 Host/Client 实现。
-- `workdsh-contracts@0.1.0-alpha.5` 已导出治理契约和 `./skills` 本地管理契约；Skill alpha.24 已独立交付。当前工作区已声明 ./experts 与 ./skill-revisions 子路径，并有候选实现；contracts 仍是 private 包，仓库外声明消费尚待验收。本文件的候选接口、团队 SOP 和全部恢复语义不能当作已发布 API；以 package.json exports、类型和实际证据为准。
+- `Praxis-contracts@0.1.0-alpha.5` 已导出治理契约和 `./skills` 本地管理契约；Skill alpha.24 已独立交付。当前工作区已声明 ./experts 与 ./skill-revisions 子路径，并有候选实现；contracts 仍是 private 包，仓库外声明消费尚待验收。本文件的候选接口、团队 SOP 和全部恢复语义不能当作已发布 API；以 package.json exports、类型和实际证据为准。
 - 本地 identity/access/audit、Session 受控入口、原生工作台、Skill 管理和共享 Modal 已存在。
 - Skill 管理具备正文/资源管理、冲突摘要、启停和可恢复卸载；**尚不能据此声称已具备业务不可变 SkillRevision、专家依赖快照租约或全入口多用户授权**。
 - 当前锁定 `@deepseek-ai/dsh-*@0.1.5-rc.1`、Cordis `4.0.2`；新版本网页不能替代锁定版本的 exports、声明和探针。
@@ -78,7 +78,7 @@
 >
 > 先对照 STATUS 和 evidence，复用已完成 EP-01 等公开接口验证，核对仍缺证据的项目；特别验证 persona 的作用域、不可变 preset、绑定 Session 的所有恢复入口、明确声明的 Skill 依赖快照、原生 draft 交接及外部包 Remote。失败时按文档给出有限替代或明确阻断，不改上游、不私自升级、不用假数据兜底。
 >
-> 按 PRD 1.1 与 DEVELOPMENT-PLAN 的 A+B→C→D→E 完成剩余 EP-02～EP-07，不重做已有证据，不新增专家 0.2。UI 用独立 TSX 组件，共享弹框来自 workdsh-ui；Host 领域服务是 UI 和 Agent 工具唯一写入口。专家管理工具不直接写文件，不接受客户端伪造主体，发布需要绑定精确内容的真实用户确认。复用原生 Session、模型、权限、附件、/ 与 @；点击示例、召唤或创建仅准备草稿，不自动发送业务请求。
+> 按 PRD 1.1 与 DEVELOPMENT-PLAN 的 A+B→C→D→E 完成剩余 EP-02～EP-07，不重做已有证据，不新增专家 0.2。UI 用独立 TSX 组件，共享弹框来自 Praxis-ui；Host 领域服务是 UI 和 Agent 工具唯一写入口。专家管理工具不直接写文件，不接受客户端伪造主体，发布需要绑定精确内容的真实用户确认。复用原生 Session、模型、权限、附件、/ 与 @；点击示例、召唤或创建仅准备草稿，不自动发送业务请求。
 >
 > 保留原有 Skill 全局能力、工作区与会话功能。任何“已完成”声明必须对应验收编号、命令结果和真实打包界面证据。完成 EP-07 后停止 D04，不自行增加“下一步”。仅依据新需求或验收失败扩展范围。
 

@@ -34,7 +34,7 @@ Office 拥有编辑工作副本、操作收据及修订；已导入资源/正式
 
 八类可采用不同编辑器及原生数据模型；统一的是会话、权限、版本、收据和能力描述，不强制八类套同一万能 JSON 文档模型。按类型按需加载，通过 Harness Loader/Profile/公开服务组合，不新增通用插件框架。
 
-部署单位为独立`workdsh-plugin-office`，内部内容服务/工具/Connection与Client适配由官方Cordis组合，详见[插件架构](PLUGIN-ARCHITECTURE.md)。多维表格为Office独立内容文档，HTML为源码/预览，二者不接管tables业务数据库或pages发布。工具、UI、其他消费者走同一公开领域服务；卸载保留已保存内容并撤销能力。
+部署单位为独立`Praxis-plugin-office`，内部内容服务/工具/Connection与Client适配由官方Cordis组合，详见[插件架构](PLUGIN-ARCHITECTURE.md)。多维表格为Office独立内容文档，HTML为源码/预览，二者不接管tables业务数据库或pages发布。工具、UI、其他消费者走同一公开领域服务；卸载保留已保存内容并撤销能力。
 
 ## 拟定 API（尚未实现；已由统一方案收敛）
 

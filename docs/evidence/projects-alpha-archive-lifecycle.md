@@ -11,6 +11,6 @@
 
 ## 验证
 
-- `corepack pnpm --filter workdsh-plugin-projects test`：通过；覆盖 active/archived 列表隔离、归档后拒绝读取、恢复与持久化事件。
+- `corepack pnpm --filter Praxis-plugin-projects test`：通过；覆盖 active/archived 列表隔离、归档后拒绝读取、恢复与持久化事件。
 - 本地真实 Preview：取消归档、确认归档、切换已归档筛选、恢复、返回进行中列表均通过。
 - 运行态截图：`.artifacts/project-archive-runtime.png`（本机忽略目录）。

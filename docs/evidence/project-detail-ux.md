@@ -2,7 +2,7 @@
 
 ## 官方能力复用记录
 - 依据：docs/dsh-v0.1.7-alpha.1/docs/web-styling.zh.md；docs/PROJECT-DESIGN.md。
-- 公开入口：@deepseek-ai/dsh-client-ui-primitives@0.1.7-alpha.1，沿用 workdsh-ui Button/Input；主题由官方 ui-layout/ui-theme 拥有。
+- 公开入口：@deepseek-ai/dsh-client-ui-primitives@0.1.7-alpha.1，沿用 Praxis-ui Button/Input；主题由官方 ui-layout/ui-theme 拥有。
 - 已有探针：scripts/probe-preview-controls.mjs；本次补充有数据的项目详情浏览器验证。
 - 业务差异：项目待办、配置与任务关联归 projects；仅重排展示和按需编辑，不修改原生 Session、任务启动、引用管线。
 - 验收：计划读取/编辑/取消/错误保留，任务导航、配置名称、布局与主题。结果待填写。

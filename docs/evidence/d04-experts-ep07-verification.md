@@ -13,7 +13,7 @@
 | 专家 Host 集成 | `node --test tests/integration/expert-manager.test.mjs` | tests 9 / pass 9 / fail 0 |
 | 全量集成 | `node --test tests/integration/*.test.mjs` | tests 42 / pass 42 / fail 0 |
 
-集成层次为**真实 Cordis Context + 官方 Storage Domain（defineDomain/CAS）+ 真实 AccessManager/AuditJournal**；`workdshIdentity`、`sessionController`、`agentPresets`、`workdshSessionAccess` 为测试替身（`ctx.provide`）。因此集成证据覆盖 Host 领域事实与治理授权/审计，不覆盖打包安装态与真实浏览器/模型。
+集成层次为**真实 Cordis Context + 官方 Storage Domain（defineDomain/CAS）+ 真实 AccessManager/AuditJournal**；`PraxisIdentity`、`sessionController`、`agentPresets`、`PraxisSessionAccess` 为测试替身（`ctx.provide`）。因此集成证据覆盖 Host 领域事实与治理授权/审计，不覆盖打包安装态与真实浏览器/模型。
 
 `build`/`typecheck`/`check:versions` 在实现阶段已绿（见 STATUS 记录）；本轮为文档与证据同步，未改产品代码，故未重跑（**本轮未执行**，代码未变）。
 
@@ -53,10 +53,10 @@
 
 真实打包 Web 激活被两个叠加阻塞挡住，已录入 [ADR-0019](../adr/0019-installable-host-self-containment-and-governance-assembly.md)：
 
-1. **阻塞1（Host 无法解析 contracts 运行时）**：`install-preview.mjs` 只 pack skills/experts/bundle，不 pack private 的 `workdsh-contracts`；而 experts Host `dist` 运行时裸导入 `ExpertsError/EXPERT_LIMITS/actionAccess/assertActorContext` 及 `export * from 'workdsh-contracts/experts'`。安装态解析失败 → experts Host Fiber FAILED。对照 skills（`export type *`、dist 零运行时 contracts 导入）已验证自包含。
-2. **阻塞2（治理未真实装配）**：identity-local/audit/access 为裸 Service 类，无 `dsh.bundle`/patch，仅在测试内 `ctx.plugin`；打包 Profile 无 `workdshIdentity/Access/Audit/SessionAccess` 提供方 → 即便修复阻塞1，experts 仍 PENDING。
+1. **阻塞1（Host 无法解析 contracts 运行时）**：`install-preview.mjs` 只 pack skills/experts/bundle，不 pack private 的 `Praxis-contracts`；而 experts Host `dist` 运行时裸导入 `ExpertsError/EXPERT_LIMITS/actionAccess/assertActorContext` 及 `export * from 'Praxis-contracts/experts'`。安装态解析失败 → experts Host Fiber FAILED。对照 skills（`export type *`、dist 零运行时 contracts 导入）已验证自包含。
+2. **阻塞2（治理未真实装配）**：identity-local/audit/access 为裸 Service 类，无 `dsh.bundle`/patch，仅在测试内 `ctx.plugin`；打包 Profile 无 `PraxisIdentity/Access/Audit/SessionAccess` 提供方 → 即便修复阻塞1，experts 仍 PENDING。
 
-经验证据（grep dist）：`experts/dist/services/experts-manager.js` `import { EXPERT_LIMITS, ExpertsError, actionAccess, assertActorContext } from 'workdsh-contracts'`；`experts/dist/shared.js` `export * from 'workdsh-contracts/experts'`；`access/dist/index.js`、`audit/dist/index.js`、`identity-local/dist/index.js` 均运行时导入 governance 原语。`workdsh-contracts` `private:true`、未发布、不在 experts `dependencies`。
+经验证据（grep dist）：`experts/dist/services/experts-manager.js` `import { EXPERT_LIMITS, ExpertsError, actionAccess, assertActorContext } from 'Praxis-contracts'`；`experts/dist/shared.js` `export * from 'Praxis-contracts/experts'`；`access/dist/index.js`、`audit/dist/index.js`、`identity-local/dist/index.js` 均运行时导入 governance 原语。`Praxis-contracts` `private:true`、未发布、不在 experts `dependencies`。
 
 ## 4. 收口 AT-18/19/20 所需的最小路径（待批准）
 

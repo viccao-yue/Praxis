@@ -4,7 +4,7 @@
 
 ## 2026-09-15：官方 Team 替换自有专家团（用户明确授权）
 
-用户要求直接废弃自有专家团执行实现。当前专项改为：移除 TeamRunsManager、SOP 运行状态机、workdsh_expert_team_* 工具和 workdsh-expert one-shot provider；以 0.1.6-alpha.1 官方 Agent Teams、九项工具及官方 Web 团队面板实现。角色/技能/WorkBuddy 导入和已发布专家内容保留为资产配置，协作场景作为工作指导，运行事实仅由官方 Session 日志和 Team 拥有。旧运行数据保留原地，不再续跑旧调度器；新任务使用官方 Team。公开查询缺陷单独实测和修复，不再作为保留旧执行器的理由。
+用户要求直接废弃自有专家团执行实现。当前专项改为：移除 TeamRunsManager、SOP 运行状态机、Praxis_expert_team_* 工具和 Praxis-expert one-shot provider；以 0.1.6-alpha.1 官方 Agent Teams、九项工具及官方 Web 团队面板实现。角色/技能/WorkBuddy 导入和已发布专家内容保留为资产配置，协作场景作为工作指导，运行事实仅由官方 Session 日志和 Team 拥有。旧运行数据保留原地，不再续跑旧调度器；新任务使用官方 Team。公开查询缺陷单独实测和修复，不再作为保留旧执行器的理由。
 
 复用：发布包 @deepseek-ai/dsh-experimental-agent-team、dsh-experimental-tool-agent-team、dsh-experimental-client-ui-agent-team；公开 agent/created、agentTeams.tryMembership 和 Agent 局部 persona/skill-filesystem 组合。已有 V1 证据包含并行、角色/技能隔离、fresh/fork、未知成员拒绝、中断和冷恢复；本次必须补生产插件测试，不能用独立探针替代。保持原有资产授权，禁止复制上游实现或增加团队运行表。未验收完整真实模型业务，不对其宣称完成。
 
@@ -56,7 +56,7 @@ U16-0/U16-1 的隔离升级与基础启动已完成；下一执行项为 U16-2 �
 
 用户要求下一步规划专家团。本轮细化[团队方案第10节](design/experts/EXPERT-TEAMS.md#10-下一步专家团规划2026-09-13)，复用现有TM-01～04；先验证精确专家绑定与原生workflow/subagent，再实现定义发布、协作交付和异常界面。仅规划，不改D11 todo/D10前置或启动代码；优先实施时需同步主线顺序。专业样本失败保留，不作为逐个修复的无限平台发布前置。
 
-当前授权变更（2026-09-13）：用户确认当前功能先保留，优先网页制作增强，连接器与资料库后移。先完善现有 workdsh-web-design 的工程选择、实际预览和最终文件交付，再用完整案例验收；不以技能文字增强宣称统一HTML编辑器上线。专家历史未签收项保留，暂不追加模型复测；Excel格式/合并/图表继续暂停。PPT仅保留当前中文pptx-react-viewer效果，Word新开发继续暂停。
+当前授权变更（2026-09-13）：用户确认当前功能先保留，优先网页制作增强，连接器与资料库后移。先完善现有 Praxis-web-design 的工程选择、实际预览和最终文件交付，再用完整案例验收；不以技能文字增强宣称统一HTML编辑器上线。专家历史未签收项保留，暂不追加模型复测；Excel格式/合并/图表继续暂停。PPT仅保留当前中文pptx-react-viewer效果，Word新开发继续暂停。
 
 ## 技能市场对标 WorkBuddy（2026-09-13）
 
@@ -108,7 +108,7 @@ U16-0/U16-1 的隔离升级与基础启动已完成；下一执行项为 U16-2 �
 
 2026-09-12 当前实施进展：U1 最小文档插件与 U2 确定性工具/UI 链路已通过，见[证据](evidence/office-live-u1.md)。五个原生工具、内容服务、原生 Tiptap、独立预构建安装已实现；真实模型/PTC、导出/文件保真、未保存缓冲/卸载故障与其余七类仍按 U2—U5 推进，六工具最终目标不变，尚未实现的 content_export 不注册。主线 D04/D15 保持原状态。
 
-2026-09-12 最新插件复审：[OP-R01—06](design/office/ARCHITECTURE-REVIEW.md)已补设计处置；[插件架构](design/office/PLUGIN-ARCHITECTURE.md)固定独立workdsh-plugin-office、官方Host服务/工具/Connection子插件与Client图。U1先验证最小真实插件及预构建包，再做Tiptap闭环；U3验在途卸载/重装，U4逐类codec矩阵，U5完整制品OP-T01—07。Office专项使用顺序台账activeSlice，保留主线D04/D15状态。设计修订不等于运行通过。
+2026-09-12 最新插件复审：[OP-R01—06](design/office/ARCHITECTURE-REVIEW.md)已补设计处置；[插件架构](design/office/PLUGIN-ARCHITECTURE.md)固定独立Praxis-plugin-office、官方Host服务/工具/Connection子插件与Client图。U1先验证最小真实插件及预构建包，再做Tiptap闭环；U3验在途卸载/重装，U4逐类codec矩阵，U5完整制品OP-T01—07。Office专项使用顺序台账activeSlice，保留主线D04/D15状态。设计修订不等于运行通过。
 
 2026-09-12 范围与组件决定：正式交付八类：Word、PPT、Excel、PDF、画布、多维表格、HTML、Markdown。采用GenOffice使用的上游基础库，[组件方案](design/office/OPEN-SOURCE-STACK.md)固定Tiptap/ProseMirror、Univer、Konva、PDF.js/pdf-lib/PDFium及CodeMirror/Mermaid/KaTeX。HTML提供源码编辑与实时页面预览，Markdown提供正文编辑/源码切换；二者同样支持AI分批写入、人工修改、保存重开。多维表格首版是独立内容文档，不接管tables业务数据；HTML不包含pages发布。U4先扩展Markdown/HTML；停止默认扩展旧候选探针。仅技术路线采纳，尚未安装新增组件或完成产品集成。
 
@@ -224,7 +224,7 @@ DOC-06 已完成 127/127 份文档审查；[收尾清单](research/harness-revie
 本地 `0.1` 以已验证的 Cordis 服务、官方 Storage Domain、Connection exact Fetch、Session owner/runtime binding 与工具 guard 收口。以下涉及通用生成 Remote、多人入口和强隔离的条目保留为企业 E01—E05 的设计输入，不表示当前本地版本已经实现企业传输。
 
 - 固化工作台贡献、专家、技能管理、连接器、应用、项目和资产契约，审查依赖方向。
-- 固化 `workdsh*` Cordis 服务命名、稳定 Loader entry id、必需/可选依赖规则和 Fiber 诊断契约；安装健康必须区分 ACTIVE、PENDING、FAILED。
+- 固化 `Praxis*` Cordis 服务命名、稳定 Loader entry id、必需/可选依赖规则和 Fiber 诊断契约；安装健康必须区分 ACTIVE、PENDING、FAILED。
 - 固化 effect 所有权与停稳卸载规则，验证服务替换会重启消费者且不会留下旧句柄、监听器、连接或子进程。
 - 固化官方 Session Controller 任务适配、Session/业务事实边界、自定义事件升级规则、flush 耐久屏障与 fork/恢复授权重验；不得用裸 Session create 建立产品任务。
 - 依据执行能力复用矩阵验证 Tool guard 对 native/PTC/MCP 子调用的覆盖，MCP 发现与断线状态，以及 Schedule/Webhook/Job 包装为持久 AutomationRun 的失败语义。

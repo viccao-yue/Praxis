@@ -3,7 +3,7 @@
 本文是 开物Praxis 桌面测试版打包的指南主体：用法、补丁用途表、快照重建、快照与仓库基线版本对照、Windows 说明与常见问题。
 脚本目录速查见 [scripts/desktop/README.md](../scripts/desktop/README.md)；决策背景见 [ADR-0025](adr/0025-desktop-packaging-via-official-pipeline.md)；历次执行证据见 [desktop-pack-test](evidence/desktop-pack-test.md)。
 
-**定位与边界**：基于官方 `deepseek-ai/deepseek-harness` 仓库 `apps/desktop` 的隔离快照（tag `dsh-v0.1.5-rc.1`），经 `WORKDSH TEST PATCH` 最小补丁产出 **开物Praxis.app 未签名本地测试版**（macOS arm64）。快照位于 `.artifacts/desktop-pack-test/upstream`（gitignored），**不作为 开物Praxis 的开发或运行依赖**，不参与 workspace、CI 与 Web 预览；不引入自建 Electron 壳与第二套插件加载器。产物仅本机自用、**不可分发**；正式发布需具备 Apple Developer ID 与公证凭据并停用未签名模式。
+**定位与边界**：基于官方 `deepseek-ai/deepseek-harness` 仓库 `apps/desktop` 的隔离快照（tag `dsh-v0.1.5-rc.1`），经 `Praxis TEST PATCH` 最小补丁产出 **开物Praxis.app 未签名本地测试版**（macOS arm64）。快照位于 `.artifacts/desktop-pack-test/upstream`（gitignored），**不作为 开物Praxis 的开发或运行依赖**，不参与 workspace、CI 与 Web 预览；不引入自建 Electron 壳与第二套插件加载器。产物仅本机自用、**不可分发**；正式发布需具备 Apple Developer ID 与公证凭据并停用未签名模式。
 
 ## 快速使用
 
@@ -24,7 +24,7 @@ node scripts/desktop/pack-desktop.mjs --sync-patches # 快照补丁有改动时�
 - macOS arm64（Apple Silicon）主机。
 - 快照存在：`.artifacts/desktop-pack-test/upstream/`（gitignored，重建见「快照重建」）。
 - 首次打包需联网：npm 产物已缓存在快照 `node_modules`；Electron 二进制等下载走 `ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/`（脚本注入）。
-- 不要求 Apple 签名凭据（`WORKDSH_DESKTOP_UNSIGNED=1` 由脚本注入）。
+- 不要求 Apple 签名凭据（`Praxis_DESKTOP_UNSIGNED=1` 由脚本注入）。
 
 ## 流水线概览
 
@@ -37,23 +37,23 @@ electron-builder 经 `extraResources` 把快照内 `.desktop-build/targets/mac-a
 
 > **改了 开物Praxis 包内容或版本后，必须重打 7 包 tarball 并重跑 `prepare:packages` + 准备序列，再执行 `pack-desktop.mjs`；只跑 `pack-desktop.mjs` 会沿用旧种子。**
 
-官方完整序列（复刻 `apps/desktop/scripts/package-target.ts`）：`build:desktop` → `build:official` → `release:pack --family dsh` → `pack apps/desktop-host` → `release:pack --family vendor` → `native/system landlock` → `prepare:runtime` → `prepare:packages` → `prepare:seed`（unsigned）→ electron-builder。脚本环境变量：`DSH_DESKTOP_TARGET_PLATFORM=darwin`、`DSH_DESKTOP_TARGET_ARCH=arm64`、`DSH_DESKTOP_APP_ID=com.workdsh.app`、`WORKDSH_DESKTOP_UNSIGNED=1`、`DSH_DESKTOP_AUTO_UPDATE_ENV=production`、`ELECTRON_MIRROR`。
+官方完整序列（复刻 `apps/desktop/scripts/package-target.ts`）：`build:desktop` → `build:official` → `release:pack --family dsh` → `pack apps/desktop-host` → `release:pack --family vendor` → `native/system landlock` → `prepare:runtime` → `prepare:packages` → `prepare:seed`（unsigned）→ electron-builder。脚本环境变量：`DSH_DESKTOP_TARGET_PLATFORM=darwin`、`DSH_DESKTOP_TARGET_ARCH=arm64`、`DSH_DESKTOP_APP_ID=com.Praxis.app`、`Praxis_DESKTOP_UNSIGNED=1`、`DSH_DESKTOP_AUTO_UPDATE_ENV=production`、`ELECTRON_MIRROR`。
 
 ## 补丁存档（patches/upstream/，9 文件）
 
-所有补丁仅存在于隔离快照，逐处注释 `WORKDSH TEST PATCH`，按快照相对路径存于 `scripts/desktop/patches/upstream/`，每次打包前逐文件 SHA-256 比对防漂移。用途：
+所有补丁仅存在于隔离快照，逐处注释 `Praxis TEST PATCH`，按快照相对路径存于 `scripts/desktop/patches/upstream/`，每次打包前逐文件 SHA-256 比对防漂移。用途：
 
 | # | 存档路径（相对 `apps/desktop/`） | 用途 |
 | - | -------------------------------- | ---- |
-| 1 | `src/project-manager.ts` | 新增 `WORKDSH_PROFILE_BUNDLES`（7 个 开物Praxis 包 + 锁定的 `dsh-ui-appearance`，置于官方内置两层 bundle 之后）；`createSeedMetadata` 的 `dsh.profile.bundles` 与 dependencies 扩展。dev 项目 metadata 刻意未改。 |
-| 2 | `scripts/prepare-package-set.ts` | `WORKDSH_ROOT_PACKAGES`（同上 8 根）作为根加入核心包集闭包选择；`packedWorkdsh` 作为默认输入。闭包算法本身未改。 |
-| 3 | `scripts/prepare-seed.ts` | `WORKDSH_DESKTOP_UNSIGNED=1` 时跳过 darwin 种子签名门槛（`resolveMacOSSigningEnvironment`）。 |
-| 4 | `scripts/desktop-build-paths.mjs` | 新增 `packedWorkdsh` 路径（`<build>/packed/workdsh`）。 |
+| 1 | `src/project-manager.ts` | 新增 `Praxis_PROFILE_BUNDLES`（7 个 开物Praxis 包 + 锁定的 `dsh-ui-appearance`，置于官方内置两层 bundle 之后）；`createSeedMetadata` 的 `dsh.profile.bundles` 与 dependencies 扩展。dev 项目 metadata 刻意未改。 |
+| 2 | `scripts/prepare-package-set.ts` | `Praxis_ROOT_PACKAGES`（同上 8 根）作为根加入核心包集闭包选择；`packedPraxis` 作为默认输入。闭包算法本身未改。 |
+| 3 | `scripts/prepare-seed.ts` | `Praxis_DESKTOP_UNSIGNED=1` 时跳过 darwin 种子签名门槛（`resolveMacOSSigningEnvironment`）。 |
+| 4 | `scripts/desktop-build-paths.mjs` | 新增 `packedPraxis` 路径（`<build>/packed/Praxis`）。 |
 | 5 | `scripts/desktop-build-paths.d.mts` | 上述类型声明同步。 |
-| 6 | `electron-builder.config.mjs` | 品牌：`productName '开物Praxis'`、`artifactName 'workdsh-${version}-…'`、`mac.icon` 指向 `workdsh-icon.icns`；unsigned 时跳过签名/公证导入校验（`mac.identity=null`、`forceCodeSigning/notarize=false`、`dmg.sign=false`、afterSign/artifactBuildCompleted 钩子守卫）。 |
+| 6 | `electron-builder.config.mjs` | 品牌：`productName '开物Praxis'`、`artifactName 'Praxis-${version}-…'`、`mac.icon` 指向 `Praxis-icon.icns`；unsigned 时跳过签名/公证导入校验（`mac.identity=null`、`forceCodeSigning/notarize=false`、`dmg.sign=false`、afterSign/artifactBuildCompleted 钩子守卫）。 |
 | 7 | `src/main.ts` | `createWindow(preload, shellFrame=false)` 新增参数；主窗口 darwin 下 `titleBarStyle: 'hiddenInset'`；管理窗口保持默认标题栏。 |
-| 8 | `src/preload-app.ts` | 注入 `style[data-workdsh-shell]` 适配样式（MutationObserver 先于首帧）：`_logoRow` 留白 48px/height:auto、logoRow 与 header 为 drag 区、交互控件 no-drag；`dataset.workdshShell='inset'` 可检测标记。选择器用 CSS-modules 类名后缀（如 `_logoRow`），官方 web UI 升级后若失效需重验。 |
-| 9 | `workdsh-icon.icns` | 品牌图标（由 `assets/brand/workdsh-logo-concept.png` / `praxis-desktop-icon-1024.png` 经 sips + iconutil 生成；当前为 1024 开关形渐变标）。 |
+| 8 | `src/preload-app.ts` | 注入 `style[data-Praxis-shell]` 适配样式（MutationObserver 先于首帧）：`_logoRow` 留白 48px/height:auto、logoRow 与 header 为 drag 区、交互控件 no-drag；`dataset.PraxisShell='inset'` 可检测标记。选择器用 CSS-modules 类名后缀（如 `_logoRow`），官方 web UI 升级后若失效需重验。 |
+| 9 | `Praxis-icon.icns` | 品牌图标（由 `assets/brand/Praxis-logo-concept.png` / `praxis-desktop-icon-1024.png` 经 sips + iconutil 生成；当前为 1024 开关形渐变标）。 |
 
 改动流程：改快照 → `--check-only` 核对差异 → `--sync-patches` 同步存档 → 存档随代码提交。补丁类别受 ADR-0025 约束（品牌 / 未签名模式 / 种子扩展 / 窗口壳融合），新增其他类别需先补 ADR。
 
@@ -61,9 +61,9 @@ electron-builder 经 `extraResources` 把快照内 `.desktop-build/targets/mac-a
 
 `pack-desktop.mjs` 产物校验（失败即退出非 0）：
 
-- `Info.plist`：`CFBundleIdentifier=com.workdsh.app`、`CFBundleDisplayName=Praxis`、`CFBundleIconFile=icon.icns`。
-- `Contents/Resources/icon.icns` 与快照 `workdsh-icon.icns` SHA-256 一致。
-- `app.asar` 补丁断言：`lib/main.js` 含 `hiddenInset`/`shellFrame`；`lib/preload-app.cjs` 含 `workdshShell`/`_logoRow`。
+- `Info.plist`：`CFBundleIdentifier=com.Praxis.app`、`CFBundleDisplayName=Praxis`、`CFBundleIconFile=icon.icns`。
+- `Contents/Resources/icon.icns` 与快照 `Praxis-icon.icns` SHA-256 一致。
+- `app.asar` 补丁断言：`lib/main.js` 含 `hiddenInset`/`shellFrame`；`lib/preload-app.cjs` 含 `PraxisShell`/`_logoRow`。
 
 脚本无法断言、需人工肉眼确认：Dock 图标、红绿灯落位与留白/品牌行间距、窗口拖动。冒烟方法（CDP 截图绕过屏幕录制权限）见证据文档。
 
@@ -74,22 +74,22 @@ electron-builder 经 `extraResources` 把快照内 `.desktop-build/targets/mac-a
 1. **获取官方快照**：下载官方 tag tarball（当前 `dsh-v0.1.5-rc.1`，commit `183f08e9…`）解包至 `.artifacts/desktop-pack-test/upstream/`。快照自持 `pnpm@11.7.0`（`packageManager`）、Node 要求 `^22.19.0 || >=24`。
 2. **安装依赖**：在快照根执行 `pnpm install --frozen-lockfile`。本机 corepack shim 可能损坏（`ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING`），直接调用缓存中的固定版本：`node ~/.cache/node/corepack/v1/pnpm/11.7.0/bin/pnpm.mjs`（`pack-desktop.mjs` 已内建该逻辑）。
 3. **应用补丁存档**：将 `scripts/desktop/patches/upstream/` 按相对路径覆盖到快照对应位置；然后 `--check-only` 验证（不一致文件会列出）。
-4. **打包 开物Praxis 本地包与预置第三方包 tarball**：对下表各包在仓库根执行 `pnpm --dir <包路径> pack --pack-destination "<快照>/apps/desktop/.desktop-build/targets/mac-arm64/packed/workdsh"`（第三方包用 `npm pack`），tarball 文件名须为 `<name>-<version>.tgz`。
+4. **打包 开物Praxis 本地包与预置第三方包 tarball**：对下表各包在仓库根执行 `pnpm --dir <包路径> pack --pack-destination "<快照>/apps/desktop/.desktop-build/targets/mac-arm64/packed/Praxis"`（第三方包用 `npm pack`），tarball 文件名须为 `<name>-<version>.tgz`。
 
    | 包名 | 来源 |
    | ---- | ---- |
-   | `workdsh-bundle` | `packages/bundle` |
-   | `workdsh-plugin-skills` | `packages/plugins/skills` |
-   | `workdsh-plugin-access` | `packages/plugins/access` |
-   | `workdsh-plugin-audit` | `packages/plugins/audit` |
-   | `workdsh-plugin-experts` | `packages/plugins/experts` |
-   | `workdsh-provider-identity-local` | `packages/providers/identity-local` |
-   | `workdsh-plugin-office` | `packages/plugins/office` |
-   | `dsh-ui-appearance@0.1.10` | npm：`npm pack dsh-ui-appearance@0.1.10 --pack-destination <packed/workdsh>`（MIT；外观/壁纸；版本锁定，禁止 latest） |
+   | `Praxis-bundle` | `packages/bundle` |
+   | `Praxis-plugin-skills` | `packages/plugins/skills` |
+   | `Praxis-plugin-access` | `packages/plugins/access` |
+   | `Praxis-plugin-audit` | `packages/plugins/audit` |
+   | `Praxis-plugin-experts` | `packages/plugins/experts` |
+   | `Praxis-provider-identity-local` | `packages/providers/identity-local` |
+   | `Praxis-plugin-office` | `packages/plugins/office` |
+   | `dsh-ui-appearance@0.1.10` | npm：`npm pack dsh-ui-appearance@0.1.10 --pack-destination <packed/Praxis>`（MIT；外观/壁纸；版本锁定，禁止 latest） |
 
-   本地未发布包无法在桌面运行时 `plugin-add/update`（官方仅接受 registry 包名@版本），预置必须走打包期种子——这是 tarball 重打路径存在的唯一原因。`dsh-ui-appearance` 虽已在 npm，仍须把**精确版本** tarball 放入 `packed/workdsh` 并写入 `WORKDSH_ROOT_PACKAGES` / `WORKDSH_PROFILE_BUNDLES`，否则种子激活层缺少该包。
+   本地未发布包无法在桌面运行时 `plugin-add/update`（官方仅接受 registry 包名@版本），预置必须走打包期种子——这是 tarball 重打路径存在的唯一原因。`dsh-ui-appearance` 虽已在 npm，仍须把**精确版本** tarball 放入 `packed/Praxis` 并写入 `Praxis_ROOT_PACKAGES` / `Praxis_PROFILE_BUNDLES`，否则种子激活层缺少该包。
 
-5. **运行官方准备序列**（快照根，目标 darwin/arm64）：`build:desktop` → `build:official` → `release:pack --family dsh` → `pack apps/desktop-host` → `release:pack --family vendor` → `native/system` landlock → `prepare:runtime` → `prepare:packages` → `prepare:seed`（带 `WORKDSH_DESKTOP_UNSIGNED=1`）。命令参数对照历史脚本 `.artifacts/desktop-pack-test/run-prepare-steps.sh`（其日志与产物保留在该目录）。
+5. **运行官方准备序列**（快照根，目标 darwin/arm64）：`build:desktop` → `build:official` → `release:pack --family dsh` → `pack apps/desktop-host` → `release:pack --family vendor` → `native/system` landlock → `prepare:runtime` → `prepare:packages` → `prepare:seed`（带 `Praxis_DESKTOP_UNSIGNED=1`）。命令参数对照历史脚本 `.artifacts/desktop-pack-test/run-prepare-steps.sh`（其日志与产物保留在该目录）。
 6. **打包与冒烟**：`node scripts/desktop/pack-desktop.mjs --restart`，然后按证据文档方式启动冒烟（首启会向 `~/.dsh/profiles/desktop` 离线安装种子；见「常见问题」残留处理）。
 7. **回填证据**：按项目规范更新 [desktop-pack-test](evidence/desktop-pack-test.md) 与 [STATUS](STATUS.md)，未做的检查写明「未执行」。
 

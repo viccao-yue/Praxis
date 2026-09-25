@@ -60,7 +60,7 @@
 
 `packages/plugins/skills/src/index.ts` 的 skillCreatorContent 仍是长 TS 模板字符串；resources/skill-creator 只有两份参考。它已经覆盖真实例子、资源选择、复用结构、任务状态更新、中断对账和发布回执，不需要全部推翻。
 
-但 workdsh_save_skill_draft 仅携带 SKILL.md。创建器本身明确写着不能发布资源树。浏览器完整 bundle 导入不能等价为“AI能自然语言创建并交付完整 bundle”。下一步应补资源生命周期，而不只是把 WorkBuddy 正文再缩写进 TS。
+但 Praxis_save_skill_draft 仅携带 SKILL.md。创建器本身明确写着不能发布资源树。浏览器完整 bundle 导入不能等价为“AI能自然语言创建并交付完整 bundle”。下一步应补资源生命周期，而不只是把 WorkBuddy 正文再缩写进 TS。
 
 WorkBuddy 的 agent_created 与市场 userModified 是其管理契约，不应直接成为我方权限依据。共享 `.agents` 与 profile 路径沿用已批准的 Harness 契约；workspace-only 目前没有该流程支持，不静默扩大范围。
 
@@ -108,7 +108,7 @@ HTML 研报规范明确要求 node --check、使用固定 ECharts option 骨架�
 
 ### 第二项：补专业网页/Office参考，而非换编辑器
 
-将对应任务的完整专业方法映射到现有 workdsh-web/ppt/word/excel-design。先确定请求→技能→真实工具→产物的路由；先展示并渐进更新已有作品，不反复创建。验收需检查实际渲染、保存重开和最终文件。参考许可逐文件记录，未明确可再分发时形成我方规范。
+将对应任务的完整专业方法映射到现有 Praxis-web/ppt/word/excel-design。先确定请求→技能→真实工具→产物的路由；先展示并渐进更新已有作品，不反复创建。验收需检查实际渲染、保存重开和最终文件。参考许可逐文件记录，未明确可再分发时形成我方规范。
 
 ### 后续项
 

@@ -34,7 +34,7 @@ LibreOffice26.2.3.2独立headless Profile打开并导出PDF成功：新建编辑
 
 2026-09-13，隔离导出增强脚本 `scripts/pptx-trial/complete-chart-workbooks.mjs` 复用 ExcelJS、JSZip 和 XML 库，为五类新建原生图表补入嵌入 XLSX、公式、关联及内容类型；不修改第三方包内部实现。公开组件重新载入后，通过原生数据面板修改 pie 91→95，再次导出：五个工作簿保留，关联工作簿数值同步为95。OfficeCLI OpenXML 验证两个文件均为0错误，LibreOffice独立打开并导出PDF成功。重复补全返回原字节；导入已有八工作簿文件也返回原字节，不重复生成或覆盖原件。
 
-`scripts/pptx-trial/scope-css.mjs` 使用 PostCSS/选择器 AST 将随包 CSS 限定在 `.workdsh-ppt-editor`。900px宿主挂载/卸载测试：body margin仍8px、外部按钮border仍outset、overflow仍visible；外部输入和卸载后输入正常，pageerror为0。原生深色图表数据面板数字原本黑字，试验样式限定 input 为浅色文字；视觉复核95/3/5可读，图表及图例无裁切。此修正只验证当前深色面板，完整主题切换、全部弹窗与全局动画名冲突未签收。
+`scripts/pptx-trial/scope-css.mjs` 使用 PostCSS/选择器 AST 将随包 CSS 限定在 `.Praxis-ppt-editor`。900px宿主挂载/卸载测试：body margin仍8px、外部按钮border仍outset、overflow仍visible；外部输入和卸载后输入正常，pageerror为0。原生深色图表数据面板数字原本黑字，试验样式限定 input 为浅色文字；视觉复核95/3/5可读，图表及图例无裁切。此修正只验证当前深色面板，完整主题切换、全部弹窗与全局动画名冲突未签收。
 
 可复现脚本：`scripts/pptx-trial/probe-completed.mjs` 和 `probe-scoped-lifecycle.mjs`；从仓库根目录运行，先运行原独立构建探针，隔离依赖还需 postcss@8.5.28/postcss-selector-parser@7.1.0，静态服务19093。结果位于隔离目录 completed-result.json、completed-package-result.json、scoped-lifecycle-result.json、completed-scoped-panel.png；完成文件 completed-workbooks.pptx 和 completed-resaved.pptx。
 

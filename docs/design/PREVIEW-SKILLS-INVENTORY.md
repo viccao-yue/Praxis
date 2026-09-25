@@ -1,10 +1,10 @@
 # Preview Profile 实际技能整理
 
-日期：2026-09-13。本清单来自正在运行的 18989 preview 服务的已认证只读管理请求 `/api/workdsh-skills`，endpoint=list/catalog；两项均返回 HTTP 200、ok=true。包含管理状态，不是全部技能的成品品质验收。完整本机响应保留 `.artifacts/preview-skill-list.json` 和 preview-skill-catalog.json，不公开认证信息或本机文件路径。
+日期：2026-09-13。本清单来自正在运行的 18989 preview 服务的已认证只读管理请求 `/api/Praxis-skills`，endpoint=list/catalog；两项均返回 HTTP 200、ok=true。包含管理状态，不是全部技能的成品品质验收。完整本机响应保留 `.artifacts/preview-skill-list.json` 和 preview-skill-catalog.json，不公开认证信息或本机文件路径。
 
 ## 装配与数量
 
-preview Profile 已安装 workdsh-plugin-skills alpha.26，以及 bundle/access/audit/experts/office 等插件。`scripts/start-preview.mjs` 默认 DSH_HOME 为项目 `.test-runtime/preview`，DSH_AGENTS_HOME 为用户 `.agents`；技能服务管理共享 agents/skills 和 DSH_HOME/skills。插件通过官方 ctx.skills 发现已合并技能，不是将每个技能声明为 preview npm 依赖。
+preview Profile 已安装 Praxis-plugin-skills alpha.26，以及 bundle/access/audit/experts/office 等插件。`scripts/start-preview.mjs` 默认 DSH_HOME 为项目 `.test-runtime/preview`，DSH_AGENTS_HOME 为用户 `.agents`；技能服务管理共享 agents/skills 和 DSH_HOME/skills。插件通过官方 ctx.skills 发现已合并技能，不是将每个技能声明为 preview npm 依赖。
 
 本次管理清单 161 条：149 启用、2 只读、1 停用、9 格式异常；151 条 modelInvocable=true。清单同时包含管理条目，不能说全部 161 条都可被模型调用。分类可能多值，下方按第一分类分组，完整分类保留在表内。
 
@@ -228,7 +228,7 @@ agently-mail 停用。conversion-ops、fintech-engineer、growth-engine、market
 | seo-ops | 格式异常 | 否 |  | 技能文件需要修复 |
 | tdd | 启用 | 是 |  | Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions "red-green-refactor", or wants integration tests. |
 | team-ops | 格式异常 | 否 |  | 技能文件需要修复 |
-| workdsh-import-test | 启用 | 是 |  | 用于验证 开物Praxis 技能导入、资源读取、全局发现和调用流程的安全测试技能。 |
+| Praxis-import-test | 启用 | 是 |  | 用于验证 开物Praxis 技能导入、资源读取、全局发现和调用流程的安全测试技能。 |
 
 ### 知识与学习（19）
 

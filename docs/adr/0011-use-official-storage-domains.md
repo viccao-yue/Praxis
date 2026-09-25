@@ -12,7 +12,7 @@ DeepSeek Harness 官方 `dsh-storage` 提供存储 hub，`dsh-storage-json` 与 
 ## 决策
 
 1. 开物Praxis 业务对象优先使用官方 `ctx.storageDomain`，不建立通用数据库抽象，也不让领域插件直接打开 SQLite。
-2. 每个领域插件声明唯一的 `workdsh-*` DomainSpec，只由该插件打开并持有类型化 Domain 句柄。跨领域读取和写入经过 Cordis 服务契约，禁止取得其他领域句柄或直接查询底层介质。
+2. 每个领域插件声明唯一的 `Praxis-*` DomainSpec，只由该插件打开并持有类型化 Domain 句柄。跨领域读取和写入经过 Cordis 服务契约，禁止取得其他领域句柄或直接查询底层介质。
 3. Profile 配置 Storage 后端和按领域路由。本地首期默认使用官方 SQLite provider；测试和可读导出场景可使用官方 JSON provider。一个后端可承载多个 unit，因此不要求每个领域一个物理数据库文件。
 4. 领域插件在自己的 effect 中打开 Domain，并在 disposer 中等待 `Domain.close()`。写入只通过 `put`、`update`、`delete` 和 global handle；读取到的记录不得就地修改。
 5. 权威数据默认以无效记录即拒绝的方式打开。只有可丢弃的派生缓存可显式选择 `backup-and-skip`，且需要重建测试与告警。

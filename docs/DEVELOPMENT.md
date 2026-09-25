@@ -67,4 +67,4 @@ P0 增加 build、typecheck、test、pack:check 和 smoke:harness；P1 增加 te
 
 ## preview启动内存恢复措施（2026-09-14）
 
-实际启动触及Node默认约4GB堆上限并崩溃。预览脚本暂将子进程堆上限设为8192MB，可用`WORKDSH_PREVIEW_HEAP_MB`覆盖；上限不代表预分配，不是内存增长根因修复。旧依赖备份`node_modules.before-alpha4-1789048561`移至`/Users/techflag/.cache/workdsh-preview-backups/`保留，未删除用户会话/技能/对象。启动稳定性与内存增长仍需继续定位；不能把提高上限称为彻底修复。
+实际启动触及Node默认约4GB堆上限并崩溃。预览脚本暂将子进程堆上限设为8192MB，可用`Praxis_PREVIEW_HEAP_MB`覆盖；上限不代表预分配，不是内存增长根因修复。旧依赖备份`node_modules.before-alpha4-1789048561`移至`/Users/techflag/.cache/Praxis-preview-backups/`保留，未删除用户会话/技能/对象。启动稳定性与内存增长仍需继续定位；不能把提高上限称为彻底修复。

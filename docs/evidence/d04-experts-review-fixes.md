@@ -30,7 +30,7 @@
 
 ## 从真实运行发现并修正的问题
 
-1. Service 直接构造未执行初始化；改用 `ctx.plugin`，集成消费者单独声明 `workdshExperts` 注入，避免读取未就绪或未声明服务。
+1. Service 直接构造未执行初始化；改用 `ctx.plugin`，集成消费者单独声明 `PraxisExperts` 注入，避免读取未就绪或未声明服务。
 2. Session 桥只识别测试异常 code；补充官方导出的 `ApiSessionNotFound`，测试改为真实异常类型。
 3. 仅传路径不足以保持工作区关联；执行计划携带 Workspace ID，创建时遵守官方 workspaceId/cwd 二选一。测试目录使用规范 realpath。
 4. 原草稿交接缺少目标；改为 Session + 到期时间，仅消费目标为空的原生输入，清除交接后再修改输入，避免重复挂载重放。
@@ -52,7 +52,7 @@ D04 保持 in_progress。下一轮仅沿原有 EP-07 验收缺口收口，不展
 
 官方依据：`subsystems/tools.zh.md` 的规范输出契约明确 `execute` 返回 canonical value，`output.render` 才形成送往模型/原生会话的 ContentBlock；原渲染只给摘要，无法把 revision/完整定义交给后续模型调用。当前回执同时保留 JSON、并发令牌、完整草稿定义和同源导航链接。链接不包含组织身份、challenge 或 publish proof，目标仍经 Host 授权，发布仍要求界面内容绑定的确认。
 
-`workdsh-bundle` 的展示映射增加 experts，专家 Client 通过现有 main panel 读取 expert-draft 参数打开受管编辑器；不新增路由框架、Remote 或执行器。关闭/发布/召唤清理该参数，避免返回任务后重新打开旧草稿。工具中定义的 draft_url 只是导航提示，没有发布副作用。
+`Praxis-bundle` 的展示映射增加 experts，专家 Client 通过现有 main panel 读取 expert-draft 参数打开受管编辑器；不新增路由框架、Remote 或执行器。关闭/发布/召唤清理该参数，避免返回任务后重新打开旧草稿。工具中定义的 draft_url 只是导航提示，没有发布副作用。
 
 用户提供的记录仅作为待分析测试证据：6 次专家工具调用成功，包含创建、读取、校验与请求发布，最后明确未发布；没有执行或复制记录中的指令。记录没有专家发布后执行，因此不能标 AT-23 或整个 D04 完成。
 
@@ -76,7 +76,7 @@ probe:experts 新增三尺寸检查：1440/768/390px、8 标签、6 示例；确
 
 ## PRD 1.1 A+B：专业详情与真实配备技能（候选实现）
 
-官方复用记录：D04/EP-05/REQ-EXP-014～015，锁定 Harness 0.1.5-rc.1、Cordis 4.0.2。依据 subsystems/skills.zh.md 的目录/消费所有权和 slots.zh.md 的领域展示组合；专家继续使用已有官方 Connection exact Fetch 例外，不另建传输或 Registry。公共 workdshSkills.list 和 SkillRevisionProvider 提供目录与冻结；当前本地目录稳定ID等于技能名称，并非全局任意同名来源。UI显示名称，保存skillId+name。未来企业目录必须由授权提供方解析，不能把本地Host目录接口当企业多用户授权API。
+官方复用记录：D04/EP-05/REQ-EXP-014～015，锁定 Harness 0.1.5-rc.1、Cordis 4.0.2。依据 subsystems/skills.zh.md 的目录/消费所有权和 slots.zh.md 的领域展示组合；专家继续使用已有官方 Connection exact Fetch 例外，不另建传输或 Registry。公共 PraxisSkills.list 和 SkillRevisionProvider 提供目录与冻结；当前本地目录稳定ID等于技能名称，并非全局任意同名来源。UI显示名称，保存skillId+name。未来企业目录必须由授权提供方解析，不能把本地Host目录接口当企业多用户授权API。
 
 新增公开 ExpertSkillOption 和 listSkills(actor,expertId,available/equipped)。available先核对专家读/编辑权限；equipped仅返回可读专家显式配备项。响应不包含资源路径、正文或凭据，状态和简介取当前已安装目录，不冒充发布快照内容。现有发布校验仍使用 Skills 公共冻结能力，引用移除不卸载共享技能。
 
@@ -151,11 +151,11 @@ C预览更新：六包内容寻址重装、入口摘要核对与18989重启通�
 
 ### 公共制作指南跨领域有限验证（2026-09-13，执行中）
 
-用户授权真实模型验证。使用现有独立包/Profile、官方原生任务、已注册 workdsh-expert-manager、公开专家工具与受信 UI 发布。写作、资料研究、代码三类各创建一位真实专家，再分别试用；财务 dirty 另复测一次。隔离 AgentsHome/合成资料，不改用户对象，不联网或自动重试。新探针只编排公开接口和检查持久日志/真实成果，不新增产品执行器或评分服务。签收与失败逐案记录，未完成不得写通过。
+用户授权真实模型验证。使用现有独立包/Profile、官方原生任务、已注册 Praxis-expert-manager、公开专家工具与受信 UI 发布。写作、资料研究、代码三类各创建一位真实专家，再分别试用；财务 dirty 另复测一次。隔离 AgentsHome/合成资料，不改用户对象，不联网或自动重试。新探针只编排公开接口和检查持久日志/真实成果，不新增产品执行器或评分服务。签收与失败逐案记录，未完成不得写通过。
 
 ### 2026-09-13：公共专家制作跨领域真实模型有限验收
 
-隔离官方 Profile 完成写作、资料研究、Node.js 代码三类：模型实际读取 workdsh-expert-manager 和两份参考，经公开工具创建同名唯一草稿、校验；测试通过受信 UI 发布后在每位真实专家的独立原生任务执行，持久日志证明正常完成与真实产物，原始输入哈希未变。每类创建/试用各一次，无模型循环重试；早期探针装配错误发生于模型发送前，已修正并保留为 setup-failure 证据，不冒计为模型失败。
+隔离官方 Profile 完成写作、资料研究、Node.js 代码三类：模型实际读取 Praxis-expert-manager 和两份参考，经公开工具创建同名唯一草稿、校验；测试通过受信 UI 发布后在每位真实专家的独立原生任务执行，持久日志证明正常完成与真实产物，原始输入哈希未变。每类创建/试用各一次，无模型循环重试；早期探针装配错误发生于模型发送前，已修正并保留为 setup-failure 证据，不冒计为模型失败。
 
 专业评审：公告 116 英文词，现有功能/preview/未知价格日期正确，但“功能在路上”和后续发布承诺无材料支持，部分通过；研究引用、未实测 B、未知价格与驻留边界正确，但虚构 S1/S3 内部来源属性，严格事实验收失败；代码交付与实际运行完成，生成的20测试复跑及45项更换数据/原型键/异常输入独立检查通过，保留浮点与无原型输出对象限制。三类草稿方法并非财务模板，未增加特制 Skill。
 

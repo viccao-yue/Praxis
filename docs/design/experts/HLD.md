@@ -50,8 +50,8 @@ packages/plugins/experts/
 
 | 需求 | 复用方式 | 限制/验证 |
 |---|---|---|
-| 导航和详情 | 官方 `sidebar.panellist`/`main` 对应 key；workdsh-ui Modal | 保留原生 owners；不查 DOM 改样式隐藏 |
-| 新任务 | `workdshSessionAccess.create` → 官方 `sessionController.create` | 请求只有 workspaceId/cwd/sessionId/agentPreset，不存在官方 expertId 参数 |
+| 导航和详情 | 官方 `sidebar.panellist`/`main` 对应 key；Praxis-ui Modal | 保留原生 owners；不查 DOM 改样式隐藏 |
+| 新任务 | `PraxisSessionAccess.create` → 官方 `sessionController.create` | 请求只有 workspaceId/cwd/sessionId/agentPreset，不存在官方 expertId 参数 |
 | 角色 | preset scope 内的 `@deepseek-ai/dsh-persona` | 只能作用域挂载；禁止全局注册；`complete` 固定 false，保留运行上下文 |
 | 执行组合 | 官方 preset 发现、copyComposition 与持久 preset ID | 业务修订仍需自行管理；复制后必须受控验证，不接收任意用户 YAML |
 | Skill 调用 | 官方分层目录、按需正文、/ 与 skill 工具 | 明确声明依赖由 Skill owner 提供不可变快照，当前需补契约 |
@@ -64,7 +64,7 @@ packages/plugins/experts/
 
 ## 3. 领域存储与并发
 
-建议领域 `workdsh_experts`（schema version 1，名称以实际 published `DomainSpec` 验证为准）：
+建议领域 `Praxis_experts`（schema version 1，名称以实际 published `DomainSpec` 验证为准）：
 
 | 数据 | 内容 | 权威策略 |
 |---|---|---|
@@ -132,7 +132,7 @@ G02 必须证明：A/B 两个 Session 同名 Skill 的目录、正文和资源�
 
 ### 6.1 创建任务
 
-`prepareExecution` 解析专家固定版本、工作区、模型可用性、当前权限与依赖健康，并创建短期计划；Client 不上传可信 owner/preset 路径。用户确认目标后 `createExecution` 使用独立 operationId，先保留随机且唯一的 SessionId、绑定记录和 owner，再经 `workdshSessionAccess.create({sessionId, workspaceId, agentPreset})` 创建原生 Session。
+`prepareExecution` 解析专家固定版本、工作区、模型可用性、当前权限与依赖健康，并创建短期计划；Client 不上传可信 owner/preset 路径。用户确认目标后 `createExecution` 使用独立 operationId，先保留随机且唯一的 SessionId、绑定记录和 owner，再经 `PraxisSessionAccess.create({sessionId, workspaceId, agentPreset})` 创建原生 Session。
 
 原生 create 可幂等采用给定身份，但当前 bridge 拒绝采用未受控的既有 Session；新适配必须检验 operation 的所有者、请求摘要及 preset，绝不按客户端任意 sessionId 接管旧会话。创建请求不支持 AbortSignal，故超时/取消只能标结果待确认，使用 inspect 对账；不能承诺已撤销创建。
 
@@ -144,7 +144,7 @@ G02 必须证明：A/B 两个 Session 同名 Skill 的目录、正文和资源�
 
 绑定不可变只是数据记录，必须在真实执行前检查：发布构件、声明 Skill 快照、最新停用/授权、模型/服务可用性。检查不得激活另一个任务或泄漏正文。
 
-**关键关卡 G03：** 验证官方原生 prompt/resume、空会话 preset selection、fork、重新加载页面及重启后的入口。仅调用 `workdshSessionAccess.resolveAgent` 的自定义按钮不保护直接走原生 Remote 的路径。
+**关键关卡 G03：** 验证官方原生 prompt/resume、空会话 preset selection、fork、重新加载页面及重启后的入口。仅调用 `PraxisSessionAccess.resolveAgent` 的自定义按钮不保护直接走原生 Remote 的路径。
 
 首选通过官方公开 scope/生命周期 seam 挂载本插件的绑定验证器，让所有绑定 Session 首次提示词及每轮执行前验证绑定；未绑定原生任务保持默认。准确 hook 和拦截时序必须以 published types + Host 探针记录，不在本文虚构官方方法。官方原生 fork 必须通过受支持 seam 继承并校验原绑定，或对该受管 Session 明确拒绝该操作，不能产生无绑定可执行副本。
 
@@ -188,7 +188,7 @@ G02 必须证明：A/B 两个 Session 同名 Skill 的目录、正文和资源�
 
 专业经验、判断标准与追问先审查当前 ExpertDefinition 的 role/methodology/boundaries/deliverables 内容及 persona 编译，不为体现“专家”而引入第二套执行器。确需新结构化字段时，统一更新公开契约/schema、草稿/发布、摘要、导入导出、迁移和测试。详情的擅长领域来自明确专业内容/标签，不能自动宣称数据访问或工具能力。
 
-技能选择使用公开 workdshSkills 目录与管理能力，Client 显示名称/简介/状态，Host 解析稳定 skillId 和冻结修订。不得导入 Skills 内部实现或直接读表；引用移除不卸载共享技能。配置技能清单与官方动态全局发现范围分开展示；实际调用仍由官方 Skill 执行和 Agent Loop 所有。
+技能选择使用公开 PraxisSkills 目录与管理能力，Client 显示名称/简介/状态，Host 解析稳定 skillId 和冻结修订。不得导入 Skills 内部实现或直接读表；引用移除不卸载共享技能。配置技能清单与官方动态全局发现范围分开展示；实际调用仍由官方 Skill 执行和 Agent Loop 所有。
 
 自然语言创建与编辑器调用同一 Host 服务，专业内容预览是展示投影而非另一状态真源。冻结绑定的官方 Loop 集成已验证部分配置行；完整安装态 preset Loader 及远程模型交付仍待 AT-27，不能混用证据。
 

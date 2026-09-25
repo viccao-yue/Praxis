@@ -4,7 +4,7 @@
 
 ## 官方复用
 
-`workdsh-plugin-access` 与 `workdsh-plugin-audit` 均采用 Cordis class service 和生命周期注入，通过 Harness 官方 `@deepseek-ai/dsh-storage-domain` 建立各自 Domain。插件不直接选择或访问 Storage backend，不复制 Harness User、Permission Preset、Approval、Sandbox、Session 或 Credentials。Access 只调用 `IdentityService.membership()`，不会读取身份提供方内部存储。
+`Praxis-plugin-access` 与 `Praxis-plugin-audit` 均采用 Cordis class service 和生命周期注入，通过 Harness 官方 `@deepseek-ai/dsh-storage-domain` 建立各自 Domain。插件不直接选择或访问 Storage backend，不复制 Harness User、Permission Preset、Approval、Sandbox、Session 或 Credentials。Access 只调用 `IdentityService.membership()`，不会读取身份提供方内部存储。
 
 ## 当前语义
 
@@ -16,9 +16,9 @@
 - 授权 decision 的 authorizationRevision 由成员修订与相关 grant 修订共同计算。
 - allow 和 deny 均在返回前持久追加 AuditEvent；审计拒绝 secret、token、password、credential 和 prompt 等敏感引用键。
 - Access 与 Audit 属于不同 Storage Domain，当前后端不提供跨 Domain 事务。grant/revoke 先记录 outcome=unknown 的操作意图，写入授权事实后再记录 succeeded，避免把部分成功伪装成原子成功。
-- Session owner 使用独立 `workdsh_runtime_binding` Domain 持久化，已绑定 owner 不能被另一主体替换；当前 RuntimeBinding 在每次执行时根据最新 membership 与 grant 重新生成。
+- Session owner 使用独立 `Praxis_runtime_binding` Domain 持久化，已绑定 owner 不能被另一主体替换；当前 RuntimeBinding 在每次执行时根据最新 membership 与 grant 重新生成。
 - 工具执行按官方扩展点接入：`tools/pre-execute` 完成异步身份解析和授权，`tools/result` 观察不可变最终结果，`session/flush` 与 Cordis disposer 等待排队审计落盘。
-- `workdshSessionAccess` 在调用官方 `sessionController.create()` 前生成稳定 Session id 并持久绑定 owner；显式 id 首次绑定前通过官方 `inspect()` 拒绝已有但无 owner 的 Session，创建失败则保留同一 owner 的可重试预留。恢复 Agent 前先按当前 membership/grant 调用 `resolveRuntime()`，拒绝时不触达官方 Controller。
+- `PraxisSessionAccess` 在调用官方 `sessionController.create()` 前生成稳定 Session id 并持久绑定 owner；显式 id 首次绑定前通过官方 `inspect()` 拒绝已有但无 owner 的 Session，创建失败则保留同一 owner 的可重试预留。恢复 Agent 前先按当前 membership/grant 调用 `resolveRuntime()`，拒绝时不触达官方 Controller。
 
 ## 验证
 
