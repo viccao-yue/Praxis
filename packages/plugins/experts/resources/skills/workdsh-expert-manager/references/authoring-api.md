@@ -1,10 +1,10 @@
-# WorkDSH 接入与真实能力
+# 开物Praxis 接入与真实能力
 
 专业文件内容直接采用 agent-md-spec.md、team-spec.md、plugin-json-spec.md、avatar-spec.md 的原规范。不要把完整正文缩减成四个字段。只有平台接入采用本说明。
 
 ## 制作文件包
 
-先在工作区制作一个完整专家目录：
+先在工作区制作一个完整数字员工目录：
 - .workdsh-expert/plugin.json：采用 plugin-json-spec 的身份、双语展示和角色资源声明。也接受 .codebuddy-plugin/plugin.json 输入。
 - agents/<business-id>.md：采用原版 Agent frontmatter 和自由 Markdown 正文，无需四段标记。
 - 团队包含 agents/<team>-team-lead.md 与各成员 MD，settings.json 的 agent 与入口一致。
@@ -12,7 +12,7 @@
 - README 写用途、示例、依赖、实际完成状态和交付方法。
 - 头像按原规范设计；目前 save_documents 接收文本，不能把二进制头像伪装成文本传入。
 
-name 是稳定标识；displayName 是名称，profession 是职业。完整 Agent MD 原样保存，并以完整正文编译执行；旧四段定义只用于兼容已有专家。
+name 是稳定标识；displayName 是名称，profession 是职业。完整 Agent MD 原样保存，并以完整正文编译执行；旧四段定义只用于兼容已有数字员工。
 
 ## 保存、注册与发布
 
@@ -26,8 +26,8 @@ get_documents 读取原包文件内容，供 write/present 实际输出；只返
 
 save_resources 接收 documents=[{path,content}]、resources=[{path,source_path,executable?}]、remove_paths。资源路径是包内路径，source_path 是绑定工作区的真实文件。更新带 expert_id、expected_revision，未改动资源保留；头像由真实图片字节生成预览，bin 文件可声明 executable。Host 原字节保存、固定到 preset 的 expert-package，核对字节和目录清单；包内 Skill 使用官方 customSkillDirs。安装资源不等于允许执行脚本，执行仍通过原生 bash/沙箱，不依赖本 Skill 的 Python 安装程序。
 
-export_file(expert_id,revision_id?,file_path) 通过原生 bash 写真实完整包，读回核对并调用原生 present。已有不同字节文件拒绝覆盖；同字节可重放。仅返回 get_documents 内容不算文件交付。导入接受原始 WorkBuddy ZIP 和带校验清单的 WorkDSH ZIP，保留文本、头像、CLI 与资源，不继承权限或自动执行。
+export_file(expert_id,revision_id?,file_path) 通过原生 bash 写真实完整包，读回核对并调用原生 present。已有不同字节文件拒绝覆盖；同字节可重放。仅返回 get_documents 内容不算文件交付。导入接受原始 WorkBuddy ZIP 和带校验清单的 开物Praxis ZIP，保留文本、头像、CLI 与资源，不继承权限或自动执行。
 
 ## 团队运行映射
 
-运行统一使用官方 Agent Teams：以成员 key 为 name 调用 spawn_teammate，使用 send_message 继续已有成员，list_agents/wait_agent 查询和等待，interrupt_agent 停止当前轮次。用 team_task_create/list/get/update 记录工作与依赖。场景正文保留专业流程、交付要求和独立评审要求；当前没有 WorkDSH 自有 SOP 执行器、尝试计数和自动签收机制。完整运行指导见 ../runtime/team-lead.md。
+运行统一使用官方 Agent Teams：以成员 key 为 name 调用 spawn_teammate，使用 send_message 继续已有成员，list_agents/wait_agent 查询和等待，interrupt_agent 停止当前轮次。用 team_task_create/list/get/update 记录工作与依赖。场景正文保留专业流程、交付要求和独立评审要求；当前没有 开物Praxis 自有 SOP 执行器、尝试计数和自动签收机制。完整运行指导见 ../runtime/team-lead.md。

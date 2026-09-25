@@ -1,14 +1,14 @@
-# WorkDSH 专家插件 / Experts plugin
+# 开物Praxis 数字员工插件 / Experts plugin
 
-一个插件管理多个专家与专家团配置。当前源码候选为 `workdsh-plugin-experts@0.1.0-alpha.8`，面向 **DeepSeek Harness 0.1.6-alpha.2 / Cordis 4.0.2**；候选代码与已经发布的安装包分别验收。
+一个插件管理多个数字员工与数字员工团配置。当前源码候选为 `workdsh-plugin-experts@0.1.0-alpha.8`，面向 **DeepSeek Harness 0.1.6-alpha.2 / Cordis 4.0.2**；候选代码与已经发布的安装包分别验收。
 
-WorkDSH manages authored expert assets and immutable revisions. Team execution, messaging, tasks and the Web team panel use the official DSH Agent Teams plugins.
+Praxis manages authored expert assets and immutable revisions. Team execution, messaging, tasks and the Web team panel use the official DSH Agent Teams plugins.
 
-## 专家资产与官方团队执行
+## 数字员工资产与官方团队执行
 
-- 专家目录、搜索、收藏、复制、草稿、导入导出、启停和确认发布由专家插件管理。页面与 Agent 管理工具使用同一 Host 服务。
+- 数字员工目录、搜索、收藏、复制、草稿、导入导出、启停和确认发布由数字员工插件管理。页面与 Agent 管理工具使用同一 Host 服务。
 - 支持 WorkBuddy 风格作品：`plugin.json`、`agents/*.md`、`settings.json`、README，以及 `skills`、`references`、`scripts`、`templates` 和二进制资源。
-- 发布冻结专家定义、成员修订、技能快照和官方 Agent preset。召唤创建原生任务并关联该版本；修改草稿不会静默改变已经发布的内容。
+- 发布冻结数字员工定义、成员修订、技能快照和官方 Agent preset。召唤创建原生任务并关联该版本；修改草稿不会静默改变已经发布的内容。
 - 团队创建成员使用官方 `spawn_teammate`；消息、等待、中断和共享任务也使用官方工具。团队面板直接加载官方 Client，不再另做一套成员状态面板。
 - 已发布成员的 key 对应官方 teammate 的 name。在公开 `agent/created` / `agent/pre-step` 中核验资产、主体和组织，通过 Agent 局部的官方 Persona / Skill Filesystem 插件装配该成员。未配置的成员名在模型请求前拒绝。
 - 场景与分工保留为工作指导；任务依赖和状态由官方 Team 及 Session 日志拥有。任务标记完成不等于专业成果已经验收。
@@ -25,13 +25,13 @@ WorkDSH manages authored expert assets and immutable revisions. Team execution, 
 
 启用 Team 时，按官方 Profile 组合停用旧 `subagent`、`subagent_fork` 及旧控制工具。默认成员创建上限为 16。九项工具为 `spawn_teammate`、`send_message`、`list_agents`、`wait_agent`、`interrupt_agent`、`team_task_create`、`team_task_list`、`team_task_get`、`team_task_update`。
 
-WorkDSH 的必需组合仍包含 identity-local、audit、access、skills、experts；可选 bundle 提供工作台导航，activity 仅显示个人工作动态。各包通过官方 Loader/Profile 和公开服务注入装配；无自建 Agent loop、消息邮箱、团队执行表或插件加载器。
+开物Praxis 的必需组合仍包含 identity-local、audit、access、skills、experts；可选 bundle 提供工作台导航，activity 仅显示个人工作动态。各包通过官方 Loader/Profile 和公开服务注入装配；无自建 Agent loop、消息邮箱、团队执行表或插件加载器。
 
 ## 旧版迁移边界
 
 已删除自建 `TeamRunsManager`、SOP 运行状态机、`workdsh_expert_team_*` 工具及 `workdsh-expert` 委派 provider。构建前清理 `dist`，防止旧执行器残留在新安装包里。
 
-用户的专家、技能、发布修订、文件和旧任务历史保留。旧版委派子任务不再续跑旧调度器，应从专家团重新召唤官方 Team 任务。旧团队运行表不会转写成伪造的官方执行记录。团队配置仍可复用，不要求重建用户作品。
+用户的数字员工、技能、发布修订、文件和旧任务历史保留。旧版委派子任务不再续跑旧调度器，应从数字员工团重新召唤官方 Team 任务。旧团队运行表不会转写成伪造的官方执行记录。团队配置仍可复用，不要求重建用户作品。
 
 原 WorkBuddy 规范与许可证归属保留在资源目录；平台适配说明维护在 `resources/skills/workdsh-expert-manager/references/authoring-api.md`，团队运行指引维护在 `runtime/team-lead.md`。
 
@@ -55,7 +55,7 @@ corepack pnpm probe:experts:team:real
 - `probe:experts:team:web` 将七个功能包打成 tgz，通过官方 CLI 安装到仓库外临时 Web Profile；使用实际生产 Host、官方 Team Client、真实浏览器和确定性模型检查成员、任务写入、成员会话与冷恢复。
 - `probe:experts:team:resilience` 是同一生产安装探针的发布验收入口，并固定持续运行、人工停止后原成员继续、完整浏览器重连、成员间任务与消息交接、失败状态展示及冷重启恢复。失败由本地模型适配器确定性注入；成员、消息、任务、持久化、Host、Client 和浏览器均走正式实现。
 - `probe:experts:team:real` 显式读取已配置的 preview DeepSeek 凭据，在一次性 DSH Home 中创建独立真实执行；真实 lead 创建两阶段任务并通过官方消息与状态工具交给两名真实成员。凭据不进入命令参数和报告，临时副本在退出时删除。
-- `probe:experts` 保留专家资产与编辑页面的独立打包回归。
+- `probe:experts` 保留数字员工资产与编辑页面的独立打包回归。
 
 本轮证据位于仓库 `.artifacts/dsh-0.1.6-upgrade/native-expert-team/` 和 `native-team-web/`，长任务、交接、重连和失败恢复的判定见 `docs/evidence/expert-team-resilience.md`，完整状态以 `docs/STATUS.md` 为准。两种测试都不修改用户 preview；只有显式 `:real` 命令调用付费模型。
 
@@ -75,6 +75,6 @@ dsh plugin --profile workdsh add /absolute/path/release/workdsh-provider-identit
 dsh --profile workdsh
 ```
 
-在专家入口保存、校验、预览并确认发布，然后召唤。示例只填入原生草稿，发送后才执行；模型与账号在 Harness 中配置。
+在数字员工入口保存、校验、预览并确认发布，然后召唤。示例只填入原生草稿，发送后才执行；模型与账号在 Harness 中配置。
 
 页面与弹窗使用 Harness 原生主题语义颜色，跟随官方外观设置及系统明暗切换。

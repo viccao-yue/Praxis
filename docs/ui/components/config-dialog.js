@@ -1,5 +1,5 @@
 /* Shared presentation-only dialog: callers own data and persistence. */
-window.WorkDSHConfigDialog = {
+window.PraxisConfigDialog = {
  open({title, content, confirm=false, onConfirm}) {
   const trigger=document.activeElement;
   const dialog=document.createElement('dialog');dialog.className='config-dialog';

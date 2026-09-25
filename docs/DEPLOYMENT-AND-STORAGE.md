@@ -35,7 +35,7 @@ flowchart TD
 | 资产正文、附件和受控工作副本 | library 管理业务资产；执行输入通过官方 Attachment Store 形成不可变内容引用，元数据不保存 object URL、base64 或任意宿主路径 |
 | 自动化规则、触发及运行关联 | automations 领域的官方 Storage Domain，由 Host 管理 |
 | 审计及用量事实 | audit/usage 各自持久化，去重/保留策略独立 |
-| 对话、工具调用和原生运行事实 | Harness 自有存储，WorkDSH 仅保留关联和授权绑定 |
+| 对话、工具调用和原生运行事实 | Harness 自有存储，开物Praxis 仅保留关联和授权绑定 |
 
 原生 Session Catalog 中的 todo、schedule、team、approval 与 deliverable 仍属于执行日志语义，不替代项目待办、自动化规则、企业组织、业务审批和资料资产。业务对象与 Session 通过稳定引用连接；导出、交接或依赖持久化读取前使用官方 Session flush，跨存储失败以 requestId 和对账恢复处理。
 
@@ -65,4 +65,4 @@ D02 复用已经完成的本地 identity/access/audit DomainSpec，继续收口�
 
 DeepSeek 官方请求扩展另设外发开关：`dsh_plugin_packages` 会把 live Loader 包名和版本发送给实际 baseURL，`dsh_session_log` 会发送未经脱敏的连续 Session 后缀，范围可含 cwd、提示词、用户/Assistant 内容、工具参数与结果、压缩摘要和插件事件。团队 Profile 默认关闭 `dsh_session_log`；启用时必须登记目标端点/网关、组织策略、用户告知、接收方连续性校验、重复处理、保留与删除。HTTP 2xx 的本地接受水位不证明 SSE 完成或远端持久化。
 
-Python SDK 的 `sdk-minimal` 运行独立 headless Profile，缺少 settings、托管凭据、subagent 和 compaction，且使用 danger-full-access。它可作为隔离的一次性集成客户端，但不承载 WorkDSH Web、团队权限或正式 runtime isolation。
+Python SDK 的 `sdk-minimal` 运行独立 headless Profile，缺少 settings、托管凭据、subagent 和 compaction，且使用 danger-full-access。它可作为隔离的一次性集成客户端，但不承载 开物Praxis Web、团队权限或正式 runtime isolation。

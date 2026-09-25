@@ -1,0 +1,8 @@
+# Optional vision bridge for text-only models. Toggle `config.enabled` in
+# Plugins → workdsh-vision (or set disabled on this row to unload Host+Client).
+- insert:
+    - id: workdsh-vision
+      name: workdsh-plugin-vision
+      inject: [fs, llm, attachments, tools]
+      config:
+        enabled: true

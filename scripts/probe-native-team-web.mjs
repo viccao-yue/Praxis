@@ -32,7 +32,7 @@ let credential = '';
 const report = {
   scope: 'expert-team-resilience',
   environment: {
-    host: 'production packaged WorkDSH profile',
+    host: 'production packaged Praxis profile',
     team: 'official DeepSeek Harness Agent Teams service, tools and Web client',
     browser: 'Playwright Chromium',
     modelIo: realModel ? 'deterministic fault adapter plus explicit DeepSeek real-model handoff' : 'deterministic local adapter',
@@ -77,7 +77,7 @@ try {
     await writeFile(join(home, '.credentials.yaml'), stringify({ version: 1, records: {}, refs: { DEEPSEEK_API_KEY: credential } }), { mode: 0o600 });
   }
   const tarballs = [];
-  // Verify the native Team panel. WorkDSH's legacy activity strip is disabled
+  // Verify the native Team panel. Praxis's legacy activity strip is disabled
   // in DSH 0.1.7, whose native conversation owns work-process presentation.
   for (const directory of ['packages/providers/identity-local', 'packages/plugins/audit', 'packages/plugins/access', 'packages/plugins/skills', 'packages/plugins/experts', 'packages/bundle', 'packages/plugins/activity']) {
     const manifest = JSON.parse(await readFile(join(root, directory, 'package.json'), 'utf8'));

@@ -12,7 +12,7 @@ export interface DesktopTargetBuildPaths {
   readonly packedDsh: string
   readonly packedVendor: string
   readonly packedLandlock: string
-  // WORKDSH TEST PATCH: local WorkDSH profile tarball directory.
+  // WORKDSH TEST PATCH: local Praxis profile tarball directory.
   readonly packedWorkdsh: string
   readonly downloads: string
 }

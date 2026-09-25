@@ -1116,6 +1116,37 @@ importers:
         specifier: workspace:*
         version: link:../../ui
 
+  packages/plugins/vision:
+    dependencies:
+      '@deepseek-ai/schemastery':
+        specifier: 3.18.3
+        version: 3.18.3
+      dsh-vision-plugin:
+        specifier: 1.4.0
+        version: 1.4.0
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: 4.0.3
+        version: 4.0.3(@deepseek-ai/cordis-plugin-include@1.0.8)(@deepseek-ai/cordis-plugin-loader@1.0.4)
+      '@deepseek-ai/dsh-client-ui-renderer':
+        specifier: 0.1.7-alpha.1
+        version: 0.1.7-alpha.1(@deepseek-ai/cordis@4.0.3)
+      '@deepseek-ai/dsh-client-ui-settings':
+        specifier: 0.1.7-alpha.1
+        version: 0.1.7-alpha.1(@deepseek-ai/cordis@4.0.3)
+      '@deepseek-ai/dsh-client-ui-slots':
+        specifier: 0.1.7-alpha.1
+        version: 0.1.7-alpha.1(@deepseek-ai/cordis@4.0.3)
+      '@types/node':
+        specifier: 22.19.0
+        version: 22.19.0
+      '@types/react':
+        specifier: 19.2.14
+        version: 19.2.14
+      react:
+        specifier: 19.2.4
+        version: 19.2.4
+
   packages/plugins/workbench:
     devDependencies:
       '@deepseek-ai/cordis':
@@ -6089,6 +6120,10 @@ packages:
 
   dompurify@3.4.15:
     resolution: {integrity: sha512-EUBjM+B+lkDE41iE82DDSCfkoPGfXx8IxFxPMjNzm/Uk4xDet77rTN9wqlxlVg71kK7XGuUMv6wUxJUwwv+Xyw==}
+
+  dsh-vision-plugin@1.4.0:
+    resolution: {integrity: sha512-Pvmp4XVdkhCHYagokvYB46DlW+LrnwIYUH0OV3LuxSI1DcN6OJaZN3nCEMGRf/SCx3teZuvGCuzq4zEYbLhQxw==}
+    engines: {node: '>=18'}
 
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
@@ -14032,6 +14067,8 @@ snapshots:
   dompurify@3.4.15:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
+
+  dsh-vision-plugin@1.4.0: {}
 
   dunder-proto@1.0.1:
     dependencies:

@@ -8,7 +8,7 @@ skills alpha.22 / bundle alpha.34 增加真实批量管理和卸载依赖影响�
 
 官方文档：../dsh-v0.1.6-alpha.2/subsystems/skills.zh.md。版本 rc.1；公开 dsh-api-remotes/client 的 remote.session.list、remote.skills.list 与 dsh-api-session-controller/client 的 sessions.open。现有 Remote 与 Session 技能消费证据见 d01-client.md、d01-presets.md。
 
-WorkDSH 增加独立 skills Client 插件的全局目录展示、搜索、说明、复制 /name 和新增技能入口；实际 Session 与技能列表仍归官方。无全局技能缓存，无自有解析器、传输或执行器。rc.1 的公开 Remote 需要 Session，当前页面对已有 Session 目录做去重投影，不能冒充完整的组织安装台账。
+开物Praxis 增加独立 skills Client 插件的全局目录展示、搜索、说明、复制 /name 和新增技能入口；实际 Session 与技能列表仍归官方。无全局技能缓存，无自有解析器、传输或执行器。rc.1 的公开 Remote 需要 Session，当前页面对已有 Session 目录做去重投影，不能冒充完整的组织安装台账。
 
 首片验收：真实 Host 数据加载、空目录/错误/搜索无结果、任务切换及返回、键盘详情、1440/1920/390 布局。导入、正文资源浏览、不可变业务修订和团队权限尚未实现，不显示成功占位。
 
@@ -22,7 +22,7 @@ build/typecheck/check:versions/check:plan、集成 8/8 通过。浏览器卸载/
 
 ## 原型对齐修正（2026-09-10）
 
-用户反馈正式页面偏离原型。本轮复用公开 dsh-client-ui-theme/client 的 register/setTheme 与官方 sidebar.panellist；注册 WorkDSH 中性深色主题，不通过全局 CSS 隐藏或改写原生 DOM。恢复能力分类工具栏，任务范围折叠到次级区域，保留真实目录。分类未实现时显式禁用。验收关注同视口截图与现有查询/详情交互。
+用户反馈正式页面偏离原型。本轮复用公开 dsh-client-ui-theme/client 的 register/setTheme 与官方 sidebar.panellist；注册 开物Praxis 中性深色主题，不通过全局 CSS 隐藏或改写原生 DOM。恢复能力分类工具栏，任务范围折叠到次级区域，保留真实目录。分类未实现时显式禁用。验收关注同视口截图与现有查询/详情交互。
 
 alpha.4 结果：build/typecheck/check:plan 与完整 probe:browser 通过；真实预览 18989 已升级并重启，目录加载后截图 `.artifacts/skills-preview-aligned.png`。正常地址没有诊断导航；任务范围默认折叠。尚未完成整套原型导航与公共组件迁移，不能视为 UI 完整验收。
 
@@ -80,7 +80,7 @@ Exact Fetch route 是 rc.1/rc.2 外部包 Remote 生成失败期间的兼容适�
 
 真实 Chromium 验收使用隔离的共享 Agents root 创建 `workdsh-browser-fixture`，验证全局列表发现、完整正文读取、编辑后原子保存并重新读取新正文、停用、重新启用、试用草稿、确认卸载及列表移除；随后完成 bundle 停服移除、Host 重启、Client 模块缺席和重新安装。集成测试 11/11、build、typecheck、规划与版本锁定检查通过。打开目录的产品动作直接调用官方 `session.openWorkspacePath({ action: 'reveal' })`；自动化未主动弹出系统 Finder。
 
-skills alpha.18 / bundle alpha.30 增加三层持久状态：跨进程技能锁、停用来源凭据和卸载回收凭据，全部位于共享 Agents home 的 WorkDSH 私有状态目录，不写入 `SKILL.md`。12/12 集成测试覆盖同 revision 并发写只允许一个成功、资源文件 revision、新资源、停用后原位恢复、卸载列表及恢复。官方 filesystem watcher 测试验证停用后运行目录撤销技能、重新启用后再次发现同一正文。完整 Chromium 验收覆盖新建资源、卸载、最近卸载列表、恢复、再次清理、插件移除后的 Host/Client 缺席与重新安装。
+skills alpha.18 / bundle alpha.30 增加三层持久状态：跨进程技能锁、停用来源凭据和卸载回收凭据，全部位于共享 Agents home 的 开物Praxis 私有状态目录，不写入 `SKILL.md`。12/12 集成测试覆盖同 revision 并发写只允许一个成功、资源文件 revision、新资源、停用后原位恢复、卸载列表及恢复。官方 filesystem watcher 测试验证停用后运行目录撤销技能、重新启用后再次发现同一正文。完整 Chromium 验收覆盖新建资源、卸载、最近卸载列表、恢复、再次清理、插件移除后的 Host/Client 缺席与重新安装。
 
 ## 2026-09-11：浏览器导入闭环
 
@@ -94,7 +94,7 @@ Client 支持 `.zip`、单个 `.md` 与文件夹选择，Host 预检通过后返
 
 ## 2026-09-11：打包 Web 的跨重启状态恢复
 
-本轮没有增加新的 Skill 状态层。官方优先复用记录如下：全局发现与重新发现继续使用 Harness `ctx.skills` 和文件 provider/watcher；浏览器认证继续使用 `dsh-client-connection`；Client 仍由官方 Web module graph 和唯一 React root 装载；停用与卸载的 WorkDSH 业务凭据继续由现有 `SkillManager` 私有状态目录拥有。新增内容只扩展真实打包验收脚本。
+本轮没有增加新的 Skill 状态层。官方优先复用记录如下：全局发现与重新发现继续使用 Harness `ctx.skills` 和文件 provider/watcher；浏览器认证继续使用 `dsh-client-connection`；Client 仍由官方 Web module graph 和唯一 React root 装载；停用与卸载的 开物Praxis 业务凭据继续由现有 `SkillManager` 私有状态目录拥有。新增内容只扩展真实打包验收脚本。
 
 `probe:browser` 在首次完整管理操作后保留隔离 Profile 与 Agents root，并执行两次新的 Host 冷启动：
 
@@ -124,7 +124,7 @@ Host 新增只读本地技能目录 `SkillCatalogStore`（默认 `~/.agents/.wor
 
 ## 2026-09-13：技能弹框紧凑化（公共 Modal 外壳）
 
-用户反馈技能预览弹框过大（宽度近全屏、112px 图标、32px 标题）。WorkDSH 弹框为 `workdsh-ui` 公共 `Modal`（`.wd-dialog` 默认宽度 `min(1120px, calc(100vw - 56px))`，由技能/专家/连接器等面板共用），因此不改公共默认值，仅在技能插件 CSS 内用 `.wd-dialog.skill-detail-dialog`、`.wd-dialog.catalog-dialog` 等高特异性类收窄并紧凑化内部：目录预览 720px、技能详情 820px、确认 480px、回收站 560px、导入 720px；图标 64px、标题 24px、正文 15px、灰卡 padding 20/22、小节标题 16px。预览小节改名「基本信息」对齐 WorkBuddy，并修复「概述」标题使用的缺失图标 `icon('file')`（改为可用图标 `library`）。
+用户反馈技能预览弹框过大（宽度近全屏、112px 图标、32px 标题）。开物Praxis 弹框为 `workdsh-ui` 公共 `Modal`（`.wd-dialog` 默认宽度 `min(1120px, calc(100vw - 56px))`，由技能/专家/连接器等面板共用），因此不改公共默认值，仅在技能插件 CSS 内用 `.wd-dialog.skill-detail-dialog`、`.wd-dialog.catalog-dialog` 等高特异性类收窄并紧凑化内部：目录预览 720px、技能详情 820px、确认 480px、回收站 560px、导入 720px；图标 64px、标题 24px、正文 15px、灰卡 padding 20/22、小节标题 16px。预览小节改名「基本信息」对齐 WorkBuddy，并修复「概述」标题使用的缺失图标 `icon('file')`（改为可用图标 `library`）。
 
 回归：`probe:skills` 浏览器段新增弹框断言（`.wd-dialog.catalog-dialog` 宽度 ≤760、图标 64px、标题 24px、「基本信息」可见后关闭），7/7 段 PASS；18989 活预览实测预览弹框 720px、图标 64px、标题 24px、详情弹框 820px、pageerror 0。截图 `.artifacts/skills-market-preview.png`、`.artifacts/skills-market-detail.png`。官方能力复用记录：弹框继续使用 workdsh-ui 公共 `Modal`，焦点陷阱、Esc/遮罩关闭与 ARIA 行为未变，未新增第二套弹框实现；本轮修复仅涉及技能插件自身样式与标题图标。
 

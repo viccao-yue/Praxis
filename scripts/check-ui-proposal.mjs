@@ -6,7 +6,7 @@ try {
  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(pathToFileURL(resolve('docs/ui/index.html')).href);
- await expect(page.getByRole('heading',{name:'WorkDSH，我帮你'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'开物Praxis，我帮你'})).toBeVisible();
  await page.screenshot({path:'docs/ui/home.png',fullPage:true,animations:'disabled'});
  await page.locator('[data-action="fill"]').first().click();
  await expect(page.getByLabel('任务描述')).toHaveValue(/文档处理/);

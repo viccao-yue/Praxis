@@ -4,7 +4,7 @@
 
 ## 1. 插件身份与组成
 
-**Office操作由独立可安装的`workdsh-plugin-office`提供。** 它通过官方`dsh.bundle.patch`、Loader/Profile、Cordis服务/工具及Client模块接入Harness。WorkDSH默认组合只选择/配置这个包，不拥有其编辑、工具或数据实现。
+**Office操作由独立可安装的`workdsh-plugin-office`提供。** 它通过官方`dsh.bundle.patch`、Loader/Profile、Cordis服务/工具及Client模块接入Harness。开物Praxis默认组合只选择/配置这个包，不拥有其编辑、工具或数据实现。
 
 一个安装包可以包含多个正式Cordis插件模块。首版保留一个Office包，在包内按职责组合，不为八种文件强制建八个npm包，也不把每个文档变成代码插件。Tiptap/Univer/Konva等是该包使用的编辑基础库；它们各自的扩展机制不承担Harness插件安装/权限/生命周期。
 
@@ -22,7 +22,7 @@ U1 已以包内正式插件实现 ContentService/Tools/Connection，并注册五
 
 ```mermaid
 flowchart TB
-  Profile[官方 Profile / WorkDSH组合] --> Package[workdsh-plugin-office 安装包]
+  Profile[官方 Profile / 开物Praxis组合] --> Package[workdsh-plugin-office 安装包]
   Package --> Host[Host 根插件：ctx.plugin组合]
   Host --> Service[Office内容服务插件]
   Host --> Tools[Office工具插件：content_*]
@@ -77,11 +77,11 @@ U1检查服务名、工具wire name、route与Slot key是否冲突；冲突显�
 
 制品沿用`workdsh-plugin-office@0.1.x`，包含Host/Client构建产物、`cordis.patch.yml`、README/CHANGELOG、必要CSS/字体/WASM/worker与LICENSE/NOTICE。只分发实际实现的能力。未来拆分独立提供方时另写ADR及包契约，本轮不生成空插件包。
 
-- 发布前在构建环境生成完整产物；干净Profile安装`.tgz`不需要WorkDSH checkout、根`scripts`、开发node_modules或安装时拉取CDN。开发build脚本位于根目录不妨碍预构建tarball，但不能宣传当前源码安装已自包含。
+- 发布前在构建环境生成完整产物；干净Profile安装`.tgz`不需要开物Praxis checkout、根`scripts`、开发node_modules或安装时拉取CDN。开发build脚本位于根目录不妨碍预构建tarball，但不能宣传当前源码安装已自包含。
 - Harness/Cordis/React运行边界按官方peer与Client inject/external声明；dev依赖锁定0.1.5-rc.1/4.0.2对应族。浏览器包不得引入Host/node:fs/child_process；Host包不得内联另一份Cordis框架。现有iframe探针不作为原生Client图兼容证据。
 - SDK、worker/WASM和字体版本成组锁定，全部同源受管资源交付；组件采用不等于codec已实现。每类都分别记录新建编辑、导入、显示、原生对象编辑、未支持对象保留、导出重开的能力矩阵。
 - 保留采用的开源发行物与实际传递依赖LICENSE/NOTICE。当前package为private，适合开发/本地tarball验证，不能称已发布npm；registry发布前处理private/包元数据并执行发布门槛。商业可用采用路线不改变产品代码里的真实限制。
-- 安装进Profile、Cordis激活与业务能力可用分别确认。独立安装包含必要的官方Host/Web组合与显式治理依赖，不要求安装专家/技能/工作台。默认WorkDSH组合装配Office一次，不能导入其内部实现。
+- 安装进Profile、Cordis激活与业务能力可用分别确认。独立安装包含必要的官方Host/Web组合与显式治理依赖，不要求安装专家/技能/工作台。默认开物Praxis组合装配Office一次，不能导入其内部实现。
 
 官方[打包与安装](https://deepseek-harness.github.io/deepseek-harness/develop/basic/publish)区分配置层与普通依赖；[服务依赖](https://deepseek-harness.github.io/deepseek-harness/develop/framework/service)说明inject与卸载后的消费者行为。精确CLI参数和公开扩展面以锁定rc.1的本地探针为准，本文未执行安装/卸载/发布。
 

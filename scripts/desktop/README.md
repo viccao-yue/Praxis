@@ -1,7 +1,7 @@
-# WorkDSH 桌面打包（官方流水线）
+# 开物Praxis 桌面打包（官方流水线）
 
 基于官方 `deepseek-ai/deepseek-harness` 仓库 `apps/desktop`（tag `dsh-v0.1.5-rc.1`）的隔离快照，
-经 `WORKDSH TEST PATCH` 补丁产出 **WorkDSH.app 未签名本地测试版**（macOS arm64）。
+经 `WORKDSH TEST PATCH` 补丁产出 **开物Praxis.app 未签名本地测试版**（macOS arm64）。
 
 **完整指南见 [docs/DESKTOP-PACKAGING.md](../../docs/DESKTOP-PACKAGING.md)**：用法、补丁用途表、
 快照重建、Windows 说明与常见问题均以该文档为主体；本文件仅作脚本目录速查。
@@ -21,7 +21,7 @@ node scripts/desktop/pack-desktop.mjs --sync-patches # 快照补丁有改动时�
 脚本自动处理：Node 22 自举、corepack 直调、`ELECTRON_MIRROR` 镜像、未签名环境变量、产物断言。
 退出码非 0 即失败。
 
-产物：`.artifacts/desktop-pack-test/upstream/apps/desktop/.desktop-build/targets/mac-arm64/artifacts/mac-arm64/WorkDSH.app`
+产物：`.artifacts/desktop-pack-test/upstream/apps/desktop/.desktop-build/targets/mac-arm64/artifacts/mac-arm64/开物Praxis.app`
 
 ## 前置条件
 

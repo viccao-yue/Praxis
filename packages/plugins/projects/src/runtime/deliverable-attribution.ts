@@ -12,7 +12,7 @@ declare module '@deepseek-ai/cordis' { interface Context { workdshLibrary: Libra
  * `present` tool inside a project task session are registered in the owning Library
  * (source=task, sourceTaskId=session) and linked to the project as asset references.
  * The Harness session log stays the execution truth; this listener only mirrors the
- * official delivery signal into WorkDSH's object/relation data.
+ * official delivery signal into Praxis's object/relation data.
  */
 
 /** Import nothing larger than the Library's own upload limit; oversized deliveries are skipped. */
@@ -116,10 +116,10 @@ export async function attributePresentedFiles(
       const outcome = await importDeliveredFile(deps, actor, { sessionId: input.sessionId, digest: digestOf(name, bytes) }, bytes, name, signal);
       if ('gap' in outcome) { await deps.projects.noteDeliveryGap(actor, context.project.id, outcome.gap, signal); continue; }
       const entry = outcome.entry;
-      if (!entry.asset || !entry.revision) { deps.warn(`项目交付入库结果缺少资产信息：${file.path}`); continue; }
+      if (!entry.asset || !entry.revision) { deps.warn(`协同空间交付入库结果缺少资产信息：${file.path}`); continue; }
       await deps.projects.addAsset(actor, context.project.id, { nodeId: entry.id, assetId: entry.asset.id, revisionId: entry.revision.id, name: entry.name, kind: entry.asset.kind }, signal);
     } catch (cause) {
-      deps.warn(`项目交付归属失败：${file.path}（${messageOf(cause)}）`);
+      deps.warn(`协同空间交付归属失败：${file.path}（${messageOf(cause)}）`);
     }
   }
 }
@@ -145,6 +145,6 @@ export function registerDeliverableAttribution(ctx: Context): void {
     const cwd = session.header.cwd;
     if (!cwd) { logger.warn('presented without cwd, skipped'); return; }
     void attributePresentedFiles(deps, { sessionId: String(session.id), cwd, files: event.data.files })
-      .catch(cause => { logger.warn(`项目交付归属异常：${messageOf(cause)}`); });
+      .catch(cause => { logger.warn(`协同空间交付归属异常：${messageOf(cause)}`); });
   });
 }

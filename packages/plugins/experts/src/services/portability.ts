@@ -13,7 +13,7 @@ import { authoringDocuments, definitionFromDocuments } from '../authoring/docume
 /**
  * Local expert package portability (EP-06, CONTRACTS §6, AT-21).
  *
- * Format `workdsh-expert` schemaVersion 1 — a WorkDSH product format, never the
+ * Format `workdsh-expert` schemaVersion 1 — a Praxis product format, never the
  * official Harness skill format. A package carries `manifest.json` + `expert.json`
  * (the definition + source attribution) and nothing that auto-installs: no owner,
  * internal preset id, granted permission, session id, credential, executable
@@ -79,15 +79,15 @@ function byteCount(bytes: Uint8Array): number {
 }
 
 function assertSafeRelativePath(path: string): void {
-  if (typeof path !== 'string' || path.length === 0 || path.length > 512) invalid('专家包文件路径无效。');
+  if (typeof path !== 'string' || path.length === 0 || path.length > 512) invalid('数字员工包文件路径无效。');
   if (path.startsWith('/') || path.includes('\\') || path.includes('\0') || /^[a-zA-Z]:/.test(path)) {
-    invalid('专家包含绝对路径或非法分隔符，已拒绝。');
+    invalid('数字员工包含绝对路径或非法分隔符，已拒绝。');
   }
   const segments = path.split('/');
   if (segments.some((segment) => segment === '' || segment === '.' || segment === '..')) {
-    invalid('专家包含越界或空路径段，已拒绝。');
+    invalid('数字员工包含越界或空路径段，已拒绝。');
   }
-  if (segments.length > MAX_DEPTH) invalid(`专家包目录层级超过 ${MAX_DEPTH} 层上限。`);
+  if (segments.length > MAX_DEPTH) invalid(`数字员工包目录层级超过 ${MAX_DEPTH} 层上限。`);
 }
 
 /** Reject entries that collide under case-folding or Unicode NFC normalization. */
@@ -97,7 +97,7 @@ function assertNoPathCollisions(paths: readonly string[]): void {
     const folded = path.normalize('NFC').toLowerCase();
     const prior = seen.get(folded);
     if (prior !== undefined && prior !== path) {
-      invalid('专家包含大小写或 Unicode 规范化碰撞的路径，已拒绝。');
+      invalid('数字员工包含大小写或 Unicode 规范化碰撞的路径，已拒绝。');
     }
     seen.set(folded, path);
   }
@@ -159,7 +159,7 @@ function assertManifest(value: unknown): ExpertPackageManifest {
     invalid('manifest.schemaVersion 无效。');
   }
   if (schemaVersion > EXPERT_SCHEMA_VERSION) {
-    invalid(`专家包 schemaVersion ${schemaVersion} 高于当前支持的 ${EXPERT_SCHEMA_VERSION}，请升级后再导入。`);
+    invalid(`数字员工包 schemaVersion ${schemaVersion} 高于当前支持的 ${EXPERT_SCHEMA_VERSION}，请升级后再导入。`);
   }
   if (record.expertFile !== EXPERT_FILE) invalid('manifest.expertFile 必须为 expert.json。');
   if (!Array.isArray(record.files)) invalid('manifest.files 缺失或不是数组。');
@@ -216,33 +216,33 @@ export function preflightPackage(zipBytes: Uint8Array): {
   issues: readonly DomainIssue[];
   previewDigest: string;
 } {
-  if (byteCount(zipBytes) > MAX_ZIP_BYTES) invalid(`专家包超过 ${MAX_ZIP_BYTES / (1024 * 1024)} MiB 上限。`);
+  if (byteCount(zipBytes) > MAX_ZIP_BYTES) invalid(`数字员工包超过 ${MAX_ZIP_BYTES / (1024 * 1024)} MiB 上限。`);
   let entries: Unzipped;
   try {
     let declaredTotal = 0, declaredCount = 0;
     entries = unzipSync(zipBytes, { filter(file) {
       if (file.name.endsWith('/') && !file.originalSize) return false;
       declaredTotal += file.originalSize; declaredCount++;
-      if (declaredCount > MAX_FILES || declaredTotal > 48 * 1024 * 1024 || file.originalSize > (file.name === EXPERT_FILE ? 32 * 1024 * 1024 : MAX_FILE_BYTES)) invalid('专家包单文件、数量或总大小过大。');
+      if (declaredCount > MAX_FILES || declaredTotal > 48 * 1024 * 1024 || file.originalSize > (file.name === EXPERT_FILE ? 32 * 1024 * 1024 : MAX_FILE_BYTES)) invalid('数字员工包单文件、数量或总大小过大。');
       return true;
     } });
     for (const path of Object.keys(entries)) if (path.endsWith('/') && !entries[path].length) delete entries[path];
   } catch {
-    invalid('专家包不是有效的 zip 压缩包或使用了不支持的压缩格式。');
+    invalid('数字员工包不是有效的 zip 压缩包或使用了不支持的压缩格式。');
   }
   const paths = Object.keys(entries);
-  if (paths.length === 0) invalid('专家包为空。');
-  if (paths.length > MAX_FILES) invalid(`专家包文件数超过 ${MAX_FILES} 上限。`);
+  if (paths.length === 0) invalid('数字员工包为空。');
+  if (paths.length > MAX_FILES) invalid(`数字员工包文件数超过 ${MAX_FILES} 上限。`);
   for (const path of paths) assertSafeRelativePath(path);
   assertNoPathCollisions(paths);
 
   let totalUncompressed = 0;
   for (const path of paths) {
     const size = byteCount(entries[path]);
-    if (size > (path === EXPERT_FILE ? 32 * 1024 * 1024 : MAX_FILE_BYTES)) invalid(`专家包文件 "${path}" 超过 ${MAX_FILE_BYTES / (1024 * 1024)} MiB 单文件上限。`);
+    if (size > (path === EXPERT_FILE ? 32 * 1024 * 1024 : MAX_FILE_BYTES)) invalid(`数字员工包文件 "${path}" 超过 ${MAX_FILE_BYTES / (1024 * 1024)} MiB 单文件上限。`);
     totalUncompressed += size;
   }
-  if (totalUncompressed > (entries[EXPERT_FILE] ? 48 * 1024 * 1024 : MAX_UNCOMPRESSED_BYTES)) invalid('专家包总解压大小超过 20 MiB 上限。');
+  if (totalUncompressed > (entries[EXPERT_FILE] ? 48 * 1024 * 1024 : MAX_UNCOMPRESSED_BYTES)) invalid('数字员工包总解压大小超过 20 MiB 上限。');
 
   if (!paths.includes(MANIFEST_FILE) && (paths.includes('.workdsh-expert/plugin.json') || paths.includes('.codebuddy-plugin/plugin.json'))) {
     const documents: Record<string, string> = {};
@@ -255,8 +255,8 @@ export function preflightPackage(zipBytes: Uint8Array): {
     const candidate = definitionFromDocuments(documents, assets);
     return { candidate, issues: validateDefinition(candidate), previewDigest: digestOf({ candidate, sourceAttribution: null }) };
   }
-  if (!paths.includes(MANIFEST_FILE)) invalid('专家包缺少 manifest.json。');
-  if (!paths.includes(EXPERT_FILE)) invalid('专家包缺少 expert.json。');
+  if (!paths.includes(MANIFEST_FILE)) invalid('数字员工包缺少 manifest.json。');
+  if (!paths.includes(EXPERT_FILE)) invalid('数字员工包缺少 expert.json。');
 
   const manifest = assertManifest(
     parseJsonRejectingDuplicateKeys(strFromU8(entries[MANIFEST_FILE]), 'manifest.json'),
@@ -266,7 +266,7 @@ export function preflightPackage(zipBytes: Uint8Array): {
   // must be present with a matching size and sha256. Rejects unlisted/tampered.
   const listed = new Map(manifest.files.map((file) => [file.path, file]));
   for (const path of paths) {
-    if (path !== MANIFEST_FILE && !listed.has(path)) invalid(`专家包含未在 manifest 列出的文件 "${path}"。`);
+    if (path !== MANIFEST_FILE && !listed.has(path)) invalid(`数字员工包含未在 manifest 列出的文件 "${path}"。`);
   }
   for (const file of manifest.files) {
     const bytes = entries[file.path];
@@ -343,7 +343,7 @@ function slugify(name: string): string {
 /** Aggregate size guard reused by the transport before staging an upload. */
 export function assertUploadWithinLimit(declaredLength: number | undefined): void {
   if (declaredLength !== undefined && Number.isFinite(declaredLength) && declaredLength > MAX_ZIP_BYTES) {
-    invalid(`专家包超过 ${MAX_ZIP_BYTES / (1024 * 1024)} MiB 上限。`);
+    invalid(`数字员工包超过 ${MAX_ZIP_BYTES / (1024 * 1024)} MiB 上限。`);
   }
 }
 

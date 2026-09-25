@@ -38,7 +38,7 @@ writeFileSync(resolve(dshHome, 'storages/workspace.json'), `${JSON.stringify({
   global: { initialized: true, workspaceIds: [workspaceId], archivedSessionIds: [] },
   tables: {
     workspaces: {
-      [workspaceId]: { path: root, title: 'WorkDSH Probe', sessionIds: [], createdAt: now, updatedAt: now },
+      [workspaceId]: { path: root, title: 'Praxis Probe', sessionIds: [], createdAt: now, updatedAt: now },
     },
   },
 }, null, 2)}\n`);
@@ -114,8 +114,8 @@ const rows = await discoverPresets(presetRoots, import.meta.url);
 const cordis = rows.find(row => row.id === 'cordis');
 const minimal = rows.find(row => row.id === 'minimal');
 assert.ok(cordis && minimal, 'published package supplies cordis and minimal presets');
-await copyComposition(presetRoots, cordis, 'workdsh-skills', 'WorkDSH Skills');
-await copyComposition(presetRoots, minimal, 'workdsh-minimal', 'WorkDSH Minimal');
+await copyComposition(presetRoots, cordis, 'workdsh-skills', 'Praxis Skills');
+await copyComposition(presetRoots, minimal, 'workdsh-minimal', 'Praxis Minimal');
 
 try {
   const { address, cookie } = await startHost(true);
@@ -152,20 +152,20 @@ try {
 
     await expect(page.getByRole('button', { name: /Standard mode|标准模式/i })).toBeVisible({ timeout: 20_000 });
     await page.getByRole('button', { name: /Standard mode|标准模式/i }).click();
-    await expect(page.getByText('WorkDSH Skills', { exact: true })).toBeVisible();
-    await expect(page.getByText('WorkDSH Minimal', { exact: true })).toBeVisible();
+    await expect(page.getByText('Praxis Skills', { exact: true })).toBeVisible();
+    await expect(page.getByText('Praxis Minimal', { exact: true })).toBeVisible();
     await page.keyboard.press('Escape');
 
     await page.getByRole('button', { name: /Choose workspace|选择工作区/i }).click();
-    await page.getByText('WorkDSH Probe', { exact: true }).last().click();
+    await page.getByText('Praxis Probe', { exact: true }).last().click();
 
     const composer = page.locator('textarea, [contenteditable="true"]').last();
     await expect(composer).toBeVisible();
     await page.getByRole('button', { name: /Standard mode|标准模式/i }).click();
     const initialSkillsSelect = page.waitForResponse(response => new URL(response.url()).pathname === '/api/agentPresets/select');
-    await page.getByText('WorkDSH Skills', { exact: true }).click();
+    await page.getByText('Praxis Skills', { exact: true }).click();
     assert.ok((await initialSkillsSelect).ok(), 'initial blank-session preset switch succeeded');
-    await expect(page.getByRole('button', { name: /WorkDSH Skills/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Praxis Skills/ })).toBeVisible();
     await page.waitForTimeout(250);
     await composer.fill('/');
     await expect(page.getByText('cordis-plugin-development', { exact: true })).toBeVisible({ timeout: 10_000 });
@@ -173,11 +173,11 @@ try {
     await composer.fill('');
     await page.keyboard.press('Escape');
     await expect(page.getByText('cordis-plugin-development', { exact: true })).not.toBeVisible();
-    await page.getByRole('button', { name: /WorkDSH Skills/ }).click();
+    await page.getByRole('button', { name: /Praxis Skills/ }).click();
     const selectMinimal = page.waitForResponse(response => new URL(response.url()).pathname === '/api/agentPresets/select');
-    await page.getByText('WorkDSH Minimal', { exact: true }).click();
+    await page.getByText('Praxis Minimal', { exact: true }).click();
     assert.ok((await selectMinimal).ok(), 'blank-session preset switch succeeded');
-    await expect(page.getByRole('button', { name: /WorkDSH Minimal/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Praxis Minimal/ })).toBeVisible();
     await page.waitForTimeout(250);
     const minimalList = page.waitForResponse(response => new URL(response.url()).pathname === '/api/skills/list');
     await composer.fill('/');
@@ -189,9 +189,9 @@ try {
     await expect(page.getByText('editing-cordis-compositions', { exact: true })).not.toBeVisible();
     await composer.fill('');
     await page.keyboard.press('Escape');
-    await page.getByRole('button', { name: /WorkDSH Minimal/ }).click();
+    await page.getByRole('button', { name: /Praxis Minimal/ }).click();
     const selectSkills = page.waitForResponse(response => new URL(response.url()).pathname === '/api/agentPresets/select');
-    await page.getByText('WorkDSH Skills', { exact: true }).click();
+    await page.getByText('Praxis Skills', { exact: true }).click();
     assert.ok((await selectSkills).ok(), 'second blank-session preset switch succeeded');
     await page.waitForTimeout(250);
     await composer.fill('/');
@@ -236,10 +236,10 @@ try {
       await secondPage.getByRole('button', { name: 'Configure later', exact: true }).waitFor({ state: 'visible', timeout: 5_000 })
         .then(() => secondPage.getByRole('button', { name: 'Configure later', exact: true }).click()).catch(() => {});
       await secondPage.getByRole('button', { name: /Choose workspace|选择工作区/i }).click();
-      await secondPage.getByText('WorkDSH Probe', { exact: true }).last().click();
-      await secondPage.getByRole('button', { name: /Standard mode|标准模式|WorkDSH Skills/i }).click();
+      await secondPage.getByText('Praxis Probe', { exact: true }).last().click();
+      await secondPage.getByRole('button', { name: /Standard mode|标准模式|开物Praxis Skills/i }).click();
       const secondSelect = secondPage.waitForResponse(response => new URL(response.url()).pathname === '/api/agentPresets/select');
-      await secondPage.getByText('WorkDSH Minimal', { exact: true }).click();
+      await secondPage.getByText('Praxis Minimal', { exact: true }).click();
       const selection = await secondSelect;
       assert.ok(selection.ok());
       const secondAgentId = JSON.parse(selection.request().postData()).payload.args.agentId;
@@ -249,9 +249,9 @@ try {
       ]);
       assert.ok(firstCatalog.result.value.skills.some(skill => skill.name === 'cordis-plugin-development'));
       assert.deepEqual(secondCatalog.result.value.skills, []);
-      await secondPage.getByRole('button', { name: /WorkDSH Minimal/ }).click();
+      await secondPage.getByRole('button', { name: /Praxis Minimal/ }).click();
       const switchSecond = secondPage.waitForResponse(response => new URL(response.url()).pathname === '/api/agentPresets/select');
-      await secondPage.getByText('WorkDSH Skills', { exact: true }).click();
+      await secondPage.getByText('Praxis Skills', { exact: true }).click();
       assert.ok((await switchSecond).ok());
       const [firstAfter, secondAfter] = await Promise.all([
         listSkills(address, cookie, firstAgentId), listSkills(address, cookie, secondAgentId),

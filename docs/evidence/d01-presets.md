@@ -32,21 +32,21 @@ Host 服务授权与 Remote 调用、技能运行注册/按需读取、真实 Se
 
 ## 第三组：官方 Host、空会话切换与 Skill 目录
 
-命令：`pnpm probe:presets`。探针使用隔离 DSH_HOME 和官方 Web Profile，通过发布包的 discoverPresets/copyComposition 创建两个用户预设：WorkDSH Skills 复制 Cordis，WorkDSH Minimal 复制 Minimal。测试只为无界面目录选择器预置一个临时 Workspace v2 存储夹具；启动后的预设选择、Session、Remote 和技能目录均由官方 Host/Client 实现，未注入模拟响应，未调用模型。
+命令：`pnpm probe:presets`。探针使用隔离 DSH_HOME 和官方 Web Profile，通过发布包的 discoverPresets/copyComposition 创建两个用户预设：开物Praxis Skills 复制 Cordis，开物Praxis Minimal 复制 Minimal。测试只为无界面目录选择器预置一个临时 Workspace v2 存储夹具；启动后的预设选择、Session、Remote 和技能目录均由官方 Host/Client 实现，未注入模拟响应，未调用模型。
 
 真实 Chromium 已验证：
 
-- 原生预设选择器同时列出两个本地副本；选择 WorkDSH Skills 后创建真实空白 Session。
+- 原生预设选择器同时列出两个本地副本；选择 开物Praxis Skills 后创建真实空白 Session。
 - `/api/agentPresets/select` 返回成功，切换由官方选择入口提交。
 - `/api/skills/list` 在 Skills 组合下返回 15 项，其中包含随 preset 复制的 `cordis-plugin-development` 与 `editing-cordis-compositions`；官方 `/` 菜单显示这些条目。
 - 同一空白 Session 切到 Minimal 后，新的 `skills/list` 返回 0 项，两项 Cordis 技能消失；切回 Skills 后目录重新返回 15 项，证明官方选择事件触发了技能目录失效与重读。
 - 探针显式移除模型密钥；提交一条用户消息后，官方界面产生 `MISSING_CREDENTIAL` 本地错误并留下非空会话记录。随后对同一 Session 请求切到 Minimal，官方 Host 返回 `agent-preset/locked`，验证非空会话不能换组合。
 - 停止并以同一隔离 DSH_HOME 重启官方 Host 后，直接对原 Session 调用官方 `skills/list` 仍返回 15 项并包含两项 Cordis 技能，验证选择事件投影和技能组合可以跨 Host 重启恢复。
 - 停服后把同一 `workdsh-skills` ID 的组装文件替换为 Minimal，再次重启并查询原 Session，技能数变为 0；恢复原文件重启后又返回 15 项。这证明 Session 跨重启解析的是 ID 对应的当前文件，不是原组合的不可变快照。
-- 在确认原文件恢复为 15 项后停服并删除该 preset，重启查询原 Session 时 `skills/list` 返回 `ok: true` 和空数组，而非明确的缺失错误。WorkDSH 不能依赖该响应保护历史任务。
-- 截图：`.artifacts/preset-skills.png`。它是官方浅色会话界面中的运行探针，不是 WorkDSH 最终 UI 设计稿。
+- 在确认原文件恢复为 15 项后停服并删除该 preset，重启查询原 Session 时 `skills/list` 返回 `ok: true` 和空数组，而非明确的缺失错误。开物Praxis 不能依赖该响应保护历史任务。
+- 截图：`.artifacts/preset-skills.png`。它是官方浅色会话界面中的运行探针，不是 开物Praxis 最终 UI 设计稿。
 
-这组证据支持“官方 Skill 子系统是 WorkDSH 唯一技能执行底座”，也否定“相同 preset ID 可安全原地升级”的假设。修订和保留策略已固化到 [ADR-0010](../adr/0010-immutable-preset-revisions.md)。本轮没有模型调用成功，也不把缺少密钥产生的错误算作模型验证。仍未验证：技能正文实际加载和模型消费、两会话运行状态隔离、团队授权，以及 ADR-0010 的 WorkDSH 层实现。P0-03 继续保持 in_progress。
+这组证据支持“官方 Skill 子系统是 开物Praxis 唯一技能执行底座”，也否定“相同 preset ID 可安全原地升级”的假设。修订和保留策略已固化到 [ADR-0010](../adr/0010-immutable-preset-revisions.md)。本轮没有模型调用成功，也不把缺少密钥产生的错误算作模型验证。仍未验证：技能正文实际加载和模型消费、两会话运行状态隔离、团队授权，以及 ADR-0010 的 开物Praxis 层实现。P0-03 继续保持 in_progress。
 ## C01 官方能力复用记录（2026-09-10）
 
 - 任务：D01 / P0-03，两 Session 目录隔离、技能正文按需加载。
@@ -89,7 +89,7 @@ P0-02 外部 Remote 生成遇到已复现的发布包识别边界，仍保留失
 
 测试同时创建 A/B 两个官方 Agent Session，各自在自身 setup scope 挂载名称同为 `sample` 的文件技能，正文分别包含 `SESSION_SCOPE_A` 和 `SESSION_SCOPE_B`。两个 Session 并发通过官方 skill 工具调用后，各自事件只包含自己的正文。随后 dispose B，A 再次发起完整模型—工具—模型回合，仍只读取 A 正文；A 共完成两次调用，B 只完成一次，释放 B 没有撤销 A 的 provider 或污染 A 的历史。
 
-`tests/integration/skill-session.test.mjs` 专项 3/3 通过，完整集成回归 19/19 通过。该证据完成 C01 的 live Session 同名正文、提示词目录与工具调用隔离部分；正常关闭后的跨进程恢复和目录退役已有上一节证据。WorkDSH 业务层的不可变 SkillRevision 绑定与团队主体授权仍属于后续契约，不能由本测试代替。模型 I/O 为固定本地 adapter，不代表真实模型效果。
+`tests/integration/skill-session.test.mjs` 专项 3/3 通过，完整集成回归 19/19 通过。该证据完成 C01 的 live Session 同名正文、提示词目录与工具调用隔离部分；正常关闭后的跨进程恢复和目录退役已有上一节证据。开物Praxis 业务层的不可变 SkillRevision 绑定与团队主体授权仍属于后续契约，不能由本测试代替。模型 I/O 为固定本地 adapter，不代表真实模型效果。
 # C01 复用记录：落盘冷恢复与目录退役（2026-09-10）
 
 使用 rc.1 `dsh-session-persistence-jsonl` 官方根入口，配置隔离临时 root 与 compression=none；复用 `sessionPersistence.open/flush` 和 `agents.resume`，不解析或写入物理日志。依据为发布包 README、handle 公开类型及本地 Session 文档。本轮测试将第一次运行与恢复放在独立 Node 进程，模型继续使用固定测试适配器。

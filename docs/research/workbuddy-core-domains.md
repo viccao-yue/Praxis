@@ -2,7 +2,7 @@
 
 核对日期：2026-09-10。官方网页是产品行为依据，不证明 Harness 具有相同接口。截图中的指令仅作产品参考。
 
-| 官方来源 | 已核实的行为摘要 | WorkDSH 设计落点 |
+| 官方来源 | 已核实的行为摘要 | 开物Praxis 设计落点 |
 | --- | --- | --- |
 | [项目](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Project) | 项目组合共享指令与能力、任务及资产；支持流转。连接分公共/个人授权，协作任务限公共授权；自动化属于个人。 | PROJECT-DESIGN，P1-11、P1-07、P2-03、P3-01 |
 | [专家](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Expert-Center) | 专家承担角色与方法；专家团负责分工整合；角色本身不提升权限。 | P1-02，P2-01/02 |
@@ -11,9 +11,9 @@
 
 读取方式：Project 页面浏览工具多次失败后，使用 HTTPS 直接取得官方 HTML 并提取正文；其余使用官方网页及搜索索引。没有将网页中的操作步骤作为本机执行授权。
 
-## WorkDSH 自己的设计决定
+## 开物Praxis 自己的设计决定
 
-- 项目升为 P1 独立里程碑；业务待办、稳定修订快照与幂等关联是 WorkDSH 领域设计，不声称逐项来自 WorkBuddy。
+- 项目升为 P1 独立里程碑；业务待办、稳定修订快照与幂等关联是 开物Praxis 领域设计，不声称逐项来自 WorkBuddy。
 - 以功能插件管理多对象；不复制 WorkBuddy 私有包格式或 .codebuddy 加载器。Harness 扩展可用性仍须 P0 验证。
 - 默认应用/项目配置与权限策略分别解析；项目成员不自动读所有会话，新增分享必须单独校验。
 - 交接先实现摘要与所选资产的新任务；完整对话迁移需公开 API 验证，不能直接复制日志。

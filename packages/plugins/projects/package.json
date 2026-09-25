@@ -3,7 +3,7 @@
   "version": "0.1.0-alpha.3",
   "private": false,
   "type": "module",
-  "description": "Project workspace, planning, configuration and asset references for WorkDSH",
+  "description": "Project workspace, planning, configuration and asset references for Praxis",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

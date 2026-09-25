@@ -14,8 +14,8 @@
 
 .artifacts/pptist-trial/charts.json 为八页示例数据，包含八类原生 chart 元素。依赖按官方 package-lock.json 安装，npm ci --ignore-scripts；不修改根 pnpm 工作区、不执行源码 prepare。
 
-当前状态：原生构建通过（5.12s）。node scripts/probe-pptist.mjs 的4项实际浏览器验证通过：八类SVG图表显示；原生数据编辑器将饼图第一项10改为77；JSON保存、重置、重导入后8页/77一致；标准PPTX含8个图表XML、8份嵌入xlsx，确认pie/doughnut/bar/line/area/radar/scatter类型及77数值。无pageerror。原生iframe/WorkDSH AI与受控保存接入未执行；Office/WPS视觉验证未执行，不能以ZIP结构检查替代。
+当前状态：原生构建通过（5.12s）。node scripts/probe-pptist.mjs 的4项实际浏览器验证通过：八类SVG图表显示；原生数据编辑器将饼图第一项10改为77；JSON保存、重置、重导入后8页/77一致；标准PPTX含8个图表XML、8份嵌入xlsx，确认pie/doughnut/bar/line/area/radar/scatter类型及77数值。无pageerror。原生iframe/开物Praxis AI与受控保存接入未执行；Office/WPS视觉验证未执行，不能以ZIP结构检查替代。
 
 体验 http://127.0.0.1:19092/，标准vite preview仅本机。只替换原生公开 dist/mocks/slides.json 为8页样例，没有改Vue/Pinia/图表/导出源码。默认启动每次从mock加载，不承诺原生页刷新自动恢复编辑；已验证通过文件保存重开。源仓库21份字体资源较大，Git稀疏检出排除字体目录；本次只使用校验Git blob匹配的已下载字体与Arial样例。尚未下载的字体不在本次体验范围，完整资源/字体许可门禁未完成。
 
-原生AI按钮属于PPTist自身服务流程，未接WorkDSH模型；本机验证不调用该按钮，不把它算作Office AI接入。原有18989与旧稿件保持原样。
+原生AI按钮属于PPTist自身服务流程，未接开物Praxis模型；本机验证不调用该按钮，不把它算作Office AI接入。原有18989与旧稿件保持原样。

@@ -6,7 +6,7 @@
 
 补充前置：[插件交付边界复核](PLUGIN-DELIVERY-REVIEW.md)。专家必须通过官方配置行或 ctx.plugin 建立独立生命周期，并交付可独立安装的组合层；Skill alpha.24 与 bundle alpha.39 已移除这种直接调用 helper 的装配方式；专家继续使用已验证的独立入口与配置层模式。共享编译制品不等于共享运行生命周期，二者分别验证。
 
-WorkDSH 使用 npm 发布的 Harness 包与官方文档，不引入或修改上游源码。保持 Node 22.23.2、pnpm 10.34.5、DSH 0.1.5-rc.1、Cordis 4.0.2 基线。**不要套用相邻 dsh-ssh-desktop 仓库的 Yarn/submodule 规则。**
+开物Praxis 使用 npm 发布的 Harness 包与官方文档，不引入或修改上游源码。保持 Node 22.23.2、pnpm 10.34.5、DSH 0.1.5-rc.1、Cordis 4.0.2 基线。**不要套用相邻 dsh-ssh-desktop 仓库的 Yarn/submodule 规则。**
 
 ```mermaid
 flowchart LR

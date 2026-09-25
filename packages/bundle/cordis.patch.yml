@@ -15,3 +15,20 @@
         executablePath: !!js "process.env.DSH_BROWSER_EXECUTABLE ?? (process.platform === 'darwin' ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' : undefined)"
     - id: auto-review
       name: '@deepseek-ai/dsh-experimental-auto-review'
+# 产品 Web 服务未收到 --port 时监听 8517。开发预览默认同为 8517；显式 --port / WORKDSH_PREVIEW_PORT 仍优先。
+# 覆盖会替换整份 config，因此保留官方 webserver 的 host 与压缩项。
+- id: webserver
+  config:
+    host: !!js ctx.webStartup.host ?? '127.0.0.1'
+    port: !!js ctx.webStartup.port ?? 8517
+    compression: gzip
+    compressionLevel: 1
+    compressionThresholdBytes: 1024
+# Blank / new sessions inherit standard; keep the hero mode chip available without
+# requiring a Settings visit to toggle modeSelectionEnabled after hard refresh.
+- id: agent-preset-registry
+  name: '@deepseek-ai/dsh-agent-preset-registry'
+  config:
+    default: standard
+    selectedDefault: standard
+    modeSelectionEnabled: true

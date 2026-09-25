@@ -2,7 +2,7 @@
 
 ## 成员命名规范
 
-Team 型专家团中，每个成员有三个外露字段：`name`（名字）、`profession`（职业头衔）、`nickname`（昵称，可选）。三者不应重复。
+Team 型数字员工团中，每个成员有三个外露字段：`name`（名字）、`profession`（职业头衔）、`nickname`（昵称，可选）。三者不应重复。
 
 ### name：谐音花名风格
 
@@ -39,7 +39,7 @@ Team 型专家团中，每个成员有三个外露字段：`name`（名字）、
 
 **示例：**
 
-| 专家团 | 主理人 name | profession(zh) | profession(en) |
+| 数字员工团 | 主理人 name | profession(zh) | profession(en) |
 |--------|-----------|---------------|----------------|
 | 软件开发团队 | 齐活林 | 交付总监 | Delivery Director |
 | 交易分析团队 | 何执舟 | 首席策略官 | Chief Strategist |

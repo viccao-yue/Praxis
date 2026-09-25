@@ -45,7 +45,7 @@ export function apply(ctx: Context): void {
     const validated = await management.validateInputRefs(snapshot.project.id, references);
     const workspace = await management.ensureWorkspace(snapshot.project.id);
     const experts = snapshot.config.capabilities.filter(x=>x.kind==='expert');
-    if(experts.length>1)throw new Error('每个任务请选择一位专家。');
+    if(experts.length>1)throw new Error('每个任务请选择一位数字员工。');
     const sessionId = experts[0] ? await createExpertSession(snapshot.project.id,experts[0]) : await sessions.create({ workspaceId: workspace.workspaceId, cwd: workspace.path }), id = String(sessionId);
     const invoke = async (path: string, endpoint: string, payload: unknown) => {
       const response = await fetch(path, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ endpoint, payload }) });
@@ -58,14 +58,14 @@ export function apply(ctx: Context): void {
     if (assets.length) await invoke('/api/workdsh-library', 'set-task-selection', { sessionId: id, nodeIds: assets.map(row => row.nodeId) });
     const connectors = snapshot.config.capabilities.filter(row => row.kind === 'connector').map(row => row.id);
     if (connectors.length) await invoke('/api/workdsh-connectors', 'set-selection', { sessionId: id, connectorIds: connectors });
-    const visibleReferences = validated.map(row => row.kind==='skill'?`/${row.id}`:`${row.kind === 'asset' ? '@资料库' : '@项目'}/${row.label}`).join(' ');
+    const visibleReferences = validated.map(row => row.kind==='skill'?`/${row.id}`:`${row.kind === 'asset' ? '@资料库' : '@协同空间'}/${row.label}`).join(' ');
     // alpha.2: scopes only borrow retained generations, so hold an owned reference across
     // the shared initial open and the send, releasing it on every path. Session scopes
     // expose services through get(); property access needs an inject accessor those contexts never get.
     const reference = sessions.retain(sessionId, { source: 'workdshProjectTaskStart', signal: lifetime.signal });
     try {
       // A failed shared open must stay a recoverable retry, not a raw controller error.
-      try { await reference.ready; } catch { throw new Error('项目会话尚未就绪，请重试。'); }
+      try { await reference.ready; } catch { throw new Error('协同空间会话尚未就绪，请重试。'); }
       for (let attempt = 0; attempt < 40; attempt++) {
         const conversation = reference.binding.ctx.get('conversation');
         if (conversation) {
@@ -76,18 +76,18 @@ export function apply(ctx: Context): void {
           try {
             await conversation.send([prompt, visibleReferences].filter(Boolean).join('\n'));
           } catch {
-            throw new Error('任务已创建，但首条消息发送失败；可从项目任务列表打开该会话重发。');
+            throw new Error('任务已创建，但首条消息发送失败；可从协同空间任务列表打开该会话重发。');
           }
           return id;
         }
         await wait(25);
       }
     } finally { reference.release(); }
-    throw new Error('项目会话尚未就绪，请重试。');
+    throw new Error('协同空间会话尚未就绪，请重试。');
   };
   // Opening a task is official Session navigation: the Session becomes current and the
   // layout returns to the built-in conversation view, whose shell owns message history,
-  // streaming, composer, model and permissions. WorkDSH keeps no second conversation
+  // streaming, composer, model and permissions. Praxis keeps no second conversation
   // renderer or send path for project tasks.
   // A reload-restored snapshot can mount before the session list pull lands; retry briefly instead of failing loud.
   const openTask = (sessionId: string, onFailed?: () => void): void => {
@@ -113,17 +113,17 @@ export function apply(ctx: Context): void {
   };
   const startExpert = async (context:ProjectTaskContext, expert:ProjectCapabilityRef, draft:string) => {
     const snapshot=await management.get(context.project.id);
-    if(!snapshot.config.capabilities.some(x=>x.kind==='expert'&&x.id===expert.id&&x.revision===expert.revision))throw new Error('该专家已从项目配置移除或更新，请回项目查看。');
+    if(!snapshot.config.capabilities.some(x=>x.kind==='expert'&&x.id===expert.id&&x.revision===expert.revision))throw new Error('该数字员工已从协同空间配置移除或更新，请回协同空间查看。');
     const sessionId=await createExpertSession(context.project.id,expert);
     await management.linkTask(context.project.id,String(sessionId),expert.label,undefined,[],[expert]);
     ctx.uiWorkspace.openSession(sessionId);ctx.layout.selectPanel(null);
     for(let i=0;i<40;i++){const binding=sessions.binding(sessionId);if(binding){const input=ctx.conversation.input.for(binding.ctx);input.setDraft(draft);return}await wait(50)}
-    throw new Error('新任务已创建，请从项目任务列表打开。');
+    throw new Error('新任务已创建，请从协同空间任务列表打开。');
   };
   ctx.slots.inject('conversation.input.overlay',()=>ctx.slots.register({
     name:'conversation.input.overlay',id:'workdsh-project-menu-bridge',order:-10,
     inject:(sessionId)=>{
-      const binding=sessions.binding(sessionId);if(!binding)throw new Error('项目会话尚未就绪');
+      const binding=sessions.binding(sessionId);if(!binding)throw new Error('协同空间会话尚未就绪');
       return {management,startExpert,controller:ctx.inputTriggers.sessionOf(binding.ctx),
         mountChrome:(anchor:(element:HTMLDivElement|null)=>void)=>{
           const disposers=[ctx.slots.register({name:'conversation.input.left',id:'workdsh-connectors-picker',priority:-20},()=>null),ctx.slots.register({name:'conversation.input.left',id:'workdsh-library-picker',priority:-20},()=>null),ctx.slots.register({name:'conversation.input.dock',id:'workdsh-project-selection-chips'},()=> <div style={{width:'100%',maxWidth:'var(--dsh-composer-card-max-width)',margin:'0 auto',boxSizing:'border-box'}} ref={anchor}/>)];

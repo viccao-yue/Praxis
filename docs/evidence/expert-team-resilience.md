@@ -8,10 +8,10 @@
 
 | 部分 | 验收实现 |
 | --- | --- |
-| 安装 | 七个 WorkDSH 正式包先打成 tgz，再通过官方 `dsh plugin add` 安装 |
+| 安装 | 七个 开物Praxis 正式包先打成 tgz，再通过官方 `dsh plugin add` 安装 |
 | 团队运行 | DeepSeek Harness 官方 Agent Teams 服务和九项团队工具 |
 | 持久化与恢复 | 正式 Session、Team 名册、邮箱和共享任务存储 |
-| 页面 | 正式 WorkDSH Host、官方 Team Client、WorkDSH 活动条 |
+| 页面 | 正式 开物Praxis Host、官方 Team Client、开物Praxis 活动条 |
 | 浏览器 | Playwright Chromium，执行完整页面导航、认证 cookie 重建和成员历史打开 |
 | 模型 I/O | resilience 使用本地确定性适配器固定等待、中断和一次失败；real 模式另建独立执行并使用 `deepseek-official/deepseek-flash` |
 
@@ -26,7 +26,7 @@ real 模式只把已配置密钥复制到一次性 DSH Home 的凭据引用，�
 5. **冷重启恢复**：停止并重启正式 Host。恢复后 `reviewer` 的成员 ID、任务 ID、所有者和状态保持不变；新恢复消息唤醒同一成员完成后续回合，名册中 `reviewer` 仍只有一个。
 6. **真实模型两阶段交接**：独立真实执行中的 lead 创建 `REAL-ANALYZE` 与依赖它的 `REAL-REVIEW`，分别交给 `analyst` 与 `reviewer`，通过官方消息和状态观察完成交接。两名成员 Session 均新增完成回合，两项任务保留各自所有者并最终为 `completed`。
 
-官方 Team 会在成员回合结束后释放该成员的激活实例。最终任务签收由 lead 执行，但签收前必须读取官方任务并核对任务仍归属于预期成员。这一处理遵循官方生命周期，没有创建 WorkDSH 自有的团队运行表。
+官方 Team 会在成员回合结束后释放该成员的激活实例。最终任务签收由 lead 执行，但签收前必须读取官方任务并核对任务仍归属于预期成员。这一处理遵循官方生命周期，没有创建 开物Praxis 自有的团队运行表。
 
 ## 证据
 

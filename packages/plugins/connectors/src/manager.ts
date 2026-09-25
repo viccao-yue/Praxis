@@ -1,5 +1,4 @@
 import { randomUUID } from 'node:crypto';
-import { fileURLToPath } from 'node:url';
 import { Context, Service } from '@deepseek-ai/cordis';
 import type { Agent } from '@deepseek-ai/dsh-agent';
 import { credentialRef } from '@deepseek-ai/dsh-credentials';
@@ -10,7 +9,6 @@ import { connectorDefinitionSchema, connectorSelectionsDomainSpec, connectorsDom
 
 declare module '@deepseek-ai/cordis' { interface Context { workdshConnectors: ConnectorManagementService; } }
 
-const serverPath = fileURLToPath(new URL('./example-server.mjs', import.meta.url));
 type ChildFiber = { dispose(): Promise<void> };
 type Runtime = { child?: ChildFiber; state: ConnectorState; diagnostic?: string };
 type JsonRecord = Record<string, unknown>;
@@ -36,15 +34,13 @@ export class ConnectorManager extends Service implements ConnectorManagementServ
     const selectionDomain = await this.ctx.storageDomain.open(connectorSelectionsDomainSpec);
     this.ctx.effect(() => () => selectionDomain.close(), 'workdshConnectors.selectionDomainClose');
     this.selections = selectionDomain.table('selections');
-    if (!domain.global.get().seededExample) {
-      const now = new Date().toISOString();
-      await this.definitions.put('workdsh-example', {
-        id: 'workdsh-example', title: 'WorkDSH MCP 示例', description: '可查询业务目录，并通过 MCP 资源与 URI 模板读取示例资料。',
-        serverName: 'workdsh-example', transport: 'stdio', command: process.execPath, args: [serverPath], enabled: true,
-        createdAt: now, updatedAt: now,
-      });
-      await domain.global.set({ seededExample: true });
+    // Do not auto-seed a demo MCP. Retire any previously seeded workdsh-example row.
+    if (this.definitions.get('workdsh-example')) {
+      await this.definitions.delete('workdsh-example');
+      this.runtimes.delete('workdsh-example');
+      await this.removeFromSelections('workdsh-example');
     }
+    if (!domain.global.get().seededExample) await domain.global.set({ seededExample: true });
     for (const [, definition] of this.table().entries()) {
       this.runtimes.set(definition.id, { state: definition.enabled ? 'discovering' : 'disabled' });
       if (definition.enabled) void this.start(definition).catch(() => undefined);

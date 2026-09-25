@@ -16,7 +16,7 @@ export * from './services/connection-api.js';
 export * from './tools/management-tools.js';
 
 /**
- * Host plugin entry for WorkDSH experts (D04 / P1-02, expert module 0.1).
+ * Host plugin entry for Praxis experts (D04 / P1-02, expert module 0.1).
  *
  * This is an independent, Loader-recognised entry: `cordis.patch.yml` inserts
  * `workdsh-plugin-experts`, and the official Loader calls `apply(ctx)` after the
@@ -68,8 +68,24 @@ export async function applyExpertsHost(ctx: Context): Promise<void> {
   await ctx.plugin({ name: 'workdsh-experts-integration', inject: [...inject, 'workdshExperts'], apply: applyIntegration });
 }
 
+/**
+ * Blank / new sessions inherit `agent-preset-registry.selectedDefault`. Expert
+ * presets require an execution binding and must never be the profile default —
+ * otherwise the empty hero shows a summoned chip with no workspace (e.g. 工作复盘顾问).
+ */
+function sanitizeNativeSelectedDefault(ctx: Context): void {
+  const registry = ctx.agentPresets as {
+    config?: { default?: string; selectedDefault?: { get?: () => string | undefined; set?: (id: string) => void } };
+  };
+  const selected = registry.config?.selectedDefault;
+  const current = selected?.get?.();
+  if (typeof current !== 'string' || !current.startsWith('wd-exp-') || typeof selected?.set !== 'function') return;
+  selected.set(registry.config?.default ?? 'standard');
+}
+
 /** The consumer declares the services provided by the manager child Fibers. */
 function applyIntegration(ctx: Context): void {
+  sanitizeNativeSelectedDefault(ctx);
   registerExpertExecutionGuard(ctx);
   registerExpertsConnection(ctx);
   registerExpertManagementTools(ctx);

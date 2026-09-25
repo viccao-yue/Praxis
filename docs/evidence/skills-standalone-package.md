@@ -24,7 +24,7 @@
 
 ## 实际验证
 
-在 WorkDSH 根目录执行：
+在 开物Praxis 根目录执行：
 
 ```sh
 corepack pnpm --filter workdsh-plugin-skills build
@@ -102,7 +102,7 @@ CLI 明确提示缺少 dsh.bundle，因此只安装为普通依赖，不作为 P
 | 独立浏览器管理 | 真实编辑写盘、陈旧 revision 冲突、启停、卸载到回收站、恢复通过 |
 | 独立插件移除与重装 | 停服移除后 Host route 404、Client 图及导航缺席；原生新会话可用，编辑内容保留；重装及重复安装各只激活一次 |
 | 默认组合 probe:browser | 通过：原生侧栏、技能列表/完整详情、正文与资源编辑、上传预检/安装、创建草稿、Remote、重连、两次冷重启、移除总包与重装 |
-| 双向独立移除 | 移除 Skill 后，WorkDSH 品牌、工作台和原生新会话仍可用，旧技能深链接回到 Conversation；移除展示包后，独立 Skill 列表仍可打开 |
+| 双向独立移除 | 移除 Skill 后，开物Praxis 品牌、工作台和原生新会话仍可用，旧技能深链接回到 Conversation；移除展示包后，独立 Skill 列表仍可打开 |
 | 同一 Host 的消费者 | 两个测试插件通过服务注入共享依赖检查；提供方消失时清理，恢复后重新注册，无关服务保持 |
 | preview:install | 新建隔离预览 Profile 通过；官方 CLI 安装两层，无手写 Loader/Profile 数据 |
 | 人工预览更新 | 原有 preview Profile 安装两层后启动 18989；认证目录返回 200、16 项技能，沿用用户 Agents home，未修改用户技能文件 |
@@ -119,7 +119,7 @@ CLI 明确提示缺少 dsh.bundle，因此只安装为普通依赖，不作为 P
 - `.artifacts/client-probe-skills-1440.png`、`client-probe-skills-1920.png`、`client-probe-skills-390.png`
 - `tests/integration/skill-plugin-lifecycle.test.mjs`、`scripts/probe-skills-package.mjs`、`scripts/probe-install.mjs`
 
-已人工查看独立与组合 1440px 截图：Skill 页面仍使用局部样式；独立安装保留 Harness 品牌和原侧栏，组合安装显示 WorkDSH 品牌与工作台入口，两种模式均只有一个能力中心入口。本轮不重做页面视觉，不将专家/连接器占位视为已实现功能。
+已人工查看独立与组合 1440px 截图：Skill 页面仍使用局部样式；独立安装保留 Harness 品牌和原侧栏，组合安装显示 开物Praxis 品牌与工作台入口，两种模式均只有一个能力中心入口。本轮不重做页面视觉，不将专家/连接器占位视为已实现功能。
 
 ### 当前边界
 

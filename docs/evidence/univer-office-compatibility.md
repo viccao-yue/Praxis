@@ -1,6 +1,6 @@
 # Univer Office 接入调查与验收边界
 
-日期：2026-09-12。对象：npm dsh-univer-office@0.2.14；WorkDSH 固定 Harness 0.1.5-rc.1。
+日期：2026-09-12。对象：npm dsh-univer-office@0.2.14；开物Praxis 固定 Harness 0.1.5-rc.1。
 
 ## 已执行与结论
 

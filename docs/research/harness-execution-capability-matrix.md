@@ -5,7 +5,7 @@
 
 ## 总体映射
 
-| WorkDSH 能力 | Harness 直接复用 | WorkDSH 插件拥有 | 不能混同 |
+| 开物Praxis 能力 | Harness 直接复用 | 开物Praxis 插件拥有 | 不能混同 |
 | --- | --- | --- | --- |
 | 专家执行 | Agent preset、Session、Skill/Tool scope、system prompt | Expert、ExpertRevision、组合解析与授权 | 专家不是 preset 目录或常驻 Agent |
 | 技能执行 | `ctx.skills`、filesystem/runtime provider、`dsh-tool-skill`、Session Skill Catalog | Skill、SkillRevision、草稿、发布、授权与不可变内容定位 | Skill 文档不是可执行插件，也不拥有业务权限 |
@@ -20,22 +20,22 @@
 
 - 官方分层注册表是唯一运行目录。全局层与 Agent scope 链合并，最近 scope 的同名条目直接覆盖；rank 只解决同一层内冲突。
 - 目录发现可以返回 `complete: false`。客户端和任务入口保留上一份完整目录并重试，不把暂时遗漏解释成技能被删除。
-- 正文不缓存，每次 `get()` 都从胜出提供方重新读取；只修改正文不会产生目录变更消息。WorkDSH 已发布修订必须使用不可变 locator/目录或内容寻址 provider，历史 Session 不解析到可变 latest。
-- `modelInvocable` 与 `userInvocable` 只控制官方调用面；两者都为 false 的技能仍可被受信代码读取。组织授权继续由 WorkDSH provider/解析服务强制执行。
+- 正文不缓存，每次 `get()` 都从胜出提供方重新读取；只修改正文不会产生目录变更消息。开物Praxis 已发布修订必须使用不可变 locator/目录或内容寻址 provider，历史 Session 不解析到可变 latest。
+- `modelInvocable` 与 `userInvocable` 只控制官方调用面；两者都为 false 的技能仍可被受信代码读取。组织授权继续由 开物Praxis provider/解析服务强制执行。
 - 模型只先看到名称和描述，正文由 `skill` 工具按需加载；这正是专家携带多个技能的默认方式，不把所有技能正文拼进专家提示词。
-- 项目目录发现只支持根目录直属包或扁平 Markdown，不支持递归 `**/SKILL.md`。WorkDSH 的领域目录可有任意层级，但发布到官方 provider 时必须投影成可发现形态。
+- 项目目录发现只支持根目录直属包或扁平 Markdown，不支持递归 `**/SKILL.md`。开物Praxis 的领域目录可有任意层级，但发布到官方 provider 时必须投影成可发现形态。
 
 ### Tool 与 Command
 
 - Tool 使用规范 JSON 输入/输出和公开执行流水线；业务写入工具默认 exclusive，只有明确无父状态写入且共享状态支持并发时才返回 `isConcurrencySafe: true`。
-- 工具的规范 `value` 是执行期值，持久结果依赖渲染 content/meta；关键外部回执同时提交到拥有它的 WorkDSH Domain，不能只依赖工具文字。
+- 工具的规范 `value` 是执行期值，持久结果依赖渲染 content/meta；关键外部回执同时提交到拥有它的 开物Praxis Domain，不能只依赖工具文字。
 - scope restriction 过滤继承的全局工具，但不会过滤该 scope 自己注册的工具。所有项目、组织、连接和资产权限仍放入服务端检查与单调 guard。
 - timeout 是协作式取消，无法硬杀同进程代码。连接器必须传递 AbortSignal，并在超时或断连后核对远端状态。
 - Command 直接面向人类，不进入模型；适合 `/expert`、`/skill` 等确定性入口。领域变更成功后以 `sourceEventSeq` 或业务引用连接权威结果。
 
 ### MCP 与连接器
 
-- 官方 MCP client 负责 stdio/Streamable HTTP 生命周期、工具发现、`mcp__<server>__<tool>` 注册及有限重连；WorkDSH 不复制 MCP 协议客户端。
+- 官方 MCP client 负责 stdio/Streamable HTTP 生命周期、工具发现、`mcp__<server>__<tool>` 注册及有限重连；开物Praxis 不复制 MCP 协议客户端。
 - DSH 不负责安装第三方 server、初始化其数据库、账号、模型、embedding、数据迁移或许可。连接器插件必须展示这些前置条件和真实健康状态。
 - stdio 启动会移除常见凭据名和 `DSH_*`，但仍继承其他环境变量。正式连接实例使用显式最小 env 与凭据引用，不继承整份宿主环境。
 - HTTP server 必须独立运行。URL、headers、认证和账号身份属于 ConnectionInstance/凭据流程；模型只能看到工具能力和非敏感执行身份摘要。
@@ -54,12 +54,12 @@
 
 - 直接复用 `ctx.web` 的 search/fetch provider seam 和唯一工具 consumer；提供方必须显式选择，多个可用提供方时不按注册顺序猜测。
 - Fetch 的非 2xx 响应仍是描述性结果；业务代码必须检查 statusCode。SSRF 防护只阻止非公开目的地址，不能阻止模型向公开 URL 发送数据。
-- 文件 sandbox 和默认审批模式不约束 Web fetch。涉及项目敏感内容时，WorkDSH Profile 通过工具 guard/审批/组织策略限制外发，并保留审计。
+- 文件 sandbox 和默认审批模式不约束 Web fetch。涉及项目敏感内容时，开物Praxis Profile 通过工具 guard/审批/组织策略限制外发，并保留审计。
 
 ## P0-04 必做探针
 
 1. 以不可变 SkillRevision provider 验证同名多修订、冷 Session 目录、正文加载、目录不完整和撤权。
-2. 验证 scope restriction 与 scope-local 工具的差异，确认 WorkDSH 单调 guard 覆盖 native、PTC 和 MCP 子调用。
+2. 验证 scope restriction 与 scope-local 工具的差异，确认 开物Praxis 单调 guard 覆盖 native、PTC 和 MCP 子调用。
 3. 用测试 MCP stdio/HTTP server 验证异步发现、账号绑定、断线、重连耗尽、注销、凭据环境和回执。
 4. 验证 Schedule cold/live、持久 barrier、逾期合并和重复窗口；证明它只用于个人会话提醒。
 5. 以持久 AutomationRun 包裹测试 Webhook，验证重复 delivery、进程崩溃、Session 创建失败和恢复对账。

@@ -36,7 +36,7 @@ export function parseExpertDocument(text: string): ExpertDefinition {
     return { name: display?.zh ?? display?.en ?? metadata.name, description: metadata.description, role: profession?.zh ?? profession?.en ?? metadata.name, methodology: body.trim(), boundaries: '遵循完整 Agent MD 与系统授权。', deliverables: '按完整 Agent MD 的输出规范交付。', tags: [], examples: [], skillRequirements: Array.isArray(metadata.skills) ? metadata.skills.map(name => { if (typeof name !== 'string') fail('skills 必须是名称数组。'); return { name }; }) : [], futureRequirements: [], agentDocument: text };
   }
   const { format, version, ...fields } = metadata;
-  if (format !== 'workdsh-expert-document' || version !== 1 || 'team' in fields) fail('不支持的专家文档格式。团队信息请写在 team.md。');
+  if (format !== 'workdsh-expert-document' || version !== 1 || 'team' in fields) fail('不支持的数字员工文档格式。团队信息请写在 team.md。');
   const markers = [...body.matchAll(/<!-- workdsh:(role|methodology|boundaries|deliverables) -->/g)];
   if (markers.length !== 4 || new Set(markers.map(m => m[1])).size !== 4) fail('四个专业内容区段必须各出现一次。');
   for (let i = 0; i < markers.length; i++) {
@@ -44,7 +44,7 @@ export function parseExpertDocument(text: string): ExpertDefinition {
     fields[markers[i][1]] = body.slice(start, markers[i + 1]?.index ?? body.length).replace(/^\s*## [^\n]*\n/, '').trim();
   }
   const parsed = expertDefinitionSchema.safeParse(fields);
-  if (!parsed.success) fail('专家文档缺少必要字段或字段类型不正确。');
+  if (!parsed.success) fail('数字员工文档缺少必要字段或字段类型不正确。');
   return normalizeDefinition(parsed.data);
 }
 
@@ -57,7 +57,7 @@ export function authoringDocuments(definition: ExpertDefinition): Record<string,
     for (const member of definition.team.members) documents[`agents/${member.key}.md`] = expertDocument(member.definition);
     documents['team.md'] = `---\n${stringify({ format: 'workdsh-team-document', version: 1, lead: root, members: definition.team.members.map(member => ({ key: member.key, file: `agents/${member.key}.md` })), workflows: definition.team.workflows })}---\n\n# ${definition.name}\n\n${definition.description}\n\n成员方法保存在 agents/；场景触发、执行依赖和成果要求保存在本文件头部。\n`;
   }
-  documents['README.md'] = `# ${definition.name}\n\n${definition.description}\n\n## 使用\n\n在 WorkDSH「我的专家」导入此专家包，预览整套内容并确认发布。选择示例开始新任务。导入不授予权限，不运行脚本，不安装依赖；缺少技能会在发布校验中指出。\n\n## 修改\n\n编辑 agents/ 中的 Markdown 专业内容${definition.team ? '及 team.md 的场景' : ''}，保留文档头部和区段标记。在制作对话中让 AI 读取修改后的文件，通过 workdsh_expert_save_documents 保存整套文档为草稿，再统一预览发布。原 ZIP 的 manifest 校验不可手工绕过；保存后从界面重新导出。\n\n## 版本\n\nexpert.json 是此交付包的结构化快照；Markdown 是同一份内容的可编辑制作稿。已有任务保持原修订。团队成员来自内容快照，不随来源专家自动更新。\n`;
+  documents['README.md'] = `# ${definition.name}\n\n${definition.description}\n\n## 使用\n\n在 开物Praxis「我的数字员工」导入此数字员工包，预览整套内容并确认发布。选择示例开始新任务。导入不授予权限，不运行脚本，不安装依赖；缺少技能会在发布校验中指出。\n\n## 修改\n\n编辑 agents/ 中的 Markdown 专业内容${definition.team ? '及 team.md 的场景' : ''}，保留文档头部和区段标记。在制作对话中让 AI 读取修改后的文件，通过 workdsh_expert_save_documents 保存整套文档为草稿，再统一预览发布。原 ZIP 的 manifest 校验不可手工绕过；保存后从界面重新导出。\n\n## 版本\n\nexpert.json 是此交付包的结构化快照；Markdown 是同一份内容的可编辑制作稿。已有任务保持原修订。团队成员来自内容快照，不随来源数字员工自动更新。\n`;
   return documents;
 }
 
@@ -66,11 +66,11 @@ export function definitionFromDocuments(documents: AuthoringDocuments, assets: P
   const paths = Object.keys(documents);
   const packageMeta = documents['.workdsh-expert/plugin.json'] ?? documents['.codebuddy-plugin/plugin.json'];
   if (packageMeta) {
-    if (paths.length > 64 || paths.some(path => path.startsWith('/') || path.includes('\\') || path.split('/').some(part => !part || part === '.' || part === '..')) || Object.values(documents).some(content => typeof content !== 'string') || Object.values(documents).reduce((sum, text) => sum + text.length, 0) > 1_000_000) fail('专家包路径或大小无效。');
+    if (paths.length > 64 || paths.some(path => path.startsWith('/') || path.includes('\\') || path.split('/').some(part => !part || part === '.' || part === '..')) || Object.values(documents).some(content => typeof content !== 'string') || Object.values(documents).reduce((sum, text) => sum + text.length, 0) > 1_000_000) fail('数字员工包路径或大小无效。');
     let meta: Record<string, any>;
     try { meta = JSON.parse(packageMeta); } catch { fail('plugin.json 无效。'); }
-    if (!meta || typeof meta !== 'object' || !Array.isArray(meta.tags ?? []) || !Array.isArray(meta.quickPrompts ?? []) || !Array.isArray(meta.skills ?? [])) fail('专家包元数据结构无效。');
-    if (!Array.isArray(meta.agents) || typeof meta.agentName !== 'string' || !['agent', 'team'].includes(meta.expertType)) fail('专家包需要 expertType、agents 与 agentName。');
+    if (!meta || typeof meta !== 'object' || !Array.isArray(meta.tags ?? []) || !Array.isArray(meta.quickPrompts ?? []) || !Array.isArray(meta.skills ?? [])) fail('数字员工包元数据结构无效。');
+    if (!Array.isArray(meta.agents) || typeof meta.agentName !== 'string' || !['agent', 'team'].includes(meta.expertType)) fail('数字员工包需要 expertType、agents 与 agentName。');
     const agents = new Map<string, ExpertDefinition>();
     for (const entry of meta.agents) {
       if (typeof entry !== 'string') fail('agents 必须是路径数组。');
@@ -93,7 +93,7 @@ export function definitionFromDocuments(documents: AuthoringDocuments, assets: P
     }
     const lead = agents.get(meta.agentName);
     if (!lead) fail('默认 Agent 不存在。');
-    if (meta.expertType === 'agent' && agents.size !== 1) fail('单专家包只能声明一个 Agent。');
+    if (meta.expertType === 'agent' && agents.size !== 1) fail('单数字员工包只能声明一个 Agent。');
     let definition: ExpertDefinition = { ...lead, name: meta.displayName?.zh ?? meta.displayName?.en ?? lead.name, description: meta.displayDescription?.zh ?? meta.displayDescription?.en ?? lead.description, categoryId: meta.categoryId, tags: (meta.tags ?? []).map((tag: any) => typeof tag === 'string' ? tag : tag.zh ?? tag.en), examples: (meta.quickPrompts ?? []).map((prompt: any, i: number) => ({ id: `prompt-${i + 1}`, prompt: typeof prompt === 'string' ? prompt : prompt.zh ?? prompt.en })) };
     if (meta.expertType === 'team') {
       if (meta.teamInfo?.leadAgent !== meta.agentName || !Array.isArray(meta.teamInfo?.memberAgents)) fail('团队入口与成员声明不一致。');
@@ -108,7 +108,7 @@ export function definitionFromDocuments(documents: AuthoringDocuments, assets: P
     definition = { ...definition, ...(avatar ? { avatarRef: avatar } : {}), packageDocuments: { ...documents }, ...(Object.keys(assets).length ? { packageAssets: { ...assets } } : {}) };
     for (const member of meta.members ?? []) if (member.avatar && !assets[String(member.avatar).replace(/^\.\//, '')]) fail('成员头像资源缺失。');
     const issues = validateDefinition(definition);
-    if (issues.length) throw new ExpertsError('experts/invalid-definition', '专家包未通过校验。', { issues });
+    if (issues.length) throw new ExpertsError('experts/invalid-definition', '数字员工包未通过校验。', { issues });
     return normalizeDefinition(definition);
   }
   if (!paths.length || paths.length > 12 || paths.some(path => !/^(README\.md|team\.md|agents\/[a-z][a-z0-9-]{0,39}\.md)$/.test(path))) fail('制作文件路径无效或数量超限。');

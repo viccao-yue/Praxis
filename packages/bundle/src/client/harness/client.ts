@@ -1,10 +1,11 @@
 import { ShellAppearance } from '../components/ShellAppearance.js';
 import type { Context } from '@deepseek-ai/cordis';
 import type {} from '@deepseek-ai/dsh-api-remotes/client';
+import type {} from '@deepseek-ai/dsh-client-ui-conversation/client';
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client';
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client';
 import * as workbench from 'workdsh-plugin-workbench';
-import { BrandMark, BrandName, DiagnosticsMark } from '../components/Brand.js';
+import { BrandMark, BrandName, DiagnosticsMark, HeroBrandMark } from '../components/Brand.js';
 import { DiagnosticsPanel, type Inventory } from '../components/DiagnosticsPanel.js';
 import { NavigationLocation } from '../components/NavigationLocation.js';
 
@@ -35,6 +36,8 @@ export function apply(ctx: Context): void {
   ctx.plugin(workbench);
   ctx.slots.inject('sidebar.brand.name', () => ctx.slots.register({ name: 'sidebar.brand.name', priority: -10 }, BrandName));
   ctx.slots.inject('sidebar.brand.mark', () => ctx.slots.register({ name: 'sidebar.brand.mark', priority: -10 }, BrandMark));
+  // Official EmptyHero only exposes the mark seat; hide the residual headline/preview badge in ShellAppearance.
+  ctx.slots.inject('conversation.hero.brand.mark', () => ctx.slots.register({ name: 'conversation.hero.brand.mark', priority: -10 }, HeroBrandMark));
   ctx.slots.inject('shell.overlay', () => ctx.slots.register({
     name: 'shell.overlay', id: 'workdsh-location', inject: () => ({ panelToView, selectView }),
   }, NavigationLocation));
@@ -55,6 +58,6 @@ export function apply(ctx: Context): void {
     return dispose;
   });
   if (diagnostics) ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({
-    name: 'sidebar.panellist', id: 'workdsh-probe', label: 'WorkDSH 接入验证', order: 90,
+    name: 'sidebar.panellist', id: 'workdsh-probe', label: '开物Praxis 接入验证', order: 90,
   }, DiagnosticsMark));
 }

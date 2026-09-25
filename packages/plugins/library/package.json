@@ -3,7 +3,7 @@
   "version": "0.1.0-alpha.4",
   "private": false,
   "type": "module",
-  "description": "Local asset library, deterministic document conversion and task reuse for WorkDSH",
+  "description": "Local asset library, deterministic document conversion and task reuse for Praxis",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

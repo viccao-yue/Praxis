@@ -13,7 +13,7 @@ Word 文本工作副本预览版：对话里提出要求，AI 创建文档后自
 
 验证：全仓 build/typecheck、65 项集成、2 项规划、12 项 Word 浏览器与 6 项真实 tgz 安装/卸载/重装检查通过；本次未重复真实模型请求，沿用此前 15 项证据。
 
-附件包含 Office 和配套本地身份/授权/审计插件，以及 SHA256SUMS 与 release-manifest。已配置 WorkDSH Profile 的用户只需安装 Office；保持同一 DSH_HOME 与 Profile，安装前停止应用，安装后重新启动。
+附件包含 Office 和配套本地身份/授权/审计插件，以及 SHA256SUMS 与 release-manifest。已配置 开物Praxis Profile 的用户只需安装 Office；保持同一 DSH_HOME 与 Profile，安装前停止应用，安装后重新启动。
 
 ```bash
 DSH_HOME="$PWD/.test-runtime/preview" \

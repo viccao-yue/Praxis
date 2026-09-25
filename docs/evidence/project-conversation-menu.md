@@ -7,7 +7,7 @@
 - 基线 `0.1.7-alpha.1`，`docs/dsh-v0.1.7-alpha.1/docs/subsystems/slots.md`：list 同 id 以 priority 替换展示，disposer 释放恢复。
 - 发布包 `dsh-client-ui-input-trigger/client` 的 InputTriggerController：menu、launcher、pick、dismiss。仅项目会话的原生 command launcher 临时替换 slash-menu；普通 `/`、`@` 不替换。
 - 实测：原生光标 track 会将 launcher 清为 null，保留零宽 synthetic hit 的 command-only menu。适配同时识别此公开 menu 快照；没有读写私有 controller 字段。
-- `conversation.input.overlay` / `input.dock` / `input.left`：菜单与连接器标签、收拢 WorkDSH 自有资料/连接器入口。未复制原生编辑器、上传、发送、队列或执行器。
+- `conversation.input.overlay` / `input.dock` / `input.left`：菜单与连接器标签、收拢 开物Praxis 自有资料/连接器入口。未复制原生编辑器、上传、发送、队列或执行器。
 - 文件通过原生 command 的 file 候选 pick 打开。项目资产引用继续由资料库 source 的 codec 序列化；载荷抽为 `LibraryComposerReference` 公开契约。
 
 ## 实现

@@ -22,9 +22,9 @@
 
 正式 Office 插件 → 官方右侧 React Slot 容器 → PPTist Vue 编辑器适配 → Office Client model → 官方 Connection / Remote → Office Host service。
 
-AI 工具同样调用 Office Host service。只有该服务持久化工作副本、校验权限、处理修订冲突和审计。Pinia 只拥有编辑器的本地交互状态；PPTist 原生历史数据库不作为业务真源。PPTist 外部 AI、在线服务和默认 mock 不直接接管 WorkDSH 用户数据。
+AI 工具同样调用 Office Host service。只有该服务持久化工作副本、校验权限、处理修订冲突和审计。Pinia 只拥有编辑器的本地交互状态；PPTist 原生历史数据库不作为业务真源。PPTist 外部 AI、在线服务和默认 mock 不直接接管 开物Praxis 用户数据。
 
-适配接口属于 WorkDSH，自有而非官方 SDK：mount(container, initialSnapshot, callbacks)、applySnapshot(snapshot)、flush()、exportPptx()、dispose()。它只交接原生文档快照、焦点和变更回调，不另造插件装载器或 Agent loop。具体方法需要实现和验证，当前不能称为已有 API。
+适配接口属于 开物Praxis，自有而非官方 SDK：mount(container, initialSnapshot, callbacks)、applySnapshot(snapshot)、flush()、exportPptx()、dispose()。它只交接原生文档快照、焦点和变更回调，不另造插件装载器或 Agent loop。具体方法需要实现和验证，当前不能称为已有 API。
 
 ## 两种承载方式
 

@@ -1,12 +1,12 @@
 # 官方依据、现状审查与开发前复用记录
 
-核对日期：2026-09-12。源码基线：WorkDSH `5225e42`。本文件区分“产品参考”“官方公开约定”“现有实现”和“拟议能力”，禁止互相替代。
+核对日期：2026-09-12。源码基线：开物Praxis `5225e42`。本文件区分“产品参考”“官方公开约定”“现有实现”和“拟议能力”，禁止互相替代。
 
 ## 1. 产品来源
 
 - **SRC-USER**：本轮用户指令——专家、专家团、制作专家三张参考图，交付需求/规范/约束/技术文档给其他开发工具；历史已确认本地/默认优先、公共企业管理后置、模块独立版本。
-- **SRC-SCREENSHOTS**：[三张参考图](references/README.md)。详情内容、成员层级、按钮与预填文案据此设计；文档中的尺寸、状态、契约和验收为 WorkDSH 自行定义。
-- **SRC-WB**：[WorkBuddy 官方专家中心说明](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Expert-Center)，本轮已访问。其说明将专家与专业角色联系，将专家团描述为分工协作；支持从中心召唤、查找、置顶和切换。这里只借鉴产品概念，不据此推断 WorkDSH 具有相同运行接口。
+- **SRC-SCREENSHOTS**：[三张参考图](references/README.md)。详情内容、成员层级、按钮与预填文案据此设计；文档中的尺寸、状态、契约和验收为 开物Praxis 自行定义。
+- **SRC-WB**：[WorkBuddy 官方专家中心说明](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Expert-Center)，本轮已访问。其说明将专家与专业角色联系，将专家团描述为分工协作；支持从中心召唤、查找、置顶和切换。这里只借鉴产品概念，不据此推断 开物Praxis 具有相同运行接口。
 - **SRC-PLAN**：[当前计划](../../PLAN.md)、[开发顺序](../../development-order.json)、[团队设计](../../TEAM-DESIGN.md)、[企业后期边界](../../ENTERPRISE-EDITION.md)。D04 单专家，D11 专家团，企业阶段再建服务器与管理 Web。
 
 WorkBuddy 的使用次数、计费倍数、线上专家数量和案例不写入本产品需求；本包的技术方案不是对 WorkBuddy 内部架构的断言。

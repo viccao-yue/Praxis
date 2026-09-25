@@ -5,7 +5,7 @@ export type LogoMarkProps = {
   readonly title?: string;
 };
 
-/** Cross-platform WorkDSH mark. The application tile is deliberately kept outside. */
+/** Cross-platform Praxis mark. The application tile is deliberately kept outside. */
 export function LogoMark({ size = 24, title }: LogoMarkProps) {
   const labelled = Boolean(title);
   return (

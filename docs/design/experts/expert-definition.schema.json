@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "WorkDSH ExpertDefinition 1.0 — proposed design",
+  "title": "Praxis ExpertDefinition 1.0 — proposed design",
   "description": "Design artifact only. Runtime must also enforce UTF-8 aggregate size, dependency readiness, identity, duplicate semantic IDs, CAS and confirmation.",
   "type": "object",
   "additionalProperties": false,

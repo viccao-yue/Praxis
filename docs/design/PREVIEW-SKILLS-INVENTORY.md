@@ -28,7 +28,7 @@ preview Profile 已安装 workdsh-plugin-skills alpha.26，以及 bundle/access/
 
 ## 更正上一轮来源判断
 
-preview 的 skill-creator 实际返回 readonly、manageable=false，描述为 WorkDSH 技能创建指南；对应 skills/src/index.ts 的 bundled 注册。已经读取该实现：收集必要信息→保存草稿→校验→明确确认→专用发布工具→真实回执，保留名称冲突与修订检查。它与本机/市场通用 skill-creator 副本不同；不要为了采用另一版本而覆盖现有创建服务。
+preview 的 skill-creator 实际返回 readonly、manageable=false，描述为 开物Praxis 技能创建指南；对应 skills/src/index.ts 的 bundled 注册。已经读取该实现：收集必要信息→保存草稿→校验→明确确认→专用发布工具→真实回执，保留名称冲突与修订检查。它与本机/市场通用 skill-creator 副本不同；不要为了采用另一版本而覆盖现有创建服务。
 
 本次 preview 的 list 和 catalog 都没有 tencent-pptx 或 ppt-implement。腾讯技能确实在 WorkBuddy 本机目录，其优秀方法可继续参考，但不能据此写为当前 preview 已启用能力。前文优秀技能整理补充此运行事实。
 
@@ -209,7 +209,7 @@ agently-mail 停用。conversion-ops、fintech-engineer、growth-engine、market
 | conversion-ops | 格式异常 | 否 |  | 技能文件需要修复 |
 | elite-powerpoint-designer | 启用 | 是 |  | Create world-class PowerPoint presentations with professional design, consistent branding, sophisticated animations, and polished visual hierarchy. Use when users request presentations, slide decks, pitches, reports, or want to convert markdown to professionally designed PowerPoint with Apple/Microsoft/Google-level quality. |
 | email-daily-summary | 启用 | 是 |  | 自动登录邮箱生成每日邮件摘要(Gmail/Outlook/QQ邮箱等) |
-| expert-manager | 只读 | 是 |  | 以对话方式创建或修改 WorkDSH 专家草稿，校验并引导用户在界面确认发布。 |
+| expert-manager | 只读 | 是 |  | 以对话方式创建或修改 开物Praxis 专家草稿，校验并引导用户在界面确认发布。 |
 | file-count-by-category | 启用 | 是 |  | 统计当前工作区或指定目录的文件数量，并按扩展名/文件类型分类汇总，输出可复核的 Markdown 表格或 JSON。当用户提出「文件数量分类统计」「统计各类文件数量」「这个项目有多少 ts/py/md 文件」「仓库文件构成/清单」等需求时使用。Use when the user asks for file counts by type or extension, repository file inventory, extension breakdown, or workspace file statistics. |
 | fintech-engineer | 格式异常 | 否 |  | 技能文件需要修复 |
 | frontend-design | 启用 | 是 |  | Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, or applications. Generates creative, polished code that avoids generic AI aesthetics. |
@@ -228,7 +228,7 @@ agently-mail 停用。conversion-ops、fintech-engineer、growth-engine、market
 | seo-ops | 格式异常 | 否 |  | 技能文件需要修复 |
 | tdd | 启用 | 是 |  | Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions "red-green-refactor", or wants integration tests. |
 | team-ops | 格式异常 | 否 |  | 技能文件需要修复 |
-| workdsh-import-test | 启用 | 是 |  | 用于验证 WorkDSH 技能导入、资源读取、全局发现和调用流程的安全测试技能。 |
+| workdsh-import-test | 启用 | 是 |  | 用于验证 开物Praxis 技能导入、资源读取、全局发现和调用流程的安全测试技能。 |
 
 ### 知识与学习（19）
 

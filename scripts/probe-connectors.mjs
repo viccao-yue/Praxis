@@ -56,8 +56,18 @@ try {
   await ctx.plugin(Agents);
   await ctx.plugin(Connectors);
   const manager = ctx.workdshConnectors;
+  if ((await manager.list()).length !== 0) throw new Error('Connectors must start empty without a seeded demo MCP.');
+  const exampleServer = new URL('../packages/plugins/connectors/dist/example-server.mjs', import.meta.url).pathname;
+  await manager.create({
+    title: '开物Praxis MCP 示例',
+    description: '可查询业务目录，并通过 MCP 资源与 URI 模板读取示例资料。',
+    serverName: 'workdsh-example',
+    transport: 'stdio',
+    command: process.execPath,
+    args: [exampleServer],
+  });
   const ready = await waitFor(async () => {
-    const row = (await manager.list())[0];
+    const row = (await manager.list()).find(entry => entry.serverName === 'workdsh-example');
     return row?.state === 'ready' ? row : undefined;
   });
   if (ready.state !== 'ready' || ready.toolNames.length !== 2 || ready.resourceCount !== 1 || ready.resourceTemplateCount !== 1) {

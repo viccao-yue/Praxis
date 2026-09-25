@@ -49,7 +49,7 @@ export function ProjectConversationMenu({sessionId,management,controller,mountMe
         const span=inputActions.captureInsertion();if(!inputActions.insertText(`/${item.id} `,span))throw new Error('输入内容已变化，请重新选择');close();
       } else if(kind==='expert'){
         const expert=(c.availableCapabilities??c.config.capabilities).find(x=>x.kind==='expert'&&x.id===item.id);if(!expert)return;
-        if(window.confirm(`使用“${expert.label}”创建新的项目任务？当前对话将保留，输入草稿会复制到新任务，不会自动发送。`)){await startExpert(c,expert,live.draft);close()}
+        if(window.confirm(`使用“${expert.label}”创建新的协同空间任务？当前对话将保留，输入草稿会复制到新任务，不会自动发送。`)){await startExpert(c,expert,live.draft);close()}
       } else if(kind==='file'&&live.snapshot){if(!insertAsset(live.snapshot,item.id))throw new Error('输入内容已变化，请重试');close()}
     }}/></>,anchor)}</>;
 }
@@ -57,5 +57,5 @@ export function ProjectConversationMenu({sessionId,management,controller,mountMe
 function ConversationChoices({context,snapshot,connectors,nativeItems,pickNative,pick,close}:{context:ProjectTaskContext;snapshot?:ProjectSnapshot;connectors:readonly string[];nativeItems:readonly {name:string;label?:string;description?:string}[];pickNative:(id:string)=>void;pick:(kind:ProjectMenuKind,item:ProjectMenuItem)=>Promise<void>;close:()=>void}){
   const caps=context.availableCapabilities??context.config.capabilities;
   const nativeFile=nativeItems.find(x=>x.name==='file');
-  return <ProjectMenu close={close} items={{file:[...(nativeFile?[{id:'native-file',label:'从本地添加',description:'使用原生附件上传'}]:[]),...(snapshot?.assets??[]).map(x=>({id:x.id,label:x.name,description:'项目资产'}))],mode:nativeItems.filter(x=>x.name!=='file').map(x=>({id:x.name,label:x.label??x.name,description:x.description})),expert:caps.filter(x=>x.kind==='expert').map(x=>({...x})),skill:caps.filter(x=>x.kind==='skill').map(x=>({...x})),connector:caps.filter(x=>x.kind==='connector').map(x=>({...x,selected:connectors.includes(x.id)}))}} pick={(kind,item)=>{if(item.id==='native-file')return pickNative('file');if(kind==='mode')return pickNative(item.id);return pick(kind,item)}}/>;
+  return <ProjectMenu close={close} items={{file:[...(nativeFile?[{id:'native-file',label:'从本地添加',description:'使用原生附件上传'}]:[]),...(snapshot?.assets??[]).map(x=>({id:x.id,label:x.name,description:'协同空间资产'}))],mode:nativeItems.filter(x=>x.name!=='file').map(x=>({id:x.name,label:x.label??x.name,description:x.description})),expert:caps.filter(x=>x.kind==='expert').map(x=>({...x})),skill:caps.filter(x=>x.kind==='skill').map(x=>({...x})),connector:caps.filter(x=>x.kind==='connector').map(x=>({...x,selected:connectors.includes(x.id)}))}} pick={(kind,item)=>{if(item.id==='native-file')return pickNative('file');if(kind==='mode')return pickNative(item.id);return pick(kind,item)}}/>;
 }

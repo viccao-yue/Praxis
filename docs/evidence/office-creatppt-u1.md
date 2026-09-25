@@ -20,4 +20,4 @@ Node 22.23.2：node --test tests/integration/office-creatppt.test.mjs tests/inte
 
 ## 尚未完成
 
-正式 ContentService 的 presentation 分支、六工具 schema、官方右侧 Tab 原生页面装配和 AI 修订同步、实际模型、PPT 制品卸载重装、Office/WPS 视觉验证、全仓 build/check 均未执行。当前 19091 是此前用户独立体验服务，没有替换用户的编辑状态；18989 WorkDSH 没有升级成 PPT 接入。不得称为应用集成完成或提前启用实时 PPT 菜单。已发布 Word alpha.2 不变。
+正式 ContentService 的 presentation 分支、六工具 schema、官方右侧 Tab 原生页面装配和 AI 修订同步、实际模型、PPT 制品卸载重装、Office/WPS 视觉验证、全仓 build/check 均未执行。当前 19091 是此前用户独立体验服务，没有替换用户的编辑状态；18989 开物Praxis 没有升级成 PPT 接入。不得称为应用集成完成或提前启用实时 PPT 菜单。已发布 Word alpha.2 不变。

@@ -80,30 +80,68 @@ export function expertPresetDir(presetId: string): string {
   return join(process.env.DSH_AGENTS_HOME ?? join(homedir(), '.agents'), '.workdsh-state', 'experts', 'presets', presetId);
 }
 
-const registrations = new WeakMap<Context, Map<string, Promise<void>>>();
+interface PresetRegistration {
+  ready: Promise<void>;
+  dispose?: () => Promise<void>;
+}
+
+/**
+ * Disposers are keyed by preset id, not by the calling context. Cordis gives
+ * each service call a fresh extended context, so a map keyed by `ctx` misses
+ * the registration made at startup.
+ */
+const registrations = new Map<string, PresetRegistration>();
 
 /** Restore only the frozen declaration; never recompile an existing revision against a new base. */
 export async function readExpertPreset(presetId: string): Promise<string> {
   try { return await readFile(join(expertPresetDir(presetId), 'preset.json'), 'utf8'); }
   catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') throw Object.assign(new Error('此专家为旧目录预设，请重新发布后创建新任务；历史任务不会自动换用新组合。'), { code: 'experts/preset-broken' });
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') throw Object.assign(new Error('此数字员工为旧目录预设，请重新发布后创建新任务；历史任务不会自动换用新组合。'), { code: 'experts/preset-broken' });
     throw error;
   }
 }
 
 export async function registerExpertPreset(ctx: Context, presetId: string, expectedDigest: string): Promise<void> {
   const text = await readExpertPreset(presetId);
-  if (sha256(text) !== expectedDigest) throw Object.assign(new Error('专家预设内容已变化，请重新发布。'), { code: 'experts/preset-drift' });
-  let pending = registrations.get(ctx);
-  if (!pending) { pending = new Map(); registrations.set(ctx, pending); }
-  if (!pending.has(presetId)) {
+  if (sha256(text) !== expectedDigest) throw Object.assign(new Error('数字员工预设内容已变化，请重新发布。'), { code: 'experts/preset-drift' });
+  let entry = registrations.get(presetId);
+  if (!entry) {
     const definition = JSON.parse(text) as PresetDefinition;
-    if (definition.id !== presetId) throw Object.assign(new Error('专家预设内容已变化，请重新发布。'), { code: 'experts/preset-drift' });
-    const promise = ctx.agentPresets.register(definition).then(dispose => { ctx.effect(() => dispose); });
-    pending.set(presetId, promise);
-    promise.catch(() => { pending!.delete(presetId); });
+    if (definition.id !== presetId) throw Object.assign(new Error('数字员工预设内容已变化，请重新发布。'), { code: 'experts/preset-drift' });
+    const registration: PresetRegistration = { ready: Promise.resolve() };
+    registration.ready = ctx.agentPresets.register(definition).then(dispose => {
+      registration.dispose = dispose;
+      ctx.effect(() => dispose);
+    });
+    registrations.set(presetId, registration);
+    registration.ready.catch(() => { if (registrations.get(presetId) === registration) registrations.delete(presetId); });
+    entry = registration;
   }
-  await pending.get(presetId);
+  await entry.ready;
+}
+
+/**
+ * Drop compiled presets from the official Agent preset roster.
+ * The declaring plugin owns `register()`'s disposer; calling it removes the
+ * definition from `list()` immediately. Frozen preset directories stay on disk.
+ */
+export async function releaseExpertPresets(ctx: Context, presetIds: readonly string[]): Promise<void> {
+  const released = new Set(presetIds);
+  const registry = ctx.agentPresets as {
+    config?: { default?: string; selectedDefault?: { get?: () => string | undefined; set?: (id: string) => void } };
+  };
+  const selected = registry.config?.selectedDefault;
+  const current = selected?.get?.();
+  if (typeof current === 'string' && released.has(current) && typeof selected?.set === 'function') {
+    selected.set(registry.config?.default ?? 'standard');
+  }
+  await Promise.all([...released].map(async (presetId) => {
+    const entry = registrations.get(presetId);
+    if (!entry) return;
+    registrations.delete(presetId);
+    await entry.ready.catch(() => undefined);
+    await entry.dispose?.();
+  }));
 }
 
 export async function compileExpertPreset(ctx: Context, input: CompileInput): Promise<CompiledPreset> {
@@ -116,7 +154,7 @@ export async function compileExpertPreset(ctx: Context, input: CompileInput): Pr
   const inputDigest = sha256(renderComposition(input));
   try {
     const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
-    if (manifest.inputDigest !== inputDigest) throw Object.assign(new Error('专家预设内容已变化，请重新发布。'), { code: 'experts/preset-drift' });
+    if (manifest.inputDigest !== inputDigest) throw Object.assign(new Error('数字员工预设内容已变化，请重新发布。'), { code: 'experts/preset-drift' });
     await verifyPackageFiles(presetDir, files, assets);
     await registerExpertPreset(ctx, presetId, manifest.compositionDigest);
     return { presetId, presetDir, compositionDigest: manifest.compositionDigest, created: false };
@@ -124,7 +162,7 @@ export async function compileExpertPreset(ctx: Context, input: CompileInput): Pr
 
   // The public Loader entry contains the effective Profile declaration, including !!js nodes.
   const base = [...ctx.loader.entries()].find(entry => !entry.disabled && entry.options.name === '@deepseek-ai/dsh-agent-preset' && entry.options.config?.id === input.basePresetId);
-  if (!base) throw Object.assign(new Error('缺少官方标准模式声明，无法发布专家。'), { code: 'experts/preset-broken' });
+  if (!base) throw Object.assign(new Error('缺少官方标准模式声明，无法发布数字员工。'), { code: 'experts/preset-broken' });
   const plugins = JSON.parse(JSON.stringify(base.options.config.plugins)) as PresetDefinition['plugins'];
   const rootsInPackage = Object.keys(files).filter(path => /^skills\/[a-z][a-z0-9-]+\/SKILL\.md$/.test(path)).map(path => join(presetDir, 'expert-package', path.slice(0, -9)));
   const packageRoot = Object.keys(files).length || Object.keys(assets).length ? join(presetDir, 'expert-package') : undefined;
@@ -214,7 +252,7 @@ export function expertPersonaConfig(input: Pick<CompileInput, 'definition' | 'pa
     readFileSync(new URL('../../resources/skills/workdsh-expert-manager/runtime/team-lead.md', import.meta.url), 'utf8'),
     JSON.stringify({ members: input.teamMembers, workflows: input.definition.team?.workflows }),
     migrateLegacyTeamInstructions(authoredPersona),
-  ] : [authoredPersona]), ...(input.packageRoot ? [`专家作品资源目录：${input.packageRoot}。bin 下的工具已随发布版本安装；用原生 bash 按此路径调用，仍遵守沙箱和审批。`] : [])].join('\n\n');
+  ] : [authoredPersona]), ...(input.packageRoot ? [`数字员工作品资源目录：${input.packageRoot}。bin 下的工具已随发布版本安装；用原生 bash 按此路径调用，仍遵守沙箱和审批。`] : [])].join('\n\n');
   const suffix = compilePersonaSuffix(input.definition);
   return { prefix, suffix, complete: false, includeRuntimeContext: true };
 }

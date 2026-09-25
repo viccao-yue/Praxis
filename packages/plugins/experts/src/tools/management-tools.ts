@@ -26,10 +26,10 @@ import { ExpertsError } from '../domain/values.js';
 const singleDefinitionParameters = {
   type: 'object' as const,
   additionalProperties: false,
-  description: '专家定义的可编辑字段；未提供的字段保持不变。文本不能包含字面量 {{ 或 }}。',
+  description: '数字员工定义的可编辑字段；未提供的字段保持不变。文本不能包含字面量 {{ 或 }}。',
   properties: {
     agent_document: { type: 'string' as const, description: '完整 Agent MD；包创作优先使用 save_documents。' },
-    name: { type: 'string' as const, description: '专家名称，最多 80 个字符。' },
+    name: { type: 'string' as const, description: '数字员工名称，最多 80 个字符。' },
     description: { type: 'string' as const, description: '一句话描述用途，最多 300 个字符。' },
     role: { type: 'string' as const, description: '角色定位（prose）。' },
     methodology: { type: 'string' as const, description: '工作方法（prose）。' },
@@ -146,7 +146,7 @@ const detailOutput = {
     readiness: { type: 'string' as const, required: true as const },
     revision: { type: 'string' as const, required: true as const, description: '乐观并发令牌；下次 update_draft 传 expected_revision。' },
     draft_revision: { type: 'string' as const, required: true as const, description: '草稿修订；validate 与 request_publish 传此值。' },
-    draft_url: { type: 'string' as const, required: true as const, description: '同一 WorkDSH 页面打开草稿的链接；仅导航，不授权发布。' },
+    draft_url: { type: 'string' as const, required: true as const, description: '同一 开物Praxis 页面打开草稿的链接；仅导航，不授权发布。' },
     definition: { ...definitionParameters, required: true as const, properties: {
       ...definitionParameters.properties,
       avatar_ref: { type: 'string' as const },
@@ -264,7 +264,7 @@ function detailProjection(detail: ExpertDetail) {
 /** The loop sends rendered blocks to the model, not the canonical JSON itself.
  * Keep ids, CAS tokens and definitions available for subsequent authoring calls. */
 function renderResult(summary: string, value: unknown, draftUrl?: string) {
-  return [{ type: 'text' as const, text: `${summary}\n${JSON.stringify(value, null, 2)}${draftUrl ? `\n[打开专家草稿](${draftUrl})` : ''}` }];
+  return [{ type: 'text' as const, text: `${summary}\n${JSON.stringify(value, null, 2)}${draftUrl ? `\n[打开数字员工草稿](${draftUrl})` : ''}` }];
 }
 
 function shellQuote(value: string): string { return "'" + value.replaceAll("'", "'\\''") + "'"; }
@@ -289,7 +289,7 @@ export function registerExpertManagementTools(ctx: Context): void {
 
   ctx.tools.register(defineTool({
     name: 'workdsh_expert_save_resources',
-    description: '从当前工作区的真实文件保存完整专家资源。支持头像、程序、二进制参考文件；与Markdown制作稿统一保存及校验。修改已有作品时保留未改文件、带expected_revision；保存不等于执行授权。',
+    description: '从当前工作区的真实文件保存完整数字员工资源。支持头像、程序、二进制参考文件；与Markdown制作稿统一保存及校验。修改已有作品时保留未改文件、带expected_revision；保存不等于执行授权。',
     parameters: { expert_id: { type: 'string' }, expected_revision: { type: 'string' }, documents: { type: 'array', items: { type: 'object', additionalProperties: false, properties: { path: { type: 'string', required: true }, content: { type: 'string', required: true } } } }, resources: { type: 'array', items: { type: 'object', additionalProperties: false, properties: { path: { type: 'string', required: true }, source_path: { type: 'string', required: true }, executable: { type: 'boolean' } } } }, remove_paths: { type: 'array', items: { type: 'string' } } },
     output: { schema: detailOutput, render: (_args, value) => renderResult('完整作品与真实资源已保存。', value, value.draft_url) },
     async execute(args, exec) {
@@ -319,7 +319,7 @@ export function registerExpertManagementTools(ctx: Context): void {
     name: 'workdsh_expert_export_file',
     description: '实际生成并呈现完整.expert.zip文件，包含角色MD、原资源和二进制文件。所有文件写入与展示经过原生bash/present及沙箱；不是仅返回下载说明。已有不同内容的文件不会覆盖。',
     parameters: { expert_id: { type: 'string', required: true }, revision_id: { type: 'string' }, file_path: { type: 'string', required: true, description: '当前工作区内的目标ZIP文件路径。' } },
-    output: { schema: { type: 'object', additionalProperties: false, properties: { path: { type: 'string', required: true }, bytes: { type: 'integer', required: true }, digest: { type: 'string', required: true }, presented: { type: 'boolean', required: true } } }, render: (_args, value) => renderResult('完整专家文件包已生成并展示。', value) },
+    output: { schema: { type: 'object', additionalProperties: false, properties: { path: { type: 'string', required: true }, bytes: { type: 'integer', required: true }, digest: { type: 'string', required: true }, presented: { type: 'boolean', required: true } } }, render: (_args, value) => renderResult('完整数字员工文件包已生成并展示。', value) },
     async execute(args, exec) {
       const descriptor = await manager.export(await resolveActor(ctx, exec), args.expert_id, args.revision_id, exec.signal);
       const { archive } = buildExport(descriptor.definition, descriptor.sourceAttribution);
@@ -331,16 +331,16 @@ export function registerExpertManagementTools(ctx: Context): void {
         if (Buffer.from(bytes).compare(Buffer.from(archive)) !== 0) throw new ExpertsError('experts/conflict', '目标文件存在且内容不同，请使用新文件名。');
       } else {
         const command = `umask 077; mkdir -p ${shellQuote(dirname(path))} && printf %s ${shellQuote(Buffer.from(archive).toString('base64'))} | base64 -d > ${shellQuote(path)}`;
-        await nativeTool(ctx, exec, 'bash', { command, description: '生成完整专家交付包' }, 'package-write');
+        await nativeTool(ctx, exec, 'bash', { command, description: '生成完整数字员工交付包' }, 'package-write');
       }
       const actual = await ctx.fs.readBytes(target, exec.signal, 10 * 1024 * 1024);
-      if (Buffer.from(actual).compare(Buffer.from(archive)) !== 0) throw new ExpertsError('experts/conflict', '交付文件字节与专家包不一致。');
-      await nativeTool(ctx, exec, 'present', { files: [{ path, description: '完整专家/专家团作品包' }] }, 'package-present');
+      if (Buffer.from(actual).compare(Buffer.from(archive)) !== 0) throw new ExpertsError('experts/conflict', '交付文件字节与数字员工包不一致。');
+      await nativeTool(ctx, exec, 'present', { files: [{ path, description: '完整数字员工/数字员工团作品包' }] }, 'package-present');
       return { path, bytes: actual.length, digest: descriptor.digest, presented: true };
     },
   }));
   ctx.tools.register(defineTool({
-    name: 'workdsh_expert_save_documents', description: '将单专家或整个专家团的 Markdown 制作稿保存为一个作品草稿。读取并提交 agents/*.md 与 team.md 的内容；不会发布、授权或执行脚本。',
+    name: 'workdsh_expert_save_documents', description: '将单数字员工或整个数字员工团的 Markdown 制作稿保存为一个作品草稿。读取并提交 agents/*.md 与 team.md 的内容；不会发布、授权或执行脚本。',
     parameters: { expert_id: { type: 'string' }, expected_revision: { type: 'string' }, documents: { type: 'array', required: true, items: { type: 'object', additionalProperties: false, properties: { path: { type: 'string', required: true }, content: { type: 'string', required: true } } } } },
     output: { schema: detailOutput, render: (_args, value) => renderResult('整套制作稿已保存，可打开预览。', value, value.draft_url) },
     async execute(args, exec) {
@@ -366,8 +366,8 @@ export function registerExpertManagementTools(ctx: Context): void {
 
   ctx.tools.register(defineTool({
     name: 'workdsh_expert_list_skills',
-    description: '查询可编辑专家的真实本地已安装技能目录，返回稳定标识、简介与可配备状态。只读；创建或获取草稿后选择 selectable=true 的项，不能猜测技能名称。',
-    parameters: { expert_id: { type: 'string', required: true, description: '当前主体可编辑的目标专家 id。' } },
+    description: '查询可编辑数字员工的真实本地已安装技能目录，返回稳定标识、简介与可配备状态。只读；创建或获取草稿后选择 selectable=true 的项，不能猜测技能名称。',
+    parameters: { expert_id: { type: 'string', required: true, description: '当前主体可编辑的目标数字员工 id。' } },
     output: {
       schema: { type: 'array', items: { type: 'object', additionalProperties: false, properties: {
         skill_id: { type: 'string', required: true }, name: { type: 'string', required: true },
@@ -387,7 +387,7 @@ export function registerExpertManagementTools(ctx: Context): void {
 
   ctx.tools.register(defineTool({
     name: 'workdsh_expert_list',
-    description: '列出当前主体可见的 WorkDSH 专家（我的专家、内置专家），可按名称/描述/标签搜索与筛选。只读，不修改任何数据。',
+    description: '列出当前主体可见的 开物Praxis 数字员工（我的数字员工、内置数字员工），可按名称/描述/标签搜索与筛选。只读，不修改任何数据。',
     parameters: {
       search: { type: 'string', description: '可选搜索词，最多 200 字。' },
       origin: { type: 'string', enum: ['default', 'personal', 'organization'], description: '可选来源筛选。' },
@@ -397,7 +397,7 @@ export function registerExpertManagementTools(ctx: Context): void {
     },
     output: {
       schema: listOutput,
-      render: (_args, value) => renderResult(`找到 ${value.total} 个专家：${value.items.map((item) => item.name).join('、') || '（无）'}`, value),
+      render: (_args, value) => renderResult(`找到 ${value.total} 个数字员工：${value.items.map((item) => item.name).join('、') || '（无）'}`, value),
     },
     async execute(args, exec) {
       exec.signal.throwIfAborted();
@@ -430,14 +430,14 @@ export function registerExpertManagementTools(ctx: Context): void {
 
   ctx.tools.register(defineTool({
     name: 'workdsh_expert_get',
-    description: '读取一个 WorkDSH 专家的完整详情：草稿定义、并发令牌 revision、草稿修订 draft_revision、就绪状态与校验问题。只读。',
+    description: '读取一个 开物Praxis 数字员工的完整详情：草稿定义、并发令牌 revision、草稿修订 draft_revision、就绪状态与校验问题。只读。',
     parameters: {
-      expert_id: { type: 'string', required: true, description: '专家 id。' },
+      expert_id: { type: 'string', required: true, description: '数字员工 id。' },
       revision_id: { type: 'string', description: '可选：读取某个已发布修订而非当前草稿。' },
     },
     output: {
       schema: detailOutput,
-      render: (_args, value) => renderResult(`专家「${value.name}」（${value.availability}/${value.readiness}）：${value.description}${value.issues.length ? `；校验问题 ${value.issues.length} 项` : ''}`, value, value.draft_url),
+      render: (_args, value) => renderResult(`数字员工「${value.name}」（${value.availability}/${value.readiness}）：${value.description}${value.issues.length ? `；校验问题 ${value.issues.length} 项` : ''}`, value, value.draft_url),
     },
     async execute(args, exec) {
       exec.signal.throwIfAborted();
@@ -450,11 +450,11 @@ export function registerExpertManagementTools(ctx: Context): void {
 
   ctx.tools.register(defineTool({
     name: 'workdsh_expert_create_draft',
-    description: '创建一个新的「我的专家」草稿。这只写入私有草稿，绝不发布、不安装、不召唤任务。返回并发令牌 revision 与草稿修订 draft_revision。',
+    description: '创建一个新的「我的数字员工」草稿。这只写入私有草稿，绝不发布、不安装、不召唤任务。返回并发令牌 revision 与草稿修订 draft_revision。',
     parameters: { definition: definitionParameters },
     output: {
       schema: detailOutput,
-      render: (_args, value) => renderResult(`已创建专家草稿 ${value.id}「${value.name}」（draft_revision=${value.draft_revision}）；校验问题 ${value.issues.length} 项。`, value, value.draft_url),
+      render: (_args, value) => renderResult(`已创建数字员工草稿 ${value.id}「${value.name}」（draft_revision=${value.draft_revision}）；校验问题 ${value.issues.length} 项。`, value, value.draft_url),
     },
     async execute(args, exec) {
       exec.signal.throwIfAborted();
@@ -468,15 +468,15 @@ export function registerExpertManagementTools(ctx: Context): void {
 
   ctx.tools.register(defineTool({
     name: 'workdsh_expert_update_draft',
-    description: '修改一个已存在的专家草稿。必须传入上次看到的并发令牌 expected_revision，冲突时会失败并要求刷新。绝不改动已发布修订或运行中的任务。',
+    description: '修改一个已存在的数字员工草稿。必须传入上次看到的并发令牌 expected_revision，冲突时会失败并要求刷新。绝不改动已发布修订或运行中的任务。',
     parameters: {
-      expert_id: { type: 'string', required: true, description: '专家 id。' },
+      expert_id: { type: 'string', required: true, description: '数字员工 id。' },
       expected_revision: { type: 'string', required: true, description: '并发令牌，来自 get/create/update 返回的 revision。' },
       definition: { ...definitionParameters, required: true as const },
     },
     output: {
       schema: detailOutput,
-      render: (_args, value) => renderResult(`已更新专家草稿 ${value.id}「${value.name}」（draft_revision=${value.draft_revision}）；校验问题 ${value.issues.length} 项。`, value, value.draft_url),
+      render: (_args, value) => renderResult(`已更新数字员工草稿 ${value.id}「${value.name}」（draft_revision=${value.draft_revision}）；校验问题 ${value.issues.length} 项。`, value, value.draft_url),
     },
     async execute(args, exec) {
       exec.signal.throwIfAborted();
@@ -496,9 +496,9 @@ export function registerExpertManagementTools(ctx: Context): void {
 
   ctx.tools.register(defineTool({
     name: 'workdsh_expert_validate',
-    description: '校验一个专家草稿是否可发布，并解析其 Skill 依赖，返回定义摘要与依赖锁摘要。无副作用。发布前应先调用它。',
+    description: '校验一个数字员工草稿是否可发布，并解析其 Skill 依赖，返回定义摘要与依赖锁摘要。无副作用。发布前应先调用它。',
     parameters: {
-      expert_id: { type: 'string', required: true, description: '专家 id。' },
+      expert_id: { type: 'string', required: true, description: '数字员工 id。' },
       draft_revision: { type: 'string', required: true, description: '要校验的草稿修订，来自 get/create/update 返回的 draft_revision。' },
     },
     output: {
@@ -522,14 +522,14 @@ export function registerExpertManagementTools(ctx: Context): void {
 
   ctx.tools.register(defineTool({
     name: 'workdsh_expert_request_publish',
-    description: '对已通过校验的草稿发起发布前检查，返回 needs-confirmation 与将被冻结的精确摘要。此工具不会发布：用户必须在专家界面亲自确认，确认与发布只能由受信 UI 完成。',
+    description: '对已通过校验的草稿发起发布前检查，返回 needs-confirmation 与将被冻结的精确摘要。此工具不会发布：用户必须在数字员工界面亲自确认，确认与发布只能由受信 UI 完成。',
     parameters: {
-      expert_id: { type: 'string', required: true, description: '专家 id。' },
+      expert_id: { type: 'string', required: true, description: '数字员工 id。' },
       draft_revision: { type: 'string', required: true, description: '要发布的草稿修订。' },
     },
     output: {
       schema: requestPublishOutput,
-      render: (_args, value) => renderResult(`草稿已通过发布前校验，等待用户在专家界面确认发布（definition=${value.definition_digest}，dependencies=${value.dependency_lock_digest}）。不要声称已发布。`, value, value.draft_url),
+      render: (_args, value) => renderResult(`草稿已通过发布前校验，等待用户在数字员工界面确认发布（definition=${value.definition_digest}，dependencies=${value.dependency_lock_digest}）。不要声称已发布。`, value, value.draft_url),
     },
     async execute(args, exec) {
       exec.signal.throwIfAborted();
@@ -546,7 +546,7 @@ export function registerExpertManagementTools(ctx: Context): void {
         dependency_lock_digest: confirmation.dependencyLockDigest,
         expires_at: confirmation.expiresAt,
         draft_url: expertDraftUrl(confirmation.expertId),
-        instruction: '请在回复中提供 draft_url 对应的打开草稿链接，引导用户前往专家界面查看将发布的名称、定义摘要与依赖锁，并由用户点击确认后发布；不要代替用户确认，也不要声称已发布。',
+        instruction: '请在回复中提供 draft_url 对应的打开草稿链接，引导用户前往数字员工界面查看将发布的名称、定义摘要与依赖锁，并由用户点击确认后发布；不要代替用户确认，也不要声称已发布。',
       };
     },
   }));

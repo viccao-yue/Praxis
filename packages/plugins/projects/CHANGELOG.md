@@ -14,7 +14,7 @@
 ## 0.1.0-alpha.2 — Unreleased（2026-09-18）
 
 - Align with DeepSeek Harness 0.1.6-alpha.2 Client Session generations: retain the target Session (`sessions.retain` → `ready` → send → `release`) before sending a project task message, and open/switch Sessions through the official `uiWorkspace.openSession` navigation.
-- Open project tasks through official Session navigation: the Session becomes current and the built-in conversation view owns messages, streaming, composer, model and permissions; remove the WorkDSH-side conversation feed, composer and run-state rendering.
+- Open project tasks through official Session navigation: the Session becomes current and the built-in conversation view owns messages, streaming, composer, model and permissions; remove the Praxis-side conversation feed, composer and run-state rendering.
 - Add confirmed project archiving, archived-project filtering, and restoration while preserving project history.
 - Show a project lineage chip beside the Session title for project task Sessions through the official `conversation.session.header.actions` slot; clicking it opens the project panel focused on that project, non-project Sessions render nothing.
 - Cache the lineage verdict per Session in the client: header remounts reuse the first `task-context` answer instead of re-issuing the RPC on every render, misses included; lookup failures are not cached, so a transient error cannot hide the chip permanently.

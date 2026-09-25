@@ -32,7 +32,7 @@ export function registerExpertExecutionGuard(ctx: Context): void {
       if (unbound && (!header.agentPreset?.startsWith('wd-exp-') || creating && root === agent && !header.parentSession)) return;
       throw error;
     }
-    if (role.binding.presetRevisionRef !== header.agentPreset) throw new ExpertsError('experts/conflict', '原生任务 preset 与固定专家组合不一致。');
+    if (role.binding.presetRevisionRef !== header.agentPreset) throw new ExpertsError('experts/conflict', '原生任务 preset 与固定数字员工组合不一致。');
     if (membership?.role === 'teammate') {
       if (header.parentSession !== root.id || header.cwd !== root.session.header.cwd) throw new ExpertsError('experts/conflict', '官方成员与主任务的父关系或工作区不一致。');
       const childActor = await ctx.workdshIdentity.resolve({ sessionId: String(agent.id) }, signal);
@@ -45,7 +45,7 @@ export function registerExpertExecutionGuard(ctx: Context): void {
     // Read only our already verified immutable composition, not arbitrary plugins.
     const rows = (JSON.parse(await readExpertPreset(revision.presetRevisionRef)) as { plugins: { name?: string; config?: SkillFiles.Config }[] }).plugins;
     const skills = rows.find(row => row.name === '@deepseek-ai/dsh-skill-filesystem')?.config;
-    if (!skills) throw new ExpertsError('experts/dependency-missing', '固定专家组合缺少技能目录。');
+    if (!skills) throw new ExpertsError('experts/dependency-missing', '固定数字员工组合缺少技能目录。');
     const definition = revision.definition;
     const packageRoot = definition.packageDocuments ? join(expertPresetDir(revision.presetRevisionRef), 'expert-package') : undefined;
     // The official Agent scope owns these providers and their disposal.

@@ -1,4 +1,4 @@
-# WorkDSH 公开契约草案
+# 开物Praxis 公开契约草案
 
 状态：本地 `0.1` 治理契约基线完成。`workdsh-contracts@0.1.0-alpha.5` 已实现 Host identity/access/audit 与 Session owner/runtime binding 契约；未进入该包的领域接口仍是拟定义草案，不是声称已存在的 Harness API。企业服务器与受控 Remote 见[后期企业版说明](ENTERPRISE-EDITION.md)。架构决策见 [ADR-0016](adr/0016-governance-contracts-first.md)。
 
@@ -57,7 +57,7 @@ expert-manager 和 skill-creator 为功能插件自带技能，管理工具是�
 
 ## 必需依赖与可选能力
 
-依赖解析需说明对象、所需能力、是否必需、不可用原因和修复入口。官方 registries 仍为技能/工具的运行权威，WorkDSH 不缓存成另一份可执行目录。可选功能缺失不阻止无关专家运行。
+依赖解析需说明对象、所需能力、是否必需、不可用原因和修复入口。官方 registries 仍为技能/工具的运行权威，开物Praxis 不缓存成另一份可执行目录。可选功能缺失不阻止无关专家运行。
 
 ## 应用默认值与任务绑定
 
@@ -83,11 +83,11 @@ skills 增加 discover/setEnabled/uninstall；启停配置不改资源原文；u
 
 ## 任务与 Session 适配（P0-04 待验证草案）
 
-任务适配器通过官方 Session Controller/Agent 生命周期创建、提示、附加文件、跟随、取消和 fork，禁止以裸 `ctx.sessions.create()` 作为产品入口。TaskCreateResult 至少返回 WorkDSH taskRef、官方 sessionId、已解析组合指纹、ProjectTaskLink 状态和 requestId；业务关联失败必须是可对账状态，不能删除或伪造已提交的 Session 事实。
+任务适配器通过官方 Session Controller/Agent 生命周期创建、提示、附加文件、跟随、取消和 fork，禁止以裸 `ctx.sessions.create()` 作为产品入口。TaskCreateResult 至少返回 开物Praxis taskRef、官方 sessionId、已解析组合指纹、ProjectTaskLink 状态和 requestId；业务关联失败必须是可对账状态，不能删除或伪造已提交的 Session 事实。
 
 原生 Session 事件拥有消息、工具、步骤、运行审批、工作流与子 Agent 等执行事实。Project WorkItem、AutomationRule、Organization、业务审批和 AssetRevision 由各自领域拥有。`todo/write`、`schedule/change`、实验性 `team/*`、`approval/*` 与 `deliverables/presented` 不直接转换成这些业务对象。成果须经 assets/library 的 registerDeliverable 校验并返回修订引用后才能关联项目。
 
-自定义 WorkDSH Session event 只承载 Conversation/Projection 需要重放的会话级节点，包含稳定 businessObjectRef、schemaVersion 与迁移处置。跨 Session/Domain 通过 requestId 和回执对账；读取持久化结果、导出和交接前执行官方 flush。fork、恢复与继续运行重新调用 access、runtime 和依赖解析，不继承 lineage 暗示的权限。
+自定义 开物Praxis Session event 只承载 Conversation/Projection 需要重放的会话级节点，包含稳定 businessObjectRef、schemaVersion 与迁移处置。跨 Session/Domain 通过 requestId 和回执对账；读取持久化结果、导出和交接前执行官方 flush。fork、恢复与继续运行重新调用 access、runtime 和依赖解析，不继承 lineage 暗示的权限。
 
 AutomationRule、WebhookDelivery、ScheduleOccurrence 与 AutomationRun 是 automations 领域对象。官方 Webhook provider/runtime 可验证并规范化输入，Schedule 可产生会话级触发，Job 可控制进程内活跃工作，但这些运行时不拥有业务去重、跨重启恢复或团队可见历史。acceptDelivery 先提交 source + deliveryId + ruleId 幂等事实，再请求创建 Session；202/dispatch 返回和 Job terminal snapshot 都不能单独完成 AutomationRun。
 
@@ -99,7 +99,7 @@ AutomationRule、WebhookDelivery、ScheduleOccurrence 与 AutomationRun 是 auto
 - ProjectPost、WorkItemComment：正文修订、作者、项目、目标、时间、访问范围；服务提供发布/查询/修改/删除语义。MentionRef 以主体 ID 表示，不等于通知已送达。
 - ComposerReference：asset/workItem/skill、稳定 ID、修订；解析服务重查权限和存在性，返回可进入任务的结构化内容与出处。引用待办本身不修改待办。
 
-这些是 WorkDSH 服务草案，不能假定为 Harness 原生接口；P0-04 决定实际公开适配。字段及权限检查必须覆盖页面和 Agent 工具两条路径。
+这些是 开物Praxis 服务草案，不能假定为 Harness 原生接口；P0-04 决定实际公开适配。字段及权限检查必须覆盖页面和 Agent 工具两条路径。
 
 ## D00 边界补全
 
@@ -112,11 +112,11 @@ ConnectionExecutionBinding 增加 configRevision/targetFingerprint/externalPrinc
 
 任务创建输入分别包含可选专家修订引用、执行组合引用、项目/资料引用和连接实例引用；组合引用至少能定位 preset id 与已验证修订或指纹。不得把可执行配置正文或客户端传入的 actor 当作可信授权。
 
-服务端解析结果包含实际组合来源、已解析角色/技能修订、允许的资源与账号绑定、不可用原因；此处是 WorkDSH 拟定义契约，不是新增 Harness 原生 API。组合解析通过已有 workbench 适配与原生 preset 服务完成，领域数据由各自服务提供。持久化的修订引用必须能重建实际配置，否则恢复拒绝继续而非回退最新版本。凭据不进入解析结果或对话。
+服务端解析结果包含实际组合来源、已解析角色/技能修订、允许的资源与账号绑定、不可用原因；此处是 开物Praxis 拟定义契约，不是新增 Harness 原生 API。组合解析通过已有 workbench 适配与原生 preset 服务完成，领域数据由各自服务提供。持久化的修订引用必须能重建实际配置，否则恢复拒绝继续而非回退最新版本。凭据不进入解析结果或对话。
 
 `ResolvedExecutionBinding` 至少返回 expertRevisionRef（可空）、presetRevisionRef、compositionDigest、provider/model/reasoningEffort、skillRevisionRefs、toolNames、projectRef、assetRevisionRefs、connectionExecutionBindings、runtimePolicyRef 与 authorizationRevision。模型目录条目不能代替精确模型解析；未支持的显式 reasoning effort 返回可区分错误。绑定形成后在该 Session 生命周期内不可静默改换 provider、preset 或专家修订。
 
-`ExpertTeamRevision` 是 WorkDSH 业务对象，包含稳定成员角色、允许的 ExpertRevision、委派/汇总规则和资源约束。一次运行可创建 `ExpertTeamRunBinding`，把成员映射到原生子 Session 与 Team member；原生 TeamId、taskId、mailbox revision 只作为运行引用。创建每个成员时重新解析 ActorContext、RuntimeBinding、scope、工具、资产和连接，不从父 Agent 自动继承。
+`ExpertTeamRevision` 是 开物Praxis 业务对象，包含稳定成员角色、允许的 ExpertRevision、委派/汇总规则和资源约束。一次运行可创建 `ExpertTeamRunBinding`，把成员映射到原生子 Session 与 Team member；原生 TeamId、taskId、mailbox revision 只作为运行引用。创建每个成员时重新解析 ActorContext、RuntimeBinding、scope、工具、资产和连接，不从父 Agent 自动继承。
 
 子代理结算至少区分 completed、partial、cancelled、failed、unavailable 和 quiescenceUnknown；一次性运行只有 completed 才可作为完整结果。`interrupt`、inbox accepted 或 provider removal 都不能单独宣告子任务已停稳。项目 WorkItem 的完成状态仅由 projects 服务根据显式业务回执更新，不从原生 team task 状态自动复制。
 

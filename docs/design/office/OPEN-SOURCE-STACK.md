@@ -8,13 +8,13 @@
 
 采用GenOffice使用的上游开源基础组件，收敛既有选型；工程参考用于确定组件职责与集成方式。继续保留Harness的Agent、工具、模型路由、会话、插件生命周期和统一内容API。GenOffice的商业产品使用经验是选型依据；具体落地使用各组件的开源发行物，版本与许可证随依赖锁定记录，不反复扩大候选搜索。
 
-来源：[GenOffice](https://github.com/genspark-ai/genoffice)，本轮静态核对提交 `de139a061537bea40f0cc81ef8f09a95f77ac52a`。核对了组件清单、package.json和有关编辑/读写源文件，没有运行其应用或把代码复制进产品。目标是采用相同基础库，不以安装GenOffice桌面应用替代WorkDSH集成。
+来源：[GenOffice](https://github.com/genspark-ai/genoffice)，本轮静态核对提交 `de139a061537bea40f0cc81ef8f09a95f77ac52a`。核对了组件清单、package.json和有关编辑/读写源文件，没有运行其应用或把代码复制进产品。目标是采用相同基础库，不以安装GenOffice桌面应用替代开物Praxis集成。
 
 **PPT选型校正（2026-09-12）：** 对方生产Slides使用自研pptx-engine和pptx-render，Konva承担画布交互；PptxGenJS仅在引擎开发依赖中，不能据此将其称为生产导出核心。我们的PPT-01组合仅是新建文字/图片导出探针。复用范围与后续顺序见[源码复核](GENOFFICE-SLIDES-REVIEW.md)，不将对方private源码包当已发布SDK直接安装。
 
 ## 2. 采用的组件与分工
 
-| WorkDSH能力 | 采用路线 | 我们需要完成的集成 |
+| 开物Praxis能力 | 采用路线 | 我们需要完成的集成 |
 | --- | --- | --- |
 | 文档/Word | Tiptap开源核心 + ProseMirror；React UI | 原生正文/段落/表格编辑，稳定ID与统一模型映射，DOCX导入导出、分页与格式保留 |
 | Excel | 继续Univer开源Sheets；按需启用对应开源功能插件 | 接入统一修订/持久化/AI范围工具，完善浏览器文件读写和图表；不扩展公式引擎 |
@@ -35,7 +35,7 @@ Tiptap与Konva是编辑基础，不自行完成DOCX/PPTX格式读写。使用相
 | opentype.js + HarfBuzz WASM | 字体度量、复杂文字整形 | 文档/PPT/PDF排版需要时引入；字体与WASM随包提供 |
 | Mermaid + KaTeX | 图示、数学公式 | Markdown必做能力，文档按能力复用；随包提供，不依赖远程脚本 |
 | CodeMirror | HTML/Markdown源码编辑 | 两类正式编辑器的组成部分，不另建AI聊天 |
-| Fluent UI System Icons | 编辑工具图标 | 复用图标库，仍遵循WorkDSH公共UI规范 |
+| Fluent UI System Icons | 编辑工具图标 | 复用图标库，仍遵循开物Praxis公共UI规范 |
 | React | UI | 继续复用Harness提供的React组合，不启动另一React根应用 |
 
 Electron/electron-updater属于GenOffice桌面壳，不加入当前Web编辑器。其calamine/IronCalc用于Rust xlsx sidecar；在用户“浏览器内运行、不要增加公式计算”约束下，当前不引入该本地进程。libeot/MTX仅在需要处理对应嵌入字体时采用，保留其独立许可记录。
@@ -44,9 +44,9 @@ Electron/electron-updater属于GenOffice桌面壳，不加入当前Web编辑器�
 
 Tiptap核心的[MIT许可证](https://github.com/ueberdosis/tiptap/blob/main/LICENSE.md)、Konva的[MIT许可证](https://github.com/konvajs/konva/blob/master/LICENSE)、Univer开源仓库的[Apache-2.0许可证](https://github.com/dream-num/univer/blob/dev/LICENSE)已核对。PDF.js/pdf-lib/PDFium分别沿用其Apache-2.0/MIT/BSD许可，封装包及字体保留各自声明；使用开源核心，不默认安装同品牌收费服务或扩展。
 
-以下是GenOffice在固定提交的**声明版本**，范围表达式不等于lockfile实际解析版本，也不表示WorkDSH已安装：
+以下是GenOffice在固定提交的**声明版本**，范围表达式不等于lockfile实际解析版本，也不表示开物Praxis已安装：
 
-| 组件 | 参考声明 | WorkDSH决定 |
+| 组件 | 参考声明 | 开物Praxis决定 |
 | --- | --- | --- |
 | @tiptap/core、extensions、pm、react | 3.31.0 | U1采用同族进行文档探针，锁定实际兼容版本，不混用主版本 |
 | @univerjs开源Sheets | ^0.25.1 | 保留现有精确0.25.1基线，新增开源插件保持同族；不切入需要授权的新商业组件 |

@@ -10,10 +10,12 @@ import type {} from '@deepseek-ai/dsh-client-ui-conversation/client';
 import type {} from '@deepseek-ai/dsh-api-workspace-controller/client';
 import type {} from '@deepseek-ai/dsh-client-ui-layout/client';
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client';
+import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client';
 import type {} from '@deepseek-ai/dsh-client-ui-session/client';
 import type {} from '@deepseek-ai/dsh-client-ui-workspace/client';
 import type {} from '@deepseek-ai/dsh-client-ui-slots';
 import { ExpertsPanel } from './client/ExpertsPanel.js';
+import { ExpertNavigationIcon } from './client/ExpertNavigationIcon.js';
 import { PendingExpertDraft, pendingExpertDraftKey, pendingExpertDraftEvent, expertManagerGuide, expertTeamManagerGuide } from './client/drafts.js';
 import { createExpertManagementClient } from './client/management.js';
 
@@ -25,16 +27,14 @@ type SessionId = Awaited<ReturnType<ISessions['create']>>;
 /**
  * Expert Client assembly (D04 / P1-02).
  *
- * Contributes exactly one `main` panel (`workdsh-experts`) and one native-input draft
- * overlay. It deliberately does NOT register a `sidebar.panellist` entry: the shared
- * capability center ("专家 · 技能 · 连接器") stays a single navigation item owned by the
- * Skill plugin, and the two panels switch through the in-panel capability tabs via
- * `layout.selectPanel`. This keeps AT-20 (no duplicate navigation) and lets the Skill
- * panel keep working when experts is removed.
+ * Contributes one `main` panel (`workdsh-experts`), its own `sidebar.panellist`
+ * entry directly under Projects (order 25), and one native-input draft overlay.
+ * Skills/Connectors keep a separate capability-center entry. Removing this
+ * plugin removes the Experts nav item and panel; Skills continue to work alone.
  *
  * Summon creates the bound native Session on the Host (so the expert's compiled preset
  * is attached at creation), then opens it here and seeds a one-shot draft hand-off; the
- * draft is never auto-sent. "制作专家" opens an ordinary Session seeded with the
+ * draft is never auto-sent. "制作数字员工" opens an ordinary Session seeded with the
  * `/workdsh-expert-manager` guide.
  */
 export function apply(ctx: Context): void {
@@ -101,7 +101,7 @@ export function apply(ctx: Context): void {
       if (sessions.list.getSnapshot().byId[sessionId]) { ctx.uiWorkspace.openSession(sessionId); return; }
       await waitForInput(120);
     }
-    throw new Error('未能打开专家任务，请稍后在会话列表中查看。');
+    throw new Error('未能打开数字员工任务，请稍后在会话列表中查看。');
   };
 
   const summon = async (expertId: string, revisionId: string | undefined, draftText: string | undefined): Promise<void> => {
@@ -113,7 +113,7 @@ export function apply(ctx: Context): void {
       ...(draftText ? { draftText } : {}),
     });
     if (plan.missing.length > 0) {
-      throw new Error(plan.missing.map(issue => issue.message).join('；') || '该专家暂不可召唤。');
+      throw new Error(plan.missing.map(issue => issue.message).join('；') || '该数字员工暂不可召唤。');
     }
     const creation = await management.createExecution(plan.executionPlanId, management.newOperationId('create-execution'));
     const sessionId = creation.sessionId as SessionId;
@@ -128,7 +128,7 @@ export function apply(ctx: Context): void {
   const createExpertTask = async (kind: 'agent' | 'team' = 'agent'): Promise<void> => {
     lifetime.signal.throwIfAborted();
     const workspace = resolveWorkspace();
-    if (!workspace) throw new Error('需要先选择一个工作区再制作专家。');
+    if (!workspace) throw new Error('需要先选择一个工作区再制作数字员工。');
     const sessionId = await sessions.create({ workspaceId: workspace.workspaceId, cwd: workspace.path });
     lifetime.signal.throwIfAborted();
     ctx.uiWorkspace.openSession(sessionId);
@@ -142,7 +142,7 @@ export function apply(ctx: Context): void {
     if (!detail.canEdit) throw new Error('没有编辑该作品的权限。');
     const definition = detail.draft.definition;
     const workspace = resolveWorkspace();
-    if (!workspace) throw new Error('需要先选择一个工作区再修改专家。');
+    if (!workspace) throw new Error('需要先选择一个工作区再修改数字员工。');
     const sessionId = await sessions.create({ workspaceId: workspace.workspaceId, cwd: workspace.path });
     lifetime.signal.throwIfAborted();
     ctx.layout.selectPanel(null);
@@ -162,15 +162,16 @@ export function apply(ctx: Context): void {
       }
     } catch { /* Missing or invalid name metadata is omitted from the input. */ }
     const name = `${definition.name}${englishName && englishName !== definition.name ? `（${englishName}）` : ''}`;
-    await seedDraft(sessionId, `/workdsh-expert-manager 帮我修改专家：[${name}]，增加/优化[请补充你希望新增/优化的技能或知识领域等]方面的能力`);
+    await seedDraft(sessionId, `/workdsh-expert-manager 帮我修改数字员工：[${name}]，增加/优化[请补充你希望新增/优化的技能或知识领域等]方面的能力`);
   };
-
-  const openCapability = (key: string): void => { ctx.layout.selectPanel(key as Parameters<typeof ctx.layout.selectPanel>[0]); };
-  const hasCapability = (key: string): boolean => ctx.slots.entriesOfSlot('main').some(entry => entry.options.key === key);
 
   ctx.slots.inject('main', () => ctx.slots.register({
     name: 'main', key: 'workdsh-experts',
-    inject: () => ({ toggleNavigation: () => ctx.layout.toggleSidebar(), management, openCapability, hasCapability, summon, createExpertTask, editExpertTask }),
+    inject: () => ({ toggleNavigation: () => ctx.layout.toggleSidebar(), management, summon, createExpertTask, editExpertTask }),
   }, ExpertsPanel));
+  // Sit directly under Projects (order 20). Skills keep the capability-center slot at 30.
+  ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({
+    name: 'sidebar.panellist', id: 'workdsh-experts', label: '数字员工', order: 25,
+  }, ExpertNavigationIcon));
   ctx.slots.inject('conversation.input.overlay', () => ctx.slots.register({ name: 'conversation.input.overlay', id: 'workdsh-expert-draft' }, PendingExpertDraft));
 }

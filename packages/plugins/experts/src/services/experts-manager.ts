@@ -6,7 +6,7 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { Context, Service } from '@deepseek-ai/cordis';
 import type { KvTable } from '@deepseek-ai/dsh-storage-domain';
 import type { SessionCreateRequest, SessionCreateValue } from '@deepseek-ai/dsh-api-session-controller';
-import { expertPresetDir, readExpertPreset, registerExpertPreset } from '../runtime/preset-compiler.js';
+import { expertPresetDir, readExpertPreset, registerExpertPreset, releaseExpertPresets } from '../runtime/preset-compiler.js';
 import {
   EXPERT_LIMITS,
   ExpertsError,
@@ -60,6 +60,7 @@ import { TtlStore } from '../runtime/plans.js';
 import { definitionDigest, normalizeDefinition, validateDefinition, teamDefinitionSchema } from '../domain/definition.js';
 import { codePointLength, digestOf, shortDigest, sha256 } from '../domain/digest.js';
 import { DEFAULT_TEMPLATES } from '../domain/templates.js';
+import { withDefaultAvatar } from '../domain/default-avatars.js';
 import { assertUploadWithinLimit, buildExport, preflightPackage } from './portability.js';
 
 /**
@@ -211,6 +212,8 @@ export class ExpertsManager extends Service implements ExpertsService {
   private operations?: KvTable<string, Operation>;
   private mutationTail: Promise<void> = Promise.resolve();
   private seeding?: Promise<void>;
+  /** Process-local: skip repeated default Skill lock repair once healthy. */
+  private defaultSkillRepairDone = false;
 
   private readonly confirmations = new ConfirmationStore();
   private readonly executionPlans = new TtlStore<ExecutionPlan>(PLAN_TTL_MS);
@@ -235,8 +238,14 @@ export class ExpertsManager extends Service implements ExpertsService {
     this.bindings = domain.table('bindings');
     this.preferences = domain.table('preferences');
     this.operations = domain.table('operations');
-    for (const [, revision] of this.revisions.entries()) {
-      if (revision.compilerVersion === COMPILER_VERSION) await registerExpertPreset(this.ctx, revision.presetRevisionRef, revision.compositionDigest);
+    // Only the current published preset of a living employee belongs on
+    // 设置 → Agent 预设. Older revisions and deleted employees stay on disk.
+    for (const [, expert] of this.experts.entries()) {
+      const ref = expert.publishedRevisionRef;
+      if (!ref) continue;
+      const revision = this.revisions.get(keys.revision(ref.expertId, ref.revisionId));
+      if (!revision || revision.compilerVersion !== COMPILER_VERSION) continue;
+      await registerExpertPreset(this.ctx, revision.presetRevisionRef, revision.compositionDigest);
     }
     // Staged uploads are transient; best-effort cleanup when the plugin unloads.
     this.ctx.effect(() => () => { void rm(this.stagingRoot, { recursive: true, force: true }); }, 'workdshExperts.stagingCleanup');
@@ -245,45 +254,45 @@ export class ExpertsManager extends Service implements ExpertsService {
   // ── table access ──────────────────────────────────────────────────────────
 
   private expertsTable(): KvTable<string, Expert> {
-    if (!this.experts) throw new ExpertsError('experts/unavailable', '专家服务尚未就绪。');
+    if (!this.experts) throw new ExpertsError('experts/unavailable', '数字员工服务尚未就绪。');
     return this.experts;
   }
   private draftsTable(): KvTable<string, ExpertDraft> {
-    if (!this.drafts) throw new ExpertsError('experts/unavailable', '专家服务尚未就绪。');
+    if (!this.drafts) throw new ExpertsError('experts/unavailable', '数字员工服务尚未就绪。');
     return this.drafts;
   }
   private revisionsTable(): KvTable<string, ExpertRevision> {
-    if (!this.revisions) throw new ExpertsError('experts/unavailable', '专家服务尚未就绪。');
+    if (!this.revisions) throw new ExpertsError('experts/unavailable', '数字员工服务尚未就绪。');
     return this.revisions;
   }
   private bindingsTable(): KvTable<string, ExecutionBinding> {
-    if (!this.bindings) throw new ExpertsError('experts/unavailable', '专家服务尚未就绪。');
+    if (!this.bindings) throw new ExpertsError('experts/unavailable', '数字员工服务尚未就绪。');
     return this.bindings;
   }
   private preferencesTable(): KvTable<string, ExpertPreference> {
-    if (!this.preferences) throw new ExpertsError('experts/unavailable', '专家服务尚未就绪。');
+    if (!this.preferences) throw new ExpertsError('experts/unavailable', '数字员工服务尚未就绪。');
     return this.preferences;
   }
   private operationsTable(): KvTable<string, Operation> {
-    if (!this.operations) throw new ExpertsError('experts/unavailable', '专家服务尚未就绪。');
+    if (!this.operations) throw new ExpertsError('experts/unavailable', '数字员工服务尚未就绪。');
     return this.operations;
   }
 
   private loadExpert(expertId: string): Expert {
     const expert = this.expertsTable().get(keys.expert(expertId));
-    if (!expert) throw new ExpertsError('experts/not-found', '未找到该专家。');
+    if (!expert) throw new ExpertsError('experts/not-found', '未找到该数字员工。');
     return expert;
   }
 
   private loadDraft(expertId: string): ExpertDraft {
     const draft = this.draftsTable().get(keys.draft(expertId));
-    if (!draft) throw new ExpertsError('experts/not-found', '未找到该专家的草稿。');
+    if (!draft) throw new ExpertsError('experts/not-found', '未找到该数字员工的草稿。');
     return draft;
   }
 
   private loadRevision(expertId: string, revisionId: string): ExpertRevision {
     const revision = this.revisionsTable().get(keys.revision(expertId, revisionId));
-    if (!revision) throw new ExpertsError('experts/not-found', '未找到该专家修订。');
+    if (!revision) throw new ExpertsError('experts/not-found', '未找到该数字员工修订。');
     return revision;
   }
 
@@ -304,14 +313,14 @@ export class ExpertsManager extends Service implements ExpertsService {
       owner: expert.owner,
     }, signal);
     if (decision.effect !== 'allow') {
-      throw new ExpertsError('experts/forbidden', '没有权限对该专家执行此操作。', { reason: decision.code });
+      throw new ExpertsError('experts/forbidden', '没有权限对该数字员工执行此操作。', { reason: decision.code });
     }
     if (expert.teamParentId) {
-      if (['experts.update-draft', 'experts.publish', 'experts.set-availability'].includes(action)) throw new ExpertsError('experts/forbidden', '请通过专家团整体修改或发布成员。');
+      if (['experts.update-draft', 'experts.publish', 'experts.set-availability', 'experts.delete'].includes(action)) throw new ExpertsError('experts/forbidden', '请通过数字员工团整体修改或发布成员。');
       const parent = this.loadExpert(expert.teamParentId);
-      if (!this.isVisible(actor, parent) || parent.availability !== 'enabled' || !parent.publishedRevisionRef) throw new ExpertsError('experts/disabled', '成员所属专家团未发布、已停用或不可访问。');
+      if (!this.isVisible(actor, parent) || parent.availability !== 'enabled' || !parent.publishedRevisionRef) throw new ExpertsError('experts/disabled', '成员所属数字员工团未发布、已停用或不可访问。');
       const attached = [...this.revisionsTable().entries()].some(([, revision]) => revision.expertId === parent.id && Object.values(revision.teamMembers ?? {}).some(ref => ref.expertId === expert.id));
-      if (!attached) throw new ExpertsError('experts/not-published', '该成员尚未随专家团发布。');
+      if (!attached) throw new ExpertsError('experts/not-published', '该成员尚未随数字员工团发布。');
     }
   }
 
@@ -358,23 +367,46 @@ export class ExpertsManager extends Service implements ExpertsService {
   // ── default seeding ───────────────────────────────────────────────────────
 
   /**
-   * Seed the three shipped default experts once, the first time the catalog is
-   * read in a deployment. They become ordinary personal-owned experts (copyable,
-   * disable-able), never a hidden second source of truth. A compilation failure
-   * (e.g. no writable preset root) skips that template rather than breaking reads.
+   * Seed shipped default experts that are still missing from the catalog.
+   * First install seeds the full set; later template additions are backfilled by id
+   * without rewriting already-seeded defaults. Also repairs default Skill locks that
+   * were resolved but never retained (otherwise detail readiness stays missing-dependency).
+   * A compilation failure (e.g. no writable preset root) skips that template rather than breaking reads.
    */
   private async ensureSeeded(actor: ActorContext, signal?: AbortSignal): Promise<void> {
-    if (this.expertsTable().size > 0) return;
+    const missing = DEFAULT_TEMPLATES.filter((template) => !this.expertsTable().get(keys.expert(template.id)));
+    const hasSeededDefaults = DEFAULT_TEMPLATES.some((template) => this.expertsTable().get(keys.expert(template.id)));
+    if (missing.length === 0 && (this.defaultSkillRepairDone || !hasSeededDefaults)) return;
     if (!this.seeding) {
       this.seeding = this.enqueue(async () => {
-        if (this.expertsTable().size > 0) return;
         for (const template of DEFAULT_TEMPLATES) {
+          if (this.expertsTable().get(keys.expert(template.id))) continue;
           try {
             await this.seedTemplate(actor, template.id, template.definition, signal);
           } catch (error) {
             await this.audit(actor, 'experts.create-draft', template.id, 'failed', errorCode(error, 'experts/seed-failed'));
           }
         }
+        let repairsHealthy = true;
+        for (const template of DEFAULT_TEMPLATES) {
+          if (!this.expertsTable().get(keys.expert(template.id))) continue;
+          try {
+            await this.repairDefaultSkillLock(actor, template.id, template.definition, signal);
+            const expert = this.expertsTable().get(keys.expert(template.id));
+            const ref = expert?.publishedRevisionRef;
+            const revision = ref ? this.revisionsTable().get(keys.revision(ref.expertId, ref.revisionId)) : undefined;
+            const desired = withDefaultAvatar(template.id, template.definition);
+            if (!revision
+              || await this.computeReadiness(revision, actor, signal) !== 'ready'
+              || (desired.avatarRef && revision.definition.avatarRef !== desired.avatarRef)) {
+              repairsHealthy = false;
+            }
+          } catch (error) {
+            repairsHealthy = false;
+            await this.audit(actor, 'experts.publish', template.id, 'failed', errorCode(error, 'experts/seed-skill-repair-failed'));
+          }
+        }
+        if (repairsHealthy) this.defaultSkillRepairDone = true;
       }).then(() => undefined, () => undefined).finally(() => { this.seeding = undefined; });
     }
     await this.seeding;
@@ -383,16 +415,16 @@ export class ExpertsManager extends Service implements ExpertsService {
   private async seedTemplate(actor: ActorContext, expertId: string, definition: ExpertDefinition, signal?: AbortSignal): Promise<void> {
     signal?.throwIfAborted();
     const now = new Date().toISOString();
-    const normalized = normalizeDefinition(definition);
+    const normalized = normalizeDefinition(withDefaultAvatar(expertId, definition));
     const defDigest = definitionDigest(normalized);
-    const lockDigest = digestOf([]);
     const draftRevision = shortDigest({ seed: expertId, defDigest });
+    const { dependencyLock, lockDigest, snapshotDirs } = await this.freezeDefaultSkills(expertId, normalized, signal);
     const basePresetId = await this.resolveBasePreset(signal);
-    const compiled = await compileExpertPreset(this.ctx, { expertId, definition: normalized, snapshotDirs: [], basePresetId });
+    const compiled = await compileExpertPreset(this.ctx, { expertId, definition: normalized, snapshotDirs, basePresetId });
     const revisionId = revisionIdFor(defDigest, lockDigest, compiled.presetId);
     const revision: ExpertRevision = {
       expertId, revisionId, definition: normalized, definitionDigest: defDigest,
-      dependencyLock: [], dependencyLockDigest: lockDigest,
+      dependencyLock, dependencyLockDigest: lockDigest,
       presetRevisionRef: compiled.presetId, compilerVersion: COMPILER_VERSION,
       compositionDigest: compiled.compositionDigest,
       publishedAt: now, publishedBy: actor.principalId,
@@ -408,6 +440,102 @@ export class ExpertsManager extends Service implements ExpertsService {
     await this.expertsTable().put(keys.expert(expertId), expert);
   }
 
+  /** Resolve + retain declared Skills for a default expert; empty when Skills are not installed yet. */
+  private async freezeDefaultSkills(
+    expertId: string,
+    definition: ExpertDefinition,
+    signal?: AbortSignal,
+  ): Promise<{ dependencyLock: ExpertRevision['dependencyLock']; lockDigest: string; snapshotDirs: string[] }> {
+    if (definition.skillRequirements.length === 0) {
+      return { dependencyLock: [], lockDigest: digestOf([]), snapshotDirs: [] };
+    }
+    const draftRevision = shortDigest({ seed: expertId, freeze: definitionDigest(definition) });
+    const validation = await this.computeValidation(
+      { expertId, revision: draftRevision, definition, validationIssues: [] },
+      signal,
+    );
+    if (validation.dependencyLock.length !== definition.skillRequirements.length
+      || validation.issues.some((issue) => issue.code === 'experts/dependency-missing' || issue.code.startsWith('skills/'))) {
+      return { dependencyLock: [], lockDigest: digestOf([]), snapshotDirs: [] };
+    }
+    const consumer = { domain: EXPERT_DOMAIN, id: expertId };
+    const snapshotDirs: string[] = [];
+    for (const ref of validation.dependencyLock) {
+      signal?.throwIfAborted();
+      snapshotDirs.push((await this.ctx.workdshSkills.retainRevision(ref, consumer, signal)).snapshotDir);
+    }
+    return {
+      dependencyLock: validation.dependencyLock,
+      lockDigest: validation.dependencyLockDigest,
+      snapshotDirs,
+    };
+  }
+
+  /**
+   * Re-freeze Skill snapshots and shipped avatars for an already-seeded default
+   * when the published lock/avatar is empty, incomplete, or retained content drifted.
+   */
+  private async repairDefaultSkillLock(
+    actor: ActorContext,
+    expertId: string,
+    definition: ExpertDefinition,
+    signal?: AbortSignal,
+  ): Promise<void> {
+    const expert = this.expertsTable().get(keys.expert(expertId));
+    if (!expert || expert.origin !== 'default' || !expert.publishedRevisionRef) return;
+    const current = this.loadRevision(expert.publishedRevisionRef.expertId, expert.publishedRevisionRef.revisionId);
+    const desired = normalizeDefinition(withDefaultAvatar(expertId, definition));
+    const readiness = await this.computeReadiness(current, actor, signal);
+    const incomplete = current.definition.skillRequirements.length > 0
+      && current.dependencyLock.length !== current.definition.skillRequirements.length;
+    const avatarStale = Boolean(desired.avatarRef) && current.definition.avatarRef !== desired.avatarRef;
+    if (readiness === 'ready' && !incomplete && !avatarStale) return;
+
+    const { dependencyLock, lockDigest, snapshotDirs } = await this.freezeDefaultSkills(expertId, desired, signal);
+    if (desired.skillRequirements.length > 0 && dependencyLock.length === 0 && !avatarStale) return;
+
+    const defDigest = definitionDigest(desired);
+    const basePresetId = await this.resolveBasePreset(signal);
+    const compiled = await compileExpertPreset(this.ctx, {
+      expertId,
+      definition: desired,
+      snapshotDirs: dependencyLock.length ? snapshotDirs : [],
+      basePresetId,
+    });
+    const effectiveLock = dependencyLock.length ? dependencyLock : current.dependencyLock;
+    const effectiveLockDigest = dependencyLock.length ? lockDigest : current.dependencyLockDigest;
+    const revisionId = revisionIdFor(defDigest, effectiveLockDigest, compiled.presetId);
+    if (revisionId === current.revisionId && readiness === 'ready' && !avatarStale) return;
+    const now = new Date().toISOString();
+    const draftRevision = shortDigest({ seed: expertId, repair: defDigest });
+    const revision: ExpertRevision = {
+      expertId, revisionId, definition: desired, definitionDigest: defDigest,
+      dependencyLock: effectiveLock, dependencyLockDigest: effectiveLockDigest,
+      presetRevisionRef: compiled.presetId, compilerVersion: COMPILER_VERSION,
+      compositionDigest: compiled.compositionDigest,
+      publishedAt: now, publishedBy: actor.principalId,
+    };
+    await this.revisionsTable().put(keys.revision(expertId, revisionId), revision);
+    await this.draftsTable().put(keys.draft(expertId), {
+      expertId,
+      revision: draftRevision,
+      definition: desired,
+      validationIssues: [],
+    });
+    await this.expertsTable().update(keys.expert(expertId), (row) => ({
+      ...row,
+      publishedRevisionRef: { expertId, revisionId },
+      draftRevision,
+      revision: `r-${randomUUID()}`,
+      updatedAt: now,
+    }));
+    await this.audit(actor, 'experts.publish', expertId, 'succeeded', 'experts/default-skill-repair-succeeded', {
+      revisionId,
+      skills: String(effectiveLock.length),
+      avatar: desired.avatarRef ? '1' : '0',
+    });
+  }
+
   /** Expert 0.1 uses standard explicitly; never inherit a different execution mode silently. */
   private async resolveBasePreset(signal?: AbortSignal): Promise<string> {
     signal?.throwIfAborted();
@@ -418,14 +546,14 @@ export class ExpertsManager extends Service implements ExpertsService {
     } catch {
       signal?.throwIfAborted();
     }
-    throw new ExpertsError('experts/preset-broken', '专家需要官方标准模式（standard），但当前不可用。请恢复标准模式后重试；不会自动切换到 PTC、创造或其他模式。');
+    throw new ExpertsError('experts/preset-broken', '数字员工需要官方标准模式（standard），但当前不可用。请恢复标准模式后重试；不会自动切换到 PTC、创造或其他模式。');
   }
 
   /**
    * Recompile an older published team for the current runtime without mutating its
    * immutable revision. Existing Sessions keep their old binding; only future
    * executions move to the derived revision. This is intentionally done on use so
-   * installations upgraded from an earlier WorkDSH release need no manual republish.
+   * installations upgraded from an earlier Praxis release need no manual republish.
    */
   private async ensureCurrentExecutionRevision(actor: ActorContext, revision: ExpertRevision, signal?: AbortSignal): Promise<ExpertRevision> {
     if (!revision.definition.team || revision.compilerVersion === COMPILER_VERSION) return revision;
@@ -643,10 +771,19 @@ export class ExpertsManager extends Service implements ExpertsService {
   }
 
   private sortRows(rows: { expert: Expert; preference?: ExpertPreference }[]): void {
+    const defaultOrder = new Map(DEFAULT_TEMPLATES.map((template, index) => [template.id, index]));
     rows.sort((left, right) => {
       const leftPin = left.preference?.pinned ? 1 : 0;
       const rightPin = right.preference?.pinned ? 1 : 0;
       if (leftPin !== rightPin) return rightPin - leftPin;
+      // Built-in defaults keep stable catalog order (常青云 first), ahead of last-used churn.
+      const leftDefault = defaultOrder.get(left.expert.id);
+      const rightDefault = defaultOrder.get(right.expert.id);
+      if (leftDefault !== undefined && rightDefault !== undefined && leftDefault !== rightDefault) {
+        return leftDefault - rightDefault;
+      }
+      if (leftDefault !== undefined && rightDefault === undefined) return -1;
+      if (leftDefault === undefined && rightDefault !== undefined) return 1;
       const leftUsed = left.preference?.lastUsedAt ? Date.parse(left.preference.lastUsedAt) : 0;
       const rightUsed = right.preference?.lastUsedAt ? Date.parse(right.preference.lastUsedAt) : 0;
       if (leftUsed !== rightUsed) return rightUsed - leftUsed;
@@ -662,7 +799,7 @@ export class ExpertsManager extends Service implements ExpertsService {
   /** Local catalog keys are stable skill names, owned by the public Skills service. */
   async listSkills(actor: ActorContext, expertId: string, scope: 'available' | 'equipped', signal?: AbortSignal): Promise<readonly import('../shared.js').ExpertSkillOption[]> {
     const detail = await this.get(actor, expertId, undefined, signal);
-    if (scope === 'available' && !detail.canEdit) throw new ExpertsError('experts/forbidden', '没有权限为该专家选择技能。');
+    if (scope === 'available' && !detail.canEdit) throw new ExpertsError('experts/forbidden', '没有权限为该数字员工选择技能。');
     const catalog = (await this.ctx.workdshSkills.list(signal)).map(skill => ({
       skillId: skill.name, name: skill.name, description: skill.description, state: skill.state,
       selectable: skill.modelInvocable && (skill.state === 'enabled' || skill.state === 'readonly'),
@@ -737,7 +874,7 @@ export class ExpertsManager extends Service implements ExpertsService {
     assertActorContext(actor);
     await this.ensureSeeded(actor, signal);
     const expert = this.loadExpert(expertId);
-    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该专家。');
+    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该数字员工。');
     await this.authorize(actor, 'experts.get', expert, signal);
     const draft = this.loadDraft(expertId);
     const targetRevisionId = revisionId ?? expert.publishedRevisionRef?.revisionId;
@@ -914,7 +1051,7 @@ export class ExpertsManager extends Service implements ExpertsService {
     assertActorContext(actor);
     await this.ensureSeeded(actor, signal);
     const expert = this.loadExpert(expertId);
-    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该专家。');
+    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该数字员工。');
     await this.authorize(actor, 'experts.update-draft', expert, signal);
     const payloadDigest = digestOf({ action: 'experts.update-draft', expertId, patch });
     try {
@@ -922,10 +1059,10 @@ export class ExpertsManager extends Service implements ExpertsService {
         async (record) => {
           const current = this.loadExpert(expertId);
           if (current.origin === 'default') {
-            throw new ExpertsError('experts/forbidden', '内置专家不可直接编辑，请先复制为我的专家。', { reason: 'default-immutable' });
+            throw new ExpertsError('experts/forbidden', '内置数字员工不可直接编辑，请先复制为我的数字员工。', { reason: 'default-immutable' });
           }
           if (context.expectedRevision !== undefined && current.revision !== context.expectedRevision) {
-            throw new ExpertsError('experts/conflict', '专家已被修改，请刷新后重试。', { expectedRevision: context.expectedRevision, currentRevision: current.revision });
+            throw new ExpertsError('experts/conflict', '数字员工已被修改，请刷新后重试。', { expectedRevision: context.expectedRevision, currentRevision: current.revision });
           }
           const base = this.loadDraft(expertId);
           const candidate = patch.packageDocuments
@@ -968,7 +1105,7 @@ export class ExpertsManager extends Service implements ExpertsService {
     assertActorContext(actor);
     await this.ensureSeeded(actor, signal);
     const source = this.loadExpert(expertId);
-    if (!this.isVisible(actor, source)) throw new ExpertsError('experts/not-found', '未找到该专家。');
+    if (!this.isVisible(actor, source)) throw new ExpertsError('experts/not-found', '未找到该数字员工。');
     await this.authorize(actor, 'experts.copy', source, signal);
     const sourceRevisionId = revisionId ?? source.publishedRevisionRef?.revisionId;
     const sourceDefinition = sourceRevisionId !== undefined
@@ -1007,7 +1144,7 @@ export class ExpertsManager extends Service implements ExpertsService {
     assertActorContext(actor);
     await this.ensureSeeded(actor, signal);
     const expert = this.loadExpert(expertId);
-    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该专家。');
+    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该数字员工。');
     await this.authorize(actor, 'experts.validate', expert, signal);
     const draft = this.loadDraft(expertId);
     if (draft.revision !== draftRevision) {
@@ -1025,10 +1162,10 @@ export class ExpertsManager extends Service implements ExpertsService {
     assertActorContext(actor);
     await this.ensureSeeded(actor, signal);
     const expert = this.loadExpert(expertId);
-    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该专家。');
+    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该数字员工。');
     await this.authorize(actor, 'experts.publish', expert, signal);
-    if (expert.origin === 'default') throw new ExpertsError('experts/forbidden', '内置专家不可直接发布，请先复制为我的专家。', { reason: 'default-immutable' });
-    if (expert.availability === 'archived') throw new ExpertsError('experts/archived', '专家已归档，无法发布。');
+    if (expert.origin === 'default') throw new ExpertsError('experts/forbidden', '内置数字员工不可直接发布，请先复制为我的数字员工。', { reason: 'default-immutable' });
+    if (expert.availability === 'archived') throw new ExpertsError('experts/archived', '数字员工已归档，无法发布。');
     const draft = this.loadDraft(expertId);
     if (draft.revision !== draftRevision) {
       throw new ExpertsError('experts/conflict', '草稿已变化，请重新加载后再确认发布。', { expected: draftRevision, current: draft.revision });
@@ -1070,17 +1207,17 @@ export class ExpertsManager extends Service implements ExpertsService {
     assertActorContext(actor);
     await this.ensureSeeded(actor, signal);
     const expert = this.loadExpert(expertId);
-    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该专家。');
+    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该数字员工。');
     await this.authorize(actor, 'experts.publish', expert, signal);
-    if (expert.origin === 'default') throw new ExpertsError('experts/forbidden', '内置专家不可直接发布，请先复制为我的专家。', { reason: 'default-immutable' });
-    if (expert.availability === 'archived') throw new ExpertsError('experts/archived', '专家已归档，无法发布。');
+    if (expert.origin === 'default') throw new ExpertsError('experts/forbidden', '内置数字员工不可直接发布，请先复制为我的数字员工。', { reason: 'default-immutable' });
+    if (expert.availability === 'archived') throw new ExpertsError('experts/archived', '数字员工已归档，无法发布。');
     const payloadDigest = digestOf({ action: 'experts.publish', expertId, draftRevision, dependencyLockDigest });
     try {
       const receipt = await this.withOperation(actor, 'experts.publish', context, payloadDigest, signal,
         async (record) => {
           const current = this.loadExpert(expertId);
           if (context.expectedRevision !== undefined && current.revision !== context.expectedRevision) {
-            throw new ExpertsError('experts/conflict', '专家已被修改，请刷新后重试。', { expectedRevision: context.expectedRevision, currentRevision: current.revision });
+            throw new ExpertsError('experts/conflict', '数字员工已被修改，请刷新后重试。', { expectedRevision: context.expectedRevision, currentRevision: current.revision });
           }
           const draft = this.loadDraft(expertId);
           if (draft.revision !== draftRevision) {
@@ -1168,6 +1305,7 @@ export class ExpertsManager extends Service implements ExpertsService {
         },
       );
       await this.audit(actor, 'experts.publish', expertId, 'succeeded', 'experts/publish-succeeded', { revisionId: receipt.revision.revisionId });
+      await releaseExpertPresets(this.ctx, this.presetIdsOf(expertId).filter(id => id !== receipt.presetRevisionRef));
       return receipt;
     } catch (error) {
       await this.audit(actor, 'experts.publish', expertId, 'failed', errorCode(error, 'experts/internal'));
@@ -1189,7 +1327,7 @@ export class ExpertsManager extends Service implements ExpertsService {
     assertActorContext(actor);
     await this.ensureSeeded(actor, signal);
     const expert = this.loadExpert(expertId);
-    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该专家。');
+    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该数字员工。');
     await this.authorize(actor, 'experts.set-availability', expert, signal);
     // Availability is reversible (enable/disable/archive are states, never a hard delete),
     // so 0.1 does not require a content-bound confirmation proof here; `_proof` is reserved.
@@ -1199,7 +1337,12 @@ export class ExpertsManager extends Service implements ExpertsService {
         async (record) => {
           const current = this.loadExpert(expertId);
           if (context.expectedRevision !== undefined && current.revision !== context.expectedRevision) {
-            throw new ExpertsError('experts/conflict', '专家已被修改，请刷新后重试。', { expectedRevision: context.expectedRevision, currentRevision: current.revision });
+            throw new ExpertsError('experts/conflict', '数字员工已被修改，请刷新后重试。', { expectedRevision: context.expectedRevision, currentRevision: current.revision });
+          }
+          // Built-in defaults stay catalog fixtures: allow re-enable after a mistaken disable,
+          // but never park them in disabled/archived where the center list used to hide them.
+          if (current.origin === 'default' && availability !== 'enabled') {
+            throw new ExpertsError('experts/forbidden', '内置数字员工不可停用或归档；若已误停用，请重新启用。', { reason: 'default-immutable' });
           }
           const now = new Date().toISOString();
           const nextRevision = `r-${randomUUID()}`;
@@ -1221,12 +1364,100 @@ export class ExpertsManager extends Service implements ExpertsService {
     }
   }
 
+  /** Preset ids compiled for this expert. Revision rows outlive a roster change. */
+  private presetIdsOf(expertId: string): string[] {
+    const presets = new Set<string>();
+    for (const [, revision] of this.revisionsTable().entries()) {
+      if (revision.expertId === expertId) presets.add(revision.presetRevisionRef);
+    }
+    return [...presets];
+  }
+
+  /**
+   * Preset ids compiled for this expert and its team members.
+   * Revision rows outlive catalog deletion, so this still works after the expert row is gone.
+   */
+  private rosterPresetIds(expertId: string): string[] {
+    const expertIds = new Set([expertId]);
+    for (const [, row] of this.expertsTable().entries()) {
+      if (row.teamParentId === expertId) expertIds.add(row.id);
+    }
+    for (const [, revision] of this.revisionsTable().entries()) {
+      if (revision.expertId !== expertId) continue;
+      for (const ref of Object.values(revision.teamMembers ?? {})) expertIds.add(ref.expertId);
+    }
+    const presets = new Set(this.presetIdsOf(expertId));
+    for (const id of expertIds) {
+      if (id === expertId) continue;
+      for (const presetId of this.presetIdsOf(id)) presets.add(presetId);
+    }
+    return [...presets];
+  }
+
+  /**
+   * Permanently remove an archived personal expert from the catalog and from the
+   * official Agent preset roster. Frozen revision records and preset directories
+   * stay so historical snapshots can still be verified; they are not re-registered,
+   * so 设置 → Agent 预设 no longer offers the deleted employee.
+   */
+  async deleteArchived(
+    actor: ActorContext,
+    expertId: string,
+    context: MutationContext,
+    signal?: AbortSignal,
+  ): Promise<{ expertId: string; operationId: string }> {
+    signal?.throwIfAborted();
+    assertActorContext(actor);
+    await this.ensureSeeded(actor, signal);
+    const expert = this.loadExpert(expertId);
+    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该数字员工。');
+    if (expert.origin === 'default') throw new ExpertsError('experts/forbidden', '内置数字员工不可删除。', { reason: 'default-immutable' });
+    if (expert.availability !== 'archived') throw new ExpertsError('experts/invalid-request', '只能删除已归档的数字员工；请先归档后再删除。');
+    await this.authorize(actor, 'experts.delete', expert, signal);
+    const payloadDigest = digestOf({ action: 'experts.delete', expertId });
+    try {
+      const receipt = await this.withOperation(actor, 'experts.delete', context, payloadDigest, signal,
+        async (record) => {
+          const current = this.loadExpert(expertId);
+          if (current.availability !== 'archived') throw new ExpertsError('experts/invalid-request', '只能删除已归档的数字员工；请先归档后再删除。');
+          if (context.expectedRevision !== undefined && current.revision !== context.expectedRevision) {
+            throw new ExpertsError('experts/conflict', '数字员工已被修改，请刷新后重试。', { expectedRevision: context.expectedRevision, currentRevision: current.revision });
+          }
+          const memberIds = [...this.expertsTable().entries()]
+            .filter(([, row]) => row.teamParentId === expertId)
+            .map(([key]) => key);
+          for (const memberId of memberIds) {
+            await this.draftsTable().delete(keys.draft(memberId));
+            await this.preferencesTable().delete(keys.preference(actor.principalId, memberId));
+            await this.expertsTable().delete(keys.expert(memberId));
+          }
+          await this.draftsTable().delete(keys.draft(expertId));
+          await this.preferencesTable().delete(keys.preference(actor.principalId, expertId));
+          await this.expertsTable().delete(keys.expert(expertId));
+          const result = { expertId, operationId: context.operationId };
+          record({ resultRef: expertId, resultDetail: JSON.stringify(result) });
+          return result;
+        },
+        (operation) => {
+          if (!operation.resultDetail) throw new ExpertsError('experts/outcome-unknown', '无法恢复删除结果，请查询操作状态。');
+          return JSON.parse(operation.resultDetail) as { expertId: string; operationId: string };
+        },
+      );
+      await this.audit(actor, 'experts.delete', expertId, 'succeeded', 'experts/delete-succeeded', {});
+      await releaseExpertPresets(this.ctx, this.rosterPresetIds(expertId));
+      return receipt;
+    } catch (error) {
+      await this.audit(actor, 'experts.delete', expertId, 'failed', errorCode(error, 'experts/internal'));
+      throw error;
+    }
+  }
+
   async setPreference(actor: ActorContext, expertId: string, pinned: boolean, expectedRevision?: string, signal?: AbortSignal): Promise<ExpertPreference> {
     signal?.throwIfAborted();
     assertActorContext(actor);
     await this.ensureSeeded(actor, signal);
     const expert = this.loadExpert(expertId);
-    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该专家。');
+    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该数字员工。');
     // Preference is per-principal and never mutates the shared expert; read access suffices.
     await this.authorize(actor, 'experts.set-preference', expert, signal);
     return this.enqueue(async () => {
@@ -1277,19 +1508,19 @@ export class ExpertsManager extends Service implements ExpertsService {
     assertActorContext(actor);
     await this.ensureSeeded(actor, signal);
     const expert = this.loadExpert(expertId);
-    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该专家。');
+    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该数字员工。');
     await this.authorize(actor, 'experts.prepare-execution', expert, signal);
-    if (expert.availability === 'archived') throw new ExpertsError('experts/archived', '专家已归档，无法召唤。');
-    if (expert.availability === 'disabled') throw new ExpertsError('experts/disabled', '专家已停用，请先启用后再召唤。');
+    if (expert.availability === 'archived') throw new ExpertsError('experts/archived', '数字员工已归档，无法召唤。');
+    if (expert.availability === 'disabled') throw new ExpertsError('experts/disabled', '数字员工已停用，请先启用后再召唤。');
     const targetRevisionId = revisionId ?? expert.publishedRevisionRef?.revisionId;
-    if (targetRevisionId === undefined) throw new ExpertsError('experts/not-published', '专家尚未发布，无法召唤。');
+    if (targetRevisionId === undefined) throw new ExpertsError('experts/not-published', '数字员工尚未发布，无法召唤。');
     let revision = this.loadRevision(expertId, targetRevisionId);
     revision = await this.ensureCurrentExecutionRevision(actor, revision, signal);
     const readiness = await this.computeReadiness(revision, actor, signal);
     const missing: DomainIssue[] = [];
     if (readiness === 'missing-dependency') missing.push({ code: 'experts/dependency-missing', message: '存在缺失或漂移的 Skill 依赖，请修复后再召唤。' });
     else if (readiness === 'unsupported-capability') missing.push({ code: 'experts/unsupported-capability', message: '存在尚未满足的必需能力，暂不可召唤。' });
-    else if (readiness === 'broken') missing.push({ code: 'experts/preset-broken', message: '专家 preset 不可用，请重新发布后再召唤。' });
+    else if (readiness === 'broken') missing.push({ code: 'experts/preset-broken', message: '数字员工 preset 不可用，请重新发布后再召唤。' });
     const executionPlanId = `plan-${randomUUID()}`;
     const plan: ExecutionPlan = {
       executionPlanId,
@@ -1339,7 +1570,7 @@ export class ExpertsManager extends Service implements ExpertsService {
       throw new ExpertsError('experts/dependency-missing', '存在未解决的依赖或能力问题，无法创建任务。', { issues: plan.missing });
     }
     const expert = this.loadExpert(plan.expertRevisionRef.expertId);
-    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该专家。');
+    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该数字员工。');
     await this.authorize(actor, 'experts.create-execution', expert, signal);
     const revision = this.loadRevision(plan.expertRevisionRef.expertId, plan.expertRevisionRef.revisionId);
     try {
@@ -1448,22 +1679,22 @@ export class ExpertsManager extends Service implements ExpertsService {
     assertActorContext(actor);
     await this.ensureSeeded(actor, signal);
     const sourceBinding = this.bindingsTable().get(keys.binding(sourceSessionId));
-    if (!sourceBinding) throw new ExpertsError('experts/not-found', '源任务不是专家绑定的任务，无法交接。');
+    if (!sourceBinding) throw new ExpertsError('experts/not-found', '源任务不是数字员工绑定的任务，无法交接。');
     if (sourceBinding.owner.ownerPrincipalId !== actor.principalId || sourceBinding.owner.organizationId !== actor.organizationId) {
       throw new ExpertsError('experts/forbidden', '没有权限交接该任务。');
     }
     const targetExpert = this.loadExpert(targetExpertId);
-    if (!this.isVisible(actor, targetExpert)) throw new ExpertsError('experts/not-found', '未找到目标专家。');
+    if (!this.isVisible(actor, targetExpert)) throw new ExpertsError('experts/not-found', '未找到目标数字员工。');
     await this.authorize(actor, 'experts.prepare-handoff', targetExpert, signal);
-    if (targetExpert.availability === 'archived') throw new ExpertsError('experts/archived', '目标专家已归档，无法交接。');
-    if (targetExpert.availability === 'disabled') throw new ExpertsError('experts/disabled', '目标专家已停用，无法交接。');
+    if (targetExpert.availability === 'archived') throw new ExpertsError('experts/archived', '目标数字员工已归档，无法交接。');
+    if (targetExpert.availability === 'disabled') throw new ExpertsError('experts/disabled', '目标数字员工已停用，无法交接。');
     const targetRevisionId = targetExpert.publishedRevisionRef?.revisionId;
-    if (targetRevisionId === undefined) throw new ExpertsError('experts/not-published', '目标专家尚未发布，无法交接。');
+    if (targetRevisionId === undefined) throw new ExpertsError('experts/not-published', '目标数字员工尚未发布，无法交接。');
     const targetRevision = this.loadRevision(targetExpertId, targetRevisionId);
     const readiness = await this.computeReadiness(targetRevision, actor, signal);
     const unavailable: DomainIssue[] = [];
     if (readiness !== 'ready') {
-      unavailable.push({ code: 'experts/dependency-missing', message: `目标专家就绪状态为 ${readiness}，交接后可能无法正常运行。` });
+      unavailable.push({ code: 'experts/dependency-missing', message: `目标数字员工就绪状态为 ${readiness}，交接后可能无法正常运行。` });
     }
     const handoffPlanId = `handoffplan-${randomUUID()}`;
     const plan: HandoffPlan = {
@@ -1496,10 +1727,10 @@ export class ExpertsManager extends Service implements ExpertsService {
     if (peeked.expired) throw new ExpertsError('experts/plan-expired', '交接计划已过期，请重新发起交接。');
     const plan = peeked.value;
     const targetExpert = this.loadExpert(plan.targetExpertId);
-    if (!this.isVisible(actor, targetExpert)) throw new ExpertsError('experts/not-found', '未找到目标专家。');
+    if (!this.isVisible(actor, targetExpert)) throw new ExpertsError('experts/not-found', '未找到目标数字员工。');
     await this.authorize(actor, 'experts.create-handoff', targetExpert, signal);
     const targetRevisionId = targetExpert.publishedRevisionRef?.revisionId;
-    if (targetRevisionId === undefined) throw new ExpertsError('experts/not-published', '目标专家尚未发布，无法交接。');
+    if (targetRevisionId === undefined) throw new ExpertsError('experts/not-published', '目标数字员工尚未发布，无法交接。');
     const targetRevision = this.loadRevision(plan.targetExpertId, targetRevisionId);
     try {
       const creation = await this.withOperation(actor, 'experts.create-handoff', context, payloadDigest, signal,
@@ -1548,9 +1779,9 @@ export class ExpertsManager extends Service implements ExpertsService {
   async resolveNativeRole(actor: ActorContext, rootSessionId: string, memberName?: string, signal?: AbortSignal): Promise<{ binding: ExecutionBinding; revision: ExpertRevision }> {
     const binding = await this.verifyBinding(actor, rootSessionId, signal);
     const owner = this.loadExpert(binding.expertRevisionRef.expertId);
-    if (!this.isVisible(actor, owner)) throw new ExpertsError('experts/not-found', '未找到该任务绑定的专家。');
+    if (!this.isVisible(actor, owner)) throw new ExpertsError('experts/not-found', '未找到该任务绑定的数字员工。');
     await this.authorize(actor, 'experts.prepare-execution', owner, signal);
-    if (owner.availability !== 'enabled') throw new ExpertsError('experts/disabled', '该任务绑定的专家已停用或归档。');
+    if (owner.availability !== 'enabled') throw new ExpertsError('experts/disabled', '该任务绑定的数字员工已停用或归档。');
     const lead = this.loadRevision(binding.expertRevisionRef.expertId, binding.expertRevisionRef.revisionId);
     let revision = lead;
     if (memberName && lead.definition.team) {
@@ -1571,15 +1802,15 @@ export class ExpertsManager extends Service implements ExpertsService {
     assertActorContext(actor);
     const binding = this.bindingsTable().get(keys.binding(sessionId));
     // An unbound or forked Session has no binding row and is rejected here.
-    if (!binding) throw new ExpertsError('experts/not-found', '该 Session 未绑定任何专家，或为未绑定的派生任务。', { reason: 'unbound' });
+    if (!binding) throw new ExpertsError('experts/not-found', '该 Session 未绑定任何数字员工，或为未绑定的派生任务。', { reason: 'unbound' });
     if (binding.owner.ownerPrincipalId !== actor.principalId || binding.owner.organizationId !== actor.organizationId) {
-      throw new ExpertsError('experts/forbidden', '没有权限校验该任务的专家绑定。');
+      throw new ExpertsError('experts/forbidden', '没有权限校验该任务的数字员工绑定。');
     }
-    if (binding.delegation) throw new ExpertsError('experts/unsupported-capability', '旧版专家团执行器已退役。请从专家团重新创建官方 Team 任务，旧文件和历史仍保留。');
+    if (binding.delegation) throw new ExpertsError('experts/unsupported-capability', '旧版数字员工团执行器已退役。请从数字员工团重新创建官方 Team 任务，旧文件和历史仍保留。');
     const revision = this.loadRevision(binding.expertRevisionRef.expertId, binding.expertRevisionRef.revisionId);
     if (revision.presetRevisionRef !== binding.presetRevisionRef || revision.compositionDigest !== binding.compositionDigest
         || digestOf(revision.dependencyLock) !== digestOf(binding.skillRevisionRefs)) {
-      throw new ExpertsError('experts/conflict', '任务绑定与专家修订不一致。');
+      throw new ExpertsError('experts/conflict', '任务绑定与数字员工修订不一致。');
     }
     await this.verifyRevision(actor, revision, signal);
     await this.audit(actor, 'experts.verify-binding', binding.expertRevisionRef.expertId, 'succeeded', 'experts/verify-binding-succeeded', { sessionId });
@@ -1589,7 +1820,7 @@ export class ExpertsManager extends Service implements ExpertsService {
   private async verifyRevision(actor: ActorContext, revision: ExpertRevision, signal?: AbortSignal): Promise<void> {
     if (revision.definition.packageDocuments) await verifyPackageFiles(expertPresetDir(revision.presetRevisionRef), revision.definition.packageDocuments, revision.definition.packageAssets);
     if (sha256(await readExpertPreset(revision.presetRevisionRef)) !== revision.compositionDigest) {
-      throw new ExpertsError('experts/conflict', '已发布专家 preset 已漂移。');
+      throw new ExpertsError('experts/conflict', '已发布数字员工 preset 已漂移。');
     }
     for (const ref of revision.dependencyLock) {
       signal?.throwIfAborted();
@@ -1653,15 +1884,15 @@ export class ExpertsManager extends Service implements ExpertsService {
     signal?.throwIfAborted();
     assertActorContext(actor);
     if (!STAGED_IMPORT_PATTERN.test(uploadedArtifactRef)) {
-      throw new ExpertsError('experts/invalid-request', '无效的导入引用，请重新上传专家包。');
+      throw new ExpertsError('experts/invalid-request', '无效的导入引用，请重新上传数字员工包。');
     }
     const staged = this.stagedImports.get(uploadedArtifactRef);
-    if (!staged) throw new ExpertsError('experts/plan-expired', '上传的专家包不存在或已过期，请重新上传。');
+    if (!staged) throw new ExpertsError('experts/plan-expired', '上传的数字员工包不存在或已过期，请重新上传。');
     let bytes: Uint8Array;
     try {
       bytes = new Uint8Array(await readFile(staged.path));
     } catch {
-      throw new ExpertsError('experts/not-found', '无法读取上传的专家包。');
+      throw new ExpertsError('experts/not-found', '无法读取上传的数字员工包。');
     }
     // Structural violations throw ExpertsError; definition problems come back as issues.
     const preflight = preflightPackage(bytes);
@@ -1675,7 +1906,7 @@ export class ExpertsManager extends Service implements ExpertsService {
       try {
         await this.ctx.workdshSkills.resolveRevision(requirement.skillId ?? name, undefined, signal);
       } catch (error) {
-        missingDependencies.push({ code: mapSkillDependencyError(error), message: `导入的专家依赖 Skill「${name}」在本机不可用。`, dependencyRef: name });
+        missingDependencies.push({ code: mapSkillDependencyError(error), message: `导入的数字员工依赖 Skill「${name}」在本机不可用。`, dependencyRef: name });
       }
     }
     const importPlanId = `import-${randomUUID()}`;
@@ -1741,7 +1972,7 @@ export class ExpertsManager extends Service implements ExpertsService {
     assertActorContext(actor);
     await this.ensureSeeded(actor, signal);
     const expert = this.loadExpert(expertId);
-    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该专家。');
+    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该数字员工。');
     await this.authorize(actor, 'experts.export', expert, signal);
     const targetRevisionId = revisionId ?? expert.publishedRevisionRef?.revisionId;
     // Export the published revision when present, else the current draft definition.

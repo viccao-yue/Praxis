@@ -149,7 +149,7 @@ Bust shot, facing forward. Clean simple {color}-toned background. High quality, 
 3. **构建个人 prompt** — 按上述步骤将特征转化为视觉描述
 4. **构建团队 prompt**（Team 型）— 从 displayDescription 和主理人 MD 提取
 5. **统一风格锚定** — 确保所有 prompt 使用相同的风格前缀和后缀
-6. **调用 ImageGen** — 逐张生成，`output_dir` 为专家包的 `avatars/`，`size` 为 `"1024x1024"`
+6. **调用 ImageGen** — 逐张生成，`output_dir` 为数字员工包的 `avatars/`，`size` 为 `"1024x1024"`
 7. **重命名文件** — 将生成的图片重命名为 plugin.json 中声明的文件名
 8. **验证** — 确认所有头像文件已存在于 avatars/
 

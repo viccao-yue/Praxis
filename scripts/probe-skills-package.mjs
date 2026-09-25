@@ -27,7 +27,7 @@ const fixture = 'standalone-skill';
 const skillFile = join(home, 'agents/skills', fixture, 'SKILL.md');
 await mkdir(dirname(skillFile), { recursive: true });
 await writeFile(skillFile, `---\nname: ${fixture}\ndescription: Standalone package fixture\n---\nORIGINAL\n`);
-// WorkDSH-owned local catalog: metadata plus inert payload, installed through
+// Praxis-owned local catalog: metadata plus inert payload, installed through
 // the same managed import path the browser upload uses.
 const catalogSkill = 'catalog-fixture';
 const catalogRoot = join(home, 'agents/.workdsh-catalog');
@@ -133,7 +133,7 @@ try {
   assert.equal((await api(host, 'install-catalog', { name: 'catalog-unknown' })).error.code, 'skill/catalog-entry-unknown');
   assert.equal((await api(host, 'install-catalog', { name: 'catalog-over-limit' })).error.code, 'skill/catalog-entry-over-limit');
   pass('Catalog status, metadata, icon route and install eligibility read real Host facts');
-  const nav = page.getByRole('button', { name: '专家 · 技能 · 连接器', exact: true });
+  const nav = page.getByRole('button', { name: '技能 · 连接器', exact: true });
   await expect(nav).toHaveCount(1);
   await nav.click();
   await expect(page.getByRole('button', { name: `查看技能 ${fixture}`, exact: true })).toBeVisible();
@@ -200,7 +200,7 @@ try {
   await expect(page.getByRole('heading', { name: '技能市场', exact: true })).toBeVisible();
   await expect(installedEntry).toBeFocused();
   pass('Installed skills open a dedicated page with back link, count heading, in-page search and shared batch management');
-  // Bundled skills keep the WorkDSH prefix so the unprefixed `skill-creator`
+  // Bundled skills keep the Praxis prefix so the unprefixed `skill-creator`
   // name stays available to the user's own skills; each registers exactly once.
   const bundledSkills = (await api(host, 'list')).value;
   for (const name of ['workdsh-skill-creator', 'workdsh-ppt-design', 'workdsh-word-design', 'workdsh-excel-design', 'workdsh-web-design']) {
@@ -236,7 +236,7 @@ try {
   await cli('plugin', '--profile', 'skills', 'remove', manifest.name);
   assert.ok(!(await cli('--profile', 'skills', '--dump-config')).includes('id: workdsh-skills'));
   host = await start(); page = await pageFor(host);
-  await expect(page.getByRole('button', { name: '专家 · 技能 · 连接器', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '技能 · 连接器', exact: true })).toHaveCount(0);
   await expect(page.getByText(/新会话|New Session/, { exact: true }).first()).toBeVisible();
   assert.ok(!(await page.evaluate(() => window.__DSH_BOOT__.entries.map(row => row.id))).includes(manifest.name));
   assert.equal((await fetch(`${host.address}/api/workdsh-skills`, { method: 'POST', headers: { cookie: host.cookie }, body: '{}' })).status, 404);
@@ -248,7 +248,7 @@ try {
   await cli('plugin', '--profile', 'skills', 'add', tarball, '--offline');
   assert.equal((await cli('--profile', 'skills', '--dump-config')).split('id: workdsh-skills').length - 1, 1);
   host = await start(); page = await pageFor(host);
-  await page.getByRole('button', { name: '专家 · 技能 · 连接器', exact: true }).click();
+  await page.getByRole('button', { name: '技能 · 连接器', exact: true }).click();
   await expect(page.getByRole('button', { name: `查看技能 ${fixture}`, exact: true })).toHaveCount(1);
   assert.equal((await api(host, 'detail', { name: fixture })).value.document, modified);
   pass('Reinstall and repeat install activate once and recover edited skill data');

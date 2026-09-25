@@ -17,11 +17,11 @@ import type { SessionSnapshot } from '@deepseek-ai/dsh-api-session-controller/cl
 export const pendingExpertDraftKey = 'workdsh.pending-expert-task-draft';
 export const pendingExpertDraftEvent = 'workdsh:expert-draft-staged';
 
-/** Fixed guide text seeded when the user chooses “制作专家” (UX §4). Never auto-sent. */
+/** Fixed guide text seeded when the user chooses “制作数字员工” (UX §4). Never auto-sent. */
 export const expertManagerGuide =
-  '/workdsh-expert-manager 帮我创建一个 XXX 专家，擅长 XXXXX。我的经验是：[请补充你的行业背景、相关经验]';
+  '/workdsh-expert-manager 帮我创建一个 XXX 数字员工，擅长 XXXXX。我的经验是：[请补充你的行业背景、相关经验]';
 export const expertTeamManagerGuide =
-  '/workdsh-expert-manager 帮我创建一个 XXX 专家团，团队成员包括[请补充成员角色]，共同擅长 XXXXX。我的经验是：[请补充你的行业背景、相关经验]';
+  '/workdsh-expert-manager 帮我创建一个 XXX 数字员工团，团队成员包括[请补充成员角色]，共同擅长 XXXXX。我的经验是：[请补充你的行业背景、相关经验]';
 
 export function PendingExpertDraft({ inputActions, useSession, useInput }: PropsRuntime<'conversation.input.overlay'>) {
   const sessionId = useSession((session: SessionSnapshot) => session.sessionId);

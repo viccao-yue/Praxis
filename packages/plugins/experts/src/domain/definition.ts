@@ -108,7 +108,7 @@ export function validateDefinition(candidate: unknown): readonly DomainIssue[] {
   try { validateResources(definition.packageDocuments ?? {}, definition.packageAssets); } catch (error) { issues.push({ code: 'definition/package', message: String(error) }); }
   if (definition.packageDocuments) {
     const files = Object.entries(definition.packageDocuments);
-    if (files.length > 64 || files.some(([path]) => path.startsWith('/') || path.includes('\\') || path.split('/').some(part => !part || part === '.' || part === '..')) || files.reduce((sum, [, text]) => sum + byteLength(text), 0) > 1_000_000) issues.push({ code: 'definition/package', message: '专家包资源路径、数量或总大小无效。' });
+    if (files.length > 64 || files.some(([path]) => path.startsWith('/') || path.includes('\\') || path.split('/').some(part => !part || part === '.' || part === '..')) || files.reduce((sum, [, text]) => sum + byteLength(text), 0) > 1_000_000) issues.push({ code: 'definition/package', message: '数字员工包资源路径、数量或总大小无效。' });
   }
   if (definition.agentDocument && (hasTemplateBraces(definition.agentDocument) || byteLength(definition.agentDocument) > 65536)) issues.push({ code: 'definition/document', message: '完整 Agent MD 过大或包含原生模板插值。' });
 
@@ -192,7 +192,7 @@ export function validateDefinition(candidate: unknown): readonly DomainIssue[] {
   if (definition.team) {
     const { members, workflows } = definition.team;
     const memberKeys = new Set(members.map(member => member.key));
-    if (members.length < 2 || members.length > 16 || memberKeys.size !== members.length) issues.push({ code: 'team/members', message: '专家团需要 2 至 16 位不同成员，另有主理人。' });
+    if (members.length < 2 || members.length > 16 || memberKeys.size !== members.length) issues.push({ code: 'team/members', message: '数字员工团需要 2 至 16 位不同成员，另有主理人。' });
     members.forEach((member, i) => {
       if (!/^[a-z][a-z0-9-]{0,39}$/.test(member.key) || member.key === 'lead') issues.push({ code: 'team/member-key', path: `team.members.${i}.key`, message: '成员标识须为小写英文和连字符，lead 保留给主理人。' });
       issues.push(...validateDefinition(member.definition).map(issue => ({ ...issue, path: `team.members.${i}.definition.${issue.path ?? ''}` })));
@@ -207,7 +207,15 @@ export function validateDefinition(candidate: unknown): readonly DomainIssue[] {
       }
     });
   }
-  const totalBytes = byteLength(JSON.stringify({ ...definition, team: undefined, packageDocuments: undefined, packageAssets: undefined, agentDocument: undefined }));
+  const totalBytes = byteLength(JSON.stringify({
+    ...definition,
+    team: undefined,
+    packageDocuments: undefined,
+    packageAssets: undefined,
+    agentDocument: undefined,
+    // data: avatarRef is a UI projection of packageAssets/avatars/*; size is gated by assetBytes.
+    ...(definition.avatarRef?.startsWith('data:image/') ? { avatarRef: undefined } : {}),
+  }));
   if (totalBytes > EXPERT_LIMITS.publishedDefinitionMaxBytes) {
     issues.push({
       code: 'definition/too-large',
@@ -280,7 +288,7 @@ export function compilePersonaPrefix(definition: ExpertDefinition): string {
 
 /** Compile the persona suffix: keeps native guidance, adds a short reminder. */
 export function compilePersonaSuffix(definition: ExpertDefinition): string {
-  const lines = ['请始终以以上专家身份回应，并在超出能力边界时明确说明，不要臆造。'];
+  const lines = ['请始终以以上数字员工身份回应，并在超出能力边界时明确说明，不要臆造。'];
   if (definition.examples.length) {
     lines.push('可参考的启动示例：');
     for (const example of definition.examples) {

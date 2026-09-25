@@ -11,7 +11,7 @@ DeepSeek Harness 官方 `dsh-storage` 提供存储 hub，`dsh-storage-json` 与 
 
 ## 决策
 
-1. WorkDSH 业务对象优先使用官方 `ctx.storageDomain`，不建立通用数据库抽象，也不让领域插件直接打开 SQLite。
+1. 开物Praxis 业务对象优先使用官方 `ctx.storageDomain`，不建立通用数据库抽象，也不让领域插件直接打开 SQLite。
 2. 每个领域插件声明唯一的 `workdsh-*` DomainSpec，只由该插件打开并持有类型化 Domain 句柄。跨领域读取和写入经过 Cordis 服务契约，禁止取得其他领域句柄或直接查询底层介质。
 3. Profile 配置 Storage 后端和按领域路由。本地首期默认使用官方 SQLite provider；测试和可读导出场景可使用官方 JSON provider。一个后端可承载多个 unit，因此不要求每个领域一个物理数据库文件。
 4. 领域插件在自己的 effect 中打开 Domain，并在 disposer 中等待 `Domain.close()`。写入只通过 `put`、`update`、`delete` 和 global handle；读取到的记录不得就地修改。
@@ -19,7 +19,7 @@ DeepSeek Harness 官方 `dsh-storage` 提供存储 hub，`dsh-storage-json` 与 
 6. DomainSpec 的 `version`、`compatibleVersions` 和 schemaVersion 是业务格式契约。破坏性变更必须先设计可恢复迁移和回退证据；不能仅提升 npm 包版本或把旧记录静默跳过。
 7. `domain/changed` 是提交后的进程内通知，不是事务参与者，也不是跨进程同步。团队部署若采用多 Host，必须在 P3 选择并验证支持共享介质、写入协调和跨进程变更传播的 provider/服务拓扑。
 8. 大型资料正文与二进制资产仍由 library 管理的文件/对象存储持有，Storage Domain 保存元数据、内容标识、修订和索引引用。凭据只保存专用凭据引用。
-9. 对话、工具、审批及原生运行事实继续由官方 Session append-only 日志和 `sessionPersistence` 管理；WorkDSH Domain 只保存业务对象及其 Session 关联，不复制事件日志。
+9. 对话、工具、审批及原生运行事实继续由官方 Session append-only 日志和 `sessionPersistence` 管理；开物Praxis Domain 只保存业务对象及其 Session 关联，不复制事件日志。
 
 ## 影响
 

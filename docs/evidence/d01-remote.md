@@ -45,7 +45,7 @@ rc.1 发布产物 `lib/index.js` 的 decorator 识别逻辑检查符号的所属
 
 上述定位解释了最小例“类型检查通过、运行时 decorator 正常、生成器漏识别”的差异。当前选择：保留失败门槛与复现，禁止补造同名 protocol 包、伪造声明、修改 node_modules、复制生成器或直接手写描述符。只在公开接口解决或有独立升级兼容证据后继续自有 Remote 网络接入。既有官方 Remote 调用测试仍有效，自有 Remote 发布链未完成。
 
-Remote 是 Client 调用 Host 领域服务的公开接口。当前测试验证 WorkDSH 的集成方式，不重测整个 Harness；后续页面和 Agent 工具调用同一领域服务，认证及资源授权仍需在服务端实现。Remote 取消可停止协作式本地工作，不能撤回已提交到外部系统的写入。
+Remote 是 Client 调用 Host 领域服务的公开接口。当前测试验证 开物Praxis 的集成方式，不重测整个 Harness；后续页面和 Agent 工具调用同一领域服务，认证及资源授权仍需在服务端实现。Remote 取消可停止协作式本地工作，不能撤回已提交到外部系统的写入。
 
 本次实际结果：runtime marker 与生命周期测试 4/4；生成命令继续报相同错误。marker 按公开可选 exportName 规则取 `exportName ?? method`，不要求 Cordis 代理与原服务对象引用相等。官方在线 [API Gateway](https://deepseek-harness.github.io/deepseek-harness/en/reference/api-gateway) 亦描述严格生成及 Host/Client 装配，但未提供本例所缺的外部符号识别配置。本轮不升级版本；先继续同一 D01 内独立的 C01 技能消费验证。
 

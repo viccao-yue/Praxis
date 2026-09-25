@@ -35,7 +35,7 @@ const maximumBodyBytes = 32 * 1024 * 1024;
 type Endpoint =
   | 'skills' | 'list' | 'get' | 'create-draft' | 'update-draft' | 'copy' | 'validate'
   | 'request-publish-confirmation' | 'confirm-publish' | 'publish'
-  | 'set-availability' | 'set-preference' | 'prepare-execution' | 'create-execution'
+  | 'set-availability' | 'delete' | 'set-preference' | 'prepare-execution' | 'create-execution'
   | 'consume-handoff' | 'prepare-handoff' | 'create-handoff' | 'preview-import'
   | 'commit-import' | 'export' | 'operation' | 'verify-binding';
 
@@ -54,7 +54,7 @@ function publicFailure(error: unknown): ConnectionRpcResult<never> {
   if (error instanceof DOMException && error.name === 'AbortError') return fail('experts/request-cancelled', '操作已取消。');
   if (error instanceof ExpertsError) return { ok: false, error: { code: error.code, message: error.message, details: error.details ?? {} } };
   const code = error instanceof Error && error.message.startsWith('experts/') ? error.message : 'experts/internal';
-  return fail(code, '专家操作失败，请重试。');
+  return fail(code, '数字员工操作失败，请重试。');
 }
 
 /** Boundary sanitizer: keep only well-typed definition fields so the domain layer validates instead of crashing. */
@@ -153,7 +153,7 @@ function listQuery(payload: unknown): ExpertListQuery {
 }
 
 async function dispatch(manager: ExpertsService, actor: ActorContext, rawEndpoint: unknown, payload: unknown, signal: AbortSignal): Promise<ConnectionRpcResult<unknown>> {
-  if (typeof rawEndpoint !== 'string') return fail('experts/invalid-request', '专家管理操作无效。');
+  if (typeof rawEndpoint !== 'string') return fail('experts/invalid-request', '数字员工管理操作无效。');
   const endpoint = rawEndpoint as Endpoint;
   const input = record(payload);
   try {
@@ -167,7 +167,7 @@ async function dispatch(manager: ExpertsService, actor: ActorContext, rawEndpoin
         return ok(await manager.list(actor, listQuery(payload), signal));
       case 'get': {
         const expertId = str(input?.expertId);
-        if (!expertId) return fail('experts/invalid-request', '请求缺少专家标识。');
+        if (!expertId) return fail('experts/invalid-request', '请求缺少数字员工标识。');
         return ok(await manager.get(actor, expertId, str(input?.revisionId), signal));
       }
       case 'create-draft': {
@@ -178,25 +178,25 @@ async function dispatch(manager: ExpertsService, actor: ActorContext, rawEndpoin
       case 'update-draft': {
         const expertId = str(input?.expertId);
         const context = mutationContext(payload);
-        if (!expertId || !context) return fail('experts/invalid-request', '请求缺少专家标识或幂等操作标识。');
+        if (!expertId || !context) return fail('experts/invalid-request', '请求缺少数字员工标识或幂等操作标识。');
         return ok(await manager.updateDraft(actor, expertId, pickDefinition(input?.patch), context, signal));
       }
       case 'copy': {
         const expertId = str(input?.expertId);
         const context = mutationContext(payload);
-        if (!expertId || !context) return fail('experts/invalid-request', '请求缺少专家标识或幂等操作标识。');
+        if (!expertId || !context) return fail('experts/invalid-request', '请求缺少数字员工标识或幂等操作标识。');
         return ok(await manager.copy(actor, expertId, str(input?.revisionId), context, signal));
       }
       case 'validate': {
         const expertId = str(input?.expertId);
         const draftRevision = str(input?.draftRevision);
-        if (!expertId || !draftRevision) return fail('experts/invalid-request', '请求缺少专家标识或草稿修订。');
+        if (!expertId || !draftRevision) return fail('experts/invalid-request', '请求缺少数字员工标识或草稿修订。');
         return ok(await manager.validate(actor, expertId, draftRevision, signal));
       }
       case 'request-publish-confirmation': {
         const expertId = str(input?.expertId);
         const draftRevision = str(input?.draftRevision);
-        if (!expertId || !draftRevision) return fail('experts/invalid-request', '请求缺少专家标识或草稿修订。');
+        if (!expertId || !draftRevision) return fail('experts/invalid-request', '请求缺少数字员工标识或草稿修订。');
         return ok(await manager.requestPublishConfirmation(actor, expertId, draftRevision, signal));
       }
       case 'confirm-publish': {
@@ -223,6 +223,12 @@ async function dispatch(manager: ExpertsService, actor: ActorContext, rawEndpoin
         const token = str(record(input?.proof)?.token);
         return ok(await manager.setAvailability(actor, expertId, availability, context, token ? { token } : undefined, signal));
       }
+      case 'delete': {
+        const expertId = str(input?.expertId);
+        const context = mutationContext(payload);
+        if (!expertId || !context) return fail('experts/invalid-request', '删除请求无效。');
+        return ok(await manager.deleteArchived(actor, expertId, context, signal));
+      }
       case 'set-preference': {
         const expertId = str(input?.expertId);
         const pinned = bool(input?.pinned);
@@ -231,7 +237,7 @@ async function dispatch(manager: ExpertsService, actor: ActorContext, rawEndpoin
       }
       case 'prepare-execution': {
         const expertId = str(input?.expertId);
-        if (!expertId) return fail('experts/invalid-request', '请求缺少专家标识。');
+        if (!expertId) return fail('experts/invalid-request', '请求缺少数字员工标识。');
         return ok(await manager.prepareExecution(actor, expertId, str(input?.revisionId), str(input?.workspaceRef), modelSelection(payload), str(input?.draftText), signal, str(input?.workspaceId)));
       }
       case 'create-execution': {
@@ -249,7 +255,7 @@ async function dispatch(manager: ExpertsService, actor: ActorContext, rawEndpoin
       case 'prepare-handoff': {
         const sourceSessionId = str(input?.sourceSessionId);
         const targetExpertId = str(input?.targetExpertId);
-        if (!sourceSessionId || !targetExpertId) return fail('experts/invalid-request', '请求缺少源会话或目标专家。');
+        if (!sourceSessionId || !targetExpertId) return fail('experts/invalid-request', '请求缺少源会话或目标数字员工。');
         return ok(await manager.prepareHandoff(actor, sourceSessionId, targetExpertId, str(input?.sourceEventRef), strArray(input?.selectedAssetRefs) ?? [], signal));
       }
       case 'create-handoff': {
@@ -273,7 +279,7 @@ async function dispatch(manager: ExpertsService, actor: ActorContext, rawEndpoin
       }
       case 'export': {
         const expertId = str(input?.expertId);
-        if (!expertId) return fail('experts/invalid-request', '请求缺少专家标识。');
+        if (!expertId) return fail('experts/invalid-request', '请求缺少数字员工标识。');
         return ok(await manager.export(actor, expertId, str(input?.revisionId), signal));
       }
       case 'operation': {
@@ -287,7 +293,7 @@ async function dispatch(manager: ExpertsService, actor: ActorContext, rawEndpoin
         return ok(await manager.verifyBinding(actor, sessionId, signal));
       }
       default:
-        return fail('experts/unknown-endpoint', '未知的专家管理操作。');
+        return fail('experts/unknown-endpoint', '未知的数字员工管理操作。');
     }
   } catch (error) {
     return publicFailure(error);
@@ -305,7 +311,7 @@ export function registerExpertsConnection(ctx: Context): void {
   const lifetime = new AbortController();
   const pending = new Set<Promise<Response>>();
   const handle = (fetcher: (request: Request) => Promise<Response>) => (request: Request) => {
-    if (lifetime.signal.aborted) return Promise.resolve(json(fail('experts/unavailable', '专家管理已停止。'), 503));
+    if (lifetime.signal.aborted) return Promise.resolve(json(fail('experts/unavailable', '数字员工管理已停止。'), 503));
     const current = new Request(request, { signal: AbortSignal.any([request.signal, lifetime.signal]) });
     const operation = fetcher(current);
     pending.add(operation);
@@ -327,16 +333,16 @@ export function registerExpertsConnection(ctx: Context): void {
     requestBody: 'buffered',
     fetch: handle(async (request) => {
       const declaredLength = Number(request.headers.get('content-length') ?? '0');
-      if (Number.isFinite(declaredLength) && declaredLength > maximumBodyBytes) return json(fail('experts/invalid-request', '专家管理请求过大。'), 413);
+      if (Number.isFinite(declaredLength) && declaredLength > maximumBodyBytes) return json(fail('experts/invalid-request', '数字员工管理请求过大。'), 413);
       try {
         const text = await request.text();
-        if (text.length > maximumBodyBytes) return json(fail('experts/invalid-request', '专家管理请求过大。'), 413);
+        if (text.length > maximumBodyBytes) return json(fail('experts/invalid-request', '数字员工管理请求过大。'), 413);
         const body = record(JSON.parse(text));
-        if (!body) return json(fail('experts/invalid-request', '专家管理请求格式无效。'), 400);
+        if (!body) return json(fail('experts/invalid-request', '数字员工管理请求格式无效。'), 400);
         const actor = await ctx.workdshIdentity.resolve(undefined, request.signal);
         return json(await dispatch(manager, actor, body.endpoint, body.payload, request.signal));
       } catch (error) {
-        if (error instanceof SyntaxError) return json(fail('experts/invalid-request', '专家管理请求格式无效。'), 400);
+        if (error instanceof SyntaxError) return json(fail('experts/invalid-request', '数字员工管理请求格式无效。'), 400);
         return json(publicFailure(error));
       }
     }),
@@ -350,7 +356,7 @@ export function registerExpertsConnection(ctx: Context): void {
     fetch: handle(async (request) => {
       const declaredLength = Number(request.headers.get('content-length') ?? '0');
       if (Number.isFinite(declaredLength) && declaredLength > EXPERT_IMPORT_LIMITS.maxZipBytes) {
-        return json(fail('experts/invalid-request', `专家包不得超过 ${EXPERT_IMPORT_LIMITS.maxZipBytes / (1024 * 1024)} MiB。`), 413);
+        return json(fail('experts/invalid-request', `数字员工包不得超过 ${EXPERT_IMPORT_LIMITS.maxZipBytes / (1024 * 1024)} MiB。`), 413);
       }
       const encodedName = request.headers.get('x-workdsh-file-name');
       if (!encodedName) return json(fail('experts/invalid-request', '请求缺少文件名。'), 400);
@@ -373,7 +379,7 @@ export function registerExpertsConnection(ctx: Context): void {
       try {
         const body = record(await request.json().catch(() => undefined));
         const expertId = str(body?.expertId);
-        if (!expertId) return json(fail('experts/invalid-request', '请求缺少专家标识。'), 400);
+        if (!expertId) return json(fail('experts/invalid-request', '请求缺少数字员工标识。'), 400);
         const actor = await ctx.workdshIdentity.resolve(undefined, request.signal);
         const descriptor = await manager.export(actor, expertId, str(body?.revisionId), request.signal);
         const { archive } = buildExport(descriptor.definition, descriptor.sourceAttribution);

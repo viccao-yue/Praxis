@@ -1,4 +1,4 @@
-# 腾讯 / WorkBuddy 内容制作方法接入 WorkDSH
+# 腾讯 / WorkBuddy 内容制作方法接入 开物Praxis
 
 2026-09-13，用户授权检查网页、PPT、Word、Excel并增强系统。参考本机 /Users/techflag/project/workbuddy 的商业产品化方法，不复制专属执行引擎、转换代码或市场包装，不将它们自动称作开源依赖。
 
@@ -15,7 +15,7 @@
 | Excel | builtin-plugins/sheetagent：excel-generation/handler、schema_principle、sheet-agent-prompt入口、audit-spreadsheet、骨架脚本依赖检查 | 场景原型、来源/单位/类型、实际行号先于公式、空/零保护、跨表验证与使用体验 | sheetagent MCP、强制子代理、自动pip、把空骨架称完整结果 |
 | 网页 | ardot-ui-design、design-to-code 的landing/web-app、code与style-extraction重点段落 | 内容先于视觉、目标与CTA、令牌、真实功能、参考提炼与响应式 | Ardot工具、固定画布布局、强制每次多选章节、模拟访谈当真实背书 |
 
-阅读范围是相关入口与上述重点参考/脚本依赖，不宣称审完全部子目录、所有专家、所有脚本或许可。方法由 WorkDSH 按当前架构重新编写为八份参考，没有原样复制转换代码。
+阅读范围是相关入口与上述重点参考/脚本依赖，不宣称审完全部子目录、所有专家、所有脚本或许可。方法由 开物Praxis 按当前架构重新编写为八份参考，没有原样复制转换代码。
 
 ## 接入
 

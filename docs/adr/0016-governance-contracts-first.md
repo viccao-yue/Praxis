@@ -4,7 +4,7 @@
 
 ## 背景
 
-Skill 0.1 已完成默认/本地管理闭环。下一阶段需要 identity、access、audit 和工作台共同使用主体、组织、资源归属与授权信息；未来企业服务端也必须保持同一语义。Harness 的 User、Permission Preset、Approval、Sandbox 和 Session scope 各自拥有运行职责，但不提供 WorkDSH 的组织成员关系或业务对象授权。
+Skill 0.1 已完成默认/本地管理闭环。下一阶段需要 identity、access、audit 和工作台共同使用主体、组织、资源归属与授权信息；未来企业服务端也必须保持同一语义。Harness 的 User、Permission Preset、Approval、Sandbox 和 Session scope 各自拥有运行职责，但不提供 开物Praxis 的组织成员关系或业务对象授权。
 
 ## 决策
 

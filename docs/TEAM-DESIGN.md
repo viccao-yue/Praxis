@@ -8,7 +8,7 @@
 
 [企业连接器](https://www.workbuddy.cn/docs/enterprise/adminguide/Connector%E7%AE%A1%E7%90%86) 提供组织级配置和工具范围；[资料库协作](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Library/Collaboration) 描述空间权限与 Agent 沿用用户权限；[企业智能体](https://www.workbuddy.cn/docs/enterprise/adminguide/CloudAgent) 描述共享 Agent 与个人独立 Session。
 
-WorkDSH 的决定：首期即有组织与权限模型；本地模式是该模型的一种部署。团队管理 UI、SSO、云存储和隔离 worker 可以后续交付，基础契约和双主体测试不能延后。
+开物Praxis 的决定：首期即有组织与权限模型；本地模式是该模型的一种部署。团队管理 UI、SSO、云存储和隔离 worker 可以后续交付，基础契约和双主体测试不能延后。
 
 ## 2. 主体、组织与资源
 
@@ -51,7 +51,7 @@ Session fork、恢复、继续运行和子 Agent 创建都重新解析 RuntimeBi
 
 子代理消息进入 inbox 后，其执行不再由发送方取消信号拥有；撤权流程必须同时禁止后续操作、请求 interrupt、撤销连接句柄，并持续核对到实际停稳或标记状态未知。provider 卸载只阻止新启动，不能被当作已撤销全部在途工作。一次性子代理的非 completed 输出只能以部分结果保存，不能驱动业务任务自动完成。
 
-复用父 Agent 的 standing preset generation 只允许在角色要求一致且 WorkDSH 已重新授权后显式 `composeFrom`；它不传播组织身份、项目范围或连接账号。Initiator 只用于同进程因果归属，不是可信主体。外部协议、浏览器 Remote、队列和 worker 都必须从受信边界恢复 ActorContext。
+复用父 Agent 的 standing preset generation 只允许在角色要求一致且 开物Praxis 已重新授权后显式 `composeFrom`；它不传播组织身份、项目范围或连接账号。Initiator 只用于同进程因果归属，不是可信主体。外部协议、浏览器 Remote、队列和 worker 都必须从受信边界恢复 ActorContext。
 
 P0 必须验证官方原生 Remote/Session/文件能力在团队模式的所有访问路径；若公开扩展不能完整保护某入口，不对团队用户暴露该入口。
 
@@ -85,7 +85,7 @@ P3：企业后台、OIDC/SSO 提供方、团队资产提供方、隔离 runtime 
 
 官方 Session Query 的过滤词汇不包含租户和项目授权。任何会话列表、全文检索、标题、snippet、事件窗口或谱系接口都先通过 RuntimeBinding/ProjectTaskLink 限定可访问 Session 集合，并在返回时重验；团队部署不得向普通成员暴露全局逻辑语料库。
 
-官方 Session Controller 声明可见/授权搜索语义，但在 H06 用锁定发布包验证策略覆盖前不作为唯一安全边界。直接 Session Query、follow 和资源预览继续经过 WorkDSH 服务端主体与绑定校验。
+官方 Session Controller 声明可见/授权搜索语义，但在 H06 用锁定发布包验证策略覆盖前不作为唯一安全边界。直接 Session Query、follow 和资源预览继续经过 开物Praxis 服务端主体与绑定校验。
 
 团队版准入条件是 ACCEPTANCE 中 T01—T12 对应阶段用例的证据和完整访问链审查，不是出现登录页。
 
@@ -99,6 +99,6 @@ P1-11 即实现项目角色/资产引用/会话访问分离和双主体测试，
 
 ## 8. 原生运行许可与企业权限的关系
 
-企业访问链固定为：WorkDSH access → 连接实例授权 → Harness 单次 Approval → runtime/sandbox 准入。Permission Preset 只是后两项中审批策略与文件 sandbox 模式的 UI 组合，不是成员角色或对象授权。Session 配置为 `never`、用户选择全权限或工具审批一次通过，都不能越过组织策略和连接范围。
+企业访问链固定为：开物Praxis access → 连接实例授权 → Harness 单次 Approval → runtime/sandbox 准入。Permission Preset 只是后两项中审批策略与文件 sandbox 模式的 UI 组合，不是成员角色或对象授权。Session 配置为 `never`、用户选择全权限或工具审批一次通过，都不能越过组织策略和连接范围。
 
 Sandbox 只约束子进程文件系统影响，不覆盖网络和进程可见性；`partial` 不满足多租户强隔离。P0-05 验证所有入口的主体绑定和失败关闭，P3 runtime provider 再证明物理隔离与网络边界。完整复用矩阵见 [Harness 治理能力复用矩阵](research/harness-governance-capability-matrix.md)。

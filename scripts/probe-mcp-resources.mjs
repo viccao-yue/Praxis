@@ -50,8 +50,8 @@ try {
   if (listed.resources?.[0]?.uri !== 'workdsh://guide/start') throw new Error('Static MCP resource was not discovered.');
   if (listed.resources?.[1]?.uri !== 'workdsh://guide/second-page' || listed.nextCursor !== undefined) throw new Error('MCP SDK pagination aggregation failed.');
   if (templates.resourceTemplates?.[0]?.uriTemplate !== 'workdsh://guide/{topic}') throw new Error('MCP URI template was not discovered.');
-  if (fixed.contents?.[0]?.text !== 'WorkDSH MCP resources are ready.') throw new Error('Static MCP resource content mismatch.');
-  if (expanded.contents?.[0]?.text !== 'WorkDSH guide topic: presentation') throw new Error('Expanded MCP resource content mismatch.');
+  if (fixed.contents?.[0]?.text !== 'Praxis MCP resources are ready.') throw new Error('Static MCP resource content mismatch.');
+  if (expanded.contents?.[0]?.text !== 'Praxis guide topic: presentation') throw new Error('Expanded MCP resource content mismatch.');
 
   console.log(JSON.stringify({
     server: 'workdsh-probe',

@@ -4,13 +4,13 @@ Package: **`workdsh-plugin-skills@0.1.0-alpha.24`**. Tag: `skills-v0.1.0-alpha.2
 
 ## 本次交付
 
-Skill 以独立 Host、Client、`dsh.bundle` 配置层和预构建浏览器制品交付，不再依赖 WorkDSH 展示包初始化。一个插件管理多个 `SKILL.md` 技能对象；通过公开 Skill 服务契约供后续专家等模块复用。
+Skill 以独立 Host、Client、`dsh.bundle` 配置层和预构建浏览器制品交付，不再依赖 开物Praxis 展示包初始化。一个插件管理多个 `SKILL.md` 技能对象；通过公开 Skill 服务契约供后续专家等模块复用。
 
 包含全局列表、全文和资源、编辑/修订冲突、启停、批量操作、可恢复卸载、导入预检与原子安装，以及原生任务框的创建/试用交接。
 
 ## English
 
-The Skill module now ships as an independently installable Harness plugin, with its own Host, Client, configuration layer, and prebuilt browser artifact. It runs without the WorkDSH presentation bundle and exposes a public service contract for future plugin collaboration.
+The Skill module now ships as an independently installable Harness plugin, with its own Host, Client, configuration layer, and prebuilt browser artifact. It runs without the Praxis presentation bundle and exposes a public service contract for future plugin collaboration.
 
 Includes local discovery, full documents and resources, editing with conflict detection, enable/disable, batch management, recoverable uninstall, validated import, and native task-composer handoff.
 
@@ -24,7 +24,7 @@ dsh plugin --profile workdsh add /absolute/path/workdsh-plugin-skills-0.1.0-alph
 dsh --profile workdsh
 ```
 
-Open **专家 · 技能 · 连接器 → 技能**. WorkDSH branding is optional and supplied by the separate [presentation bundle](https://github.com/techflag/workdsh/releases/tag/bundle-v0.1.0-alpha.39).
+Open **专家 · 技能 · 连接器 → 技能**. 开物Praxis branding is optional and supplied by the separate [presentation bundle](https://github.com/techflag/workdsh/releases/tag/bundle-v0.1.0-alpha.39).
 
 ## 已知限制 / Known limitations
 

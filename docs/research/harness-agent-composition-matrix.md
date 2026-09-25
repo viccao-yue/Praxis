@@ -1,13 +1,13 @@
-# Harness Agent 与 WorkDSH 专家编排矩阵
+# Harness Agent 与 开物Praxis 专家编排矩阵
 
 状态：H07 已审，发布包行为仍需 P0-03/P0-04 探针确认。
 依据：H07 的 14 份生命周期、Core/preset、Agent Team/Subagent、LLM、提示词、压缩、计量与适配器文档，精确清单见 [审查总表](deepseek-harness-capability-review.md#h07-审查记录已完成)。
 
 ## 1. 对象归属
 
-| 概念 | Harness 直接拥有 | WorkDSH 直接拥有 | 组合规则 |
+| 概念 | Harness 直接拥有 | 开物Praxis 直接拥有 | 组合规则 |
 | --- | --- | --- | --- |
-| Agent / Session | 当前执行实例、追加式日志、步骤、实时状态 | TaskRef、RuntimeBinding、项目归属、访问授权 | 一个 WorkDSH 任务绑定一个根 Session；恢复前重验绑定 |
+| Agent / Session | 当前执行实例、追加式日志、步骤、实时状态 | TaskRef、RuntimeBinding、项目归属、访问授权 | 一个 开物Praxis 任务绑定一个根 Session；恢复前重验绑定 |
 | Agent preset | 插件与运行能力组合 | 被专家/应用/自动化引用的不可变组合引用 | preset 是执行配方，不是专家档案 |
 | 专家 | Persona/提示词、技能和工具的运行投影 | Expert、ExpertRevision、可见范围、依赖、发布状态 | 发布时解析成不可变修订和组合指纹 |
 | 子代理 | 一次性运行或可继续子 Session、相邻消息、深度 | 委派策略、允许的专家修订、资料和账号范围 | 每次创建显式重新解析能力与授权 |
@@ -42,18 +42,18 @@
 
 ### 专家团
 
-WorkDSH 的 `ExpertTeamRevision` 描述稳定角色、允许的专家修订、分工和汇总要求。运行时可投影到原生 Agent Team：
+开物Praxis 的 `ExpertTeamRevision` 描述稳定角色、允许的专家修订、分工和汇总要求。运行时可投影到原生 Agent Team：
 
 1. 根 Session 作为 lead，创建每个成员前解析精确专家修订。
 2. 为每个成员建立新的 RuntimeBinding、flat scope、工具过滤、资料范围和连接账号绑定。
 3. 原生任务 DAG/CAS revision 用于本次运行协调；项目 WorkItem 仍通过 projects 服务显式创建或更新。
-4. 原生 mailbox 是耐久的 queued-minus-delivered 协作事实；业务通知和跨项目消息仍走 WorkDSH 服务。
+4. 原生 mailbox 是耐久的 queued-minus-delivered 协作事实；业务通知和跨项目消息仍走 开物Praxis 服务。
 5. `writeScopes` 只作协作提示，不是锁。对同一资产或外部记录的写入仍使用领域 expectedRevision、幂等键或提供方事务。
 6. provider 被卸载后禁止新启动，已经接受的运行不会自动撤销；管理端需区分“禁止新建”和“已在运行”。
 
 原生 TeamId 等于根 SessionId，成员标识是 SessionId，成员名不可变。它不创建 Organization、Membership、AccessGrant 或共享专家对象。Fork 继承到的旧 team 事件不形成新根 Team。
 
-同角色、同执行组合的子 Agent 可以由 WorkDSH 在完成业务授权解析后显式调用 `composeFrom`，加入父 Agent 当前的同一 standing preset generation；不同角色则挂载自己的不可变 preset 修订。`composeFrom` 只复用插件组合对象，不传递 RuntimeBinding、资产或账号授权。
+同角色、同执行组合的子 Agent 可以由 开物Praxis 在完成业务授权解析后显式调用 `composeFrom`，加入父 Agent 当前的同一 standing preset generation；不同角色则挂载自己的不可变 preset 修订。`composeFrom` 只复用插件组合对象，不传递 RuntimeBinding、资产或账号授权。
 
 ## 4. 生命周期与失败语义
 
@@ -74,7 +74,7 @@ WorkDSH 的 `ExpertTeamRevision` 描述稳定角色、允许的专家修订、�
 - `LlmFailure` 保持 provider-neutral。提供方返回的 retry delay 是事实，实际是否重试由 Agent loop 策略决定。
 - provider request 的 AppIdentity 只能是静态公开信息，不携带用户、Session、路径、提示词或秘密。
 - replay cursor 只在历史和目标路由仍由同一个 adapter 实例持有时复用，否则退回 provider-neutral 历史并给出诊断。
-- TokenMeter 是请求压力和 surface 定价快照，不是账单或组织用量数据库。WorkDSH usage 领域消费已完成调用事实并保存租户归属；界面把 estimated 与 provider usage 分开显示。
+- TokenMeter 是请求压力和 surface 定价快照，不是账单或组织用量数据库。开物Praxis usage 领域消费已完成调用事实并保存租户归属；界面把 estimated 与 provider usage 分开显示。
 - DeepSeek `dsh_plugin_packages` 会外发 live 包名与版本；可选 `dsh_session_log` 会无脱敏外发连续 Session 后缀。团队 Profile 默认关闭后者，启用需组织外发策略、接收端连续性/去重和保留规则。
 
 ## 6. 压缩与业务资料
@@ -92,7 +92,7 @@ Compaction 只改变模型当前 surface。开始/摘要/结束是日志事实�
 1. 验证 ExpertRevision → preset 修订 → Session header/系统提示词的可重建链。
 2. 验证两个并发专家的 scope、动态 PromptContext、工具和技能互不污染。
 3. 验证一次性/可继续子代理的能力声明、结果、取消、dispose、冷恢复和诊断。
-4. 验证子代理不会继承父 scope-local 工具、资料或账号；WorkDSH 显式绑定后才可见。
+4. 验证子代理不会继承父 scope-local 工具、资料或账号；开物Praxis 显式绑定后才可见。
 5. 验证 Team task CAS、循环依赖拒绝、mailbox ack、fork 隔离和 provider 卸载行为。
 6. 验证精确模型解析、unsupported effort 拒绝、adapter HMR 代次、流终态和 retry ownership。
 7. 验证提示词与动态上下文通过官方 surface 持久化，compaction 后仍可说明来源。

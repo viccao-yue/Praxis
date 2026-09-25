@@ -1,10 +1,10 @@
 /**
- * WorkDSH expert domain contracts (D04 / P1-02, expert module 0.1).
+ * Praxis expert domain contracts (D04 / P1-02, expert module 0.1).
  *
  * Pure DTOs, stable error codes and the Host service interface. No runtime
  * dependency: the Host resolves the actor, owns every write, and never accepts
  * a client- or model-supplied actor/owner/confirmation boolean as authority.
- * These are WorkDSH contracts, not Harness official API.
+ * These are Praxis contracts, not Harness official API.
  */
 import type { ActorContext, ResourceOwner } from './governance.js';
 
@@ -12,7 +12,7 @@ import type { ActorContext, ResourceOwner } from './governance.js';
 
 /** Where an expert came from. `organization` is reserved for the enterprise phase. */
 export type ExpertOrigin = 'default' | 'personal' | 'organization';
-/** Lifecycle availability. Archive is an availability change, never a silent hard delete. */
+/** Lifecycle availability. Archive removes from active use without deleting; permanent delete is a separate, confirmed action only allowed on archived personal experts. */
 export type ExpertAvailability = 'enabled' | 'disabled' | 'archived';
 /** Whether a published expert can actually compose a task right now. */
 export type ExpertReadiness = 'ready' | 'missing-dependency' | 'unsupported-capability' | 'broken' | 'unknown';
@@ -338,6 +338,12 @@ export interface AvailabilityReceipt {
   readonly operationId: string;
 }
 
+/** Permanent delete receipt for an already-archived personal expert. */
+export interface DeleteReceipt {
+  readonly expertId: string;
+  readonly operationId: string;
+}
+
 /** Import preview produced by `previewImport`. */
 export interface ImportPreview {
   readonly importPlanId: string;
@@ -423,6 +429,8 @@ export interface ExpertsService {
   confirmPublish(actor: ActorContext, confirmationToken: string, signal?: AbortSignal): Promise<ConfirmationProof>;
   publish(actor: ActorContext, expertId: string, draftRevision: string, dependencyLockDigest: string, proof: ConfirmationProof, context: MutationContext, signal?: AbortSignal): Promise<PublishReceipt>;
   setAvailability(actor: ActorContext, expertId: string, availability: ExpertAvailability, context: MutationContext, proof?: ConfirmationProof, signal?: AbortSignal): Promise<AvailabilityReceipt>;
+  /** Permanently remove an already-archived personal expert from the catalog. Historical Session bindings and frozen revisions are retained. */
+  deleteArchived(actor: ActorContext, expertId: string, context: MutationContext, signal?: AbortSignal): Promise<DeleteReceipt>;
   setPreference(actor: ActorContext, expertId: string, pinned: boolean, expectedRevision?: string, signal?: AbortSignal): Promise<ExpertPreference>;
   prepareExecution(actor: ActorContext, expertId: string, revisionId: string | undefined, workspaceRef: string | undefined, modelSelection: ModelSelectionRequest | undefined, draftText: string | undefined, signal?: AbortSignal, workspaceId?: string): Promise<ExecutionPlan>;
   createExecution(actor: ActorContext, executionPlanId: string, context: MutationContext, signal?: AbortSignal): Promise<ExecutionCreation>;
@@ -441,6 +449,6 @@ export interface ExpertsService {
 export type ExpertAction =
   | 'experts.list' | 'experts.get' | 'experts.create-draft' | 'experts.update-draft'
   | 'experts.copy' | 'experts.validate' | 'experts.publish' | 'experts.set-availability'
-  | 'experts.set-preference' | 'experts.prepare-execution' | 'experts.create-execution'
+  | 'experts.delete' | 'experts.set-preference' | 'experts.prepare-execution' | 'experts.create-execution'
   | 'experts.prepare-handoff' | 'experts.create-handoff' | 'experts.preview-import'
   | 'experts.commit-import' | 'experts.export' | 'experts.operation' | 'experts.verify-binding';

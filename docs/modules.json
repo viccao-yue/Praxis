@@ -77,7 +77,7 @@
       "src/client/components",
       "src/harness",
       "tests",
-      "resources/skills/expert-manager",
+      "resources/skills/workdsh-expert-manager",
       "resources/templates",
       "src/services/preferences"
     ],
@@ -525,5 +525,18 @@
       "evidence": "docs/releases/2026-09-15-dsh-0.1.6-alpha.1.md"
     },
     "acceptanceNote": "官方 Team 协作栏布局与状态投影已验证；60 分钟资源收敛和跨平台长任务仍未验收。"
+  },
+  {
+    "path": "packages/plugins/vision",
+    "title": "视觉增强",
+    "phase": "P1",
+    "task": "VISION-01",
+    "moduleVersion": "0.1",
+    "status": "in_progress",
+    "directories": [
+      "src",
+      "tests"
+    ],
+    "acceptanceNote": "用户授权专项：可启停视觉桥接；不推进 D04。需 Preview 实测 enabled 开关与设置页。"
   }
 ]

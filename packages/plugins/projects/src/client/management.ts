@@ -35,7 +35,7 @@ async function invoke<T>(endpoint: string, payload: unknown, signal?: AbortSigna
     error?: { message?: string };
   };
   if (!response.ok || !result.ok) {
-    throw new Error(result.error?.message ?? `项目服务请求失败（${response.status}）`);
+    throw new Error(result.error?.message ?? `协同空间服务请求失败（${response.status}）`);
   }
   return result.value as T;
 }

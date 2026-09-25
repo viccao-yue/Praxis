@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { withoutRedundantAgentTeamProfile } from '../../scripts/preview-agent-team.mjs';
 
-test('preview keeps only the WorkDSH-owned Agent Team bundle', () => {
+test('preview keeps only the Praxis-owned Agent Team bundle', () => {
   const input = { dsh: { profile: { bundles: ['@deepseek-ai/dsh-base', 'workdsh-plugin-experts', '@deepseek-ai/dsh-experimental-agent-team-profile', 'workdsh-plugin-library'] } } };
   const output = withoutRedundantAgentTeamProfile(input);
   assert.deepEqual(output.dsh.profile.bundles, ['@deepseek-ai/dsh-base', 'workdsh-plugin-experts', 'workdsh-plugin-library']);
@@ -10,7 +10,7 @@ test('preview keeps only the WorkDSH-owned Agent Team bundle', () => {
   assert.equal(withoutRedundantAgentTeamProfile(output), undefined);
 });
 
-test('preview leaves a standalone upstream Team profile alone without WorkDSH experts', () => {
+test('preview leaves a standalone upstream Team profile alone without Praxis experts', () => {
   const input = { dsh: { profile: { bundles: ['@deepseek-ai/dsh-experimental-agent-team-profile'] } } };
   assert.equal(withoutRedundantAgentTeamProfile(input), undefined);
 });

@@ -3,7 +3,7 @@
 独立DSH标准展示插件（0.1）：顶部一行活动/协作状态，按需展开成员，轻量动画可关闭。复用原生Session事件、Header和子会话导航，不执行任务，不替代专家团验收。
 
 构建：根目录 `corepack pnpm --filter workdsh-plugin-activity build`。
-安装：将pack后的tgz通过官方 `dsh plugin --profile <profile> add <tgz>` 安装，重启该Profile。无需WorkDSH专家插件；安装专家/技能插件时通过公开可选契约增强身份与标题。
+安装：将pack后的tgz通过官方 `dsh plugin --profile <profile> add <tgz>` 安装，重启该Profile。无需开物Praxis专家插件；安装专家/技能插件时通过公开可选契约增强身份与标题。
 
 展开箭头 → 取消“启用轻量动画”，偏好按浏览器保存；减少动态效果的系统设置始终生效。所有动画局部作用于 `.wd-activity`，不改变原生正文、工具卡片和输入框。插件卸载恢复原生标题，偏好不会控制其他插件。
 

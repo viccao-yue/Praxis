@@ -46,7 +46,7 @@ U1—U3文档闭环保持，U4先接Markdown/HTML再接其他类型，U5覆盖�
 
 ## 修订4：独立Office插件与生命周期
 
-沿用ADR-0018/0019：`workdsh-plugin-office`是独立安装包，Host根只用官方ctx.plugin组合内容服务、工具与Connection消费者；Client进入官方模块图并共享renderer。公共服务拟定为workdshOfficeContent，contract类型与运行实现分开，默认WorkDSH组合不拥有Office实现。不新建PluginManager，不强制八个npm包，不让文档成为代码插件。
+沿用ADR-0018/0019：`workdsh-plugin-office`是独立安装包，Host根只用官方ctx.plugin组合内容服务、工具与Connection消费者；Client进入官方模块图并共享renderer。公共服务拟定为workdshOfficeContent，contract类型与运行实现分开，默认开物Praxis组合不拥有Office实现。不新建PluginManager，不强制八个npm包，不让文档成为代码插件。
 
 采用[插件架构与门槛](../design/office/PLUGIN-ARCHITECTURE.md)：写入与插件运行代绑定，卸载先关准入、结算在途提交、拒绝旧响应、清理工具/路由/SDK、保留用户数据；代码升级不能覆盖用户工作副本。代价是每个adapter/worker必须有严格生命周期与格式能力验证，收益是可以真实安装、停用和恢复，其他功能按依赖诊断。
 

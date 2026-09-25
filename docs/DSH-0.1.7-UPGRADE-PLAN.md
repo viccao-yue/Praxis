@@ -14,7 +14,7 @@
 
 ## 官方能力复用记录
 
-|任务|官方依据/公开面|WorkDSH 差异与验证|
+|任务|官方依据/公开面|开物Praxis 差异与验证|
 |---|---|---|
 |U17-1|docs/dsh-v0.1.7-alpha.1/docs/config-catalog.zh.md；已发布 0.1.7-alpha.1 包|精确依赖、Loader/Profile 安装与构建|
 |U17-2|subsystems/core.zh.md 的 ctx.agentPresets；dsh-agent-preset-registry|专家多对象/冻结修订/主体绑定仍由专家服务拥有；注册、释放、重启、资源漂移测试|

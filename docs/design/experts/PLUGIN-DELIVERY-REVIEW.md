@@ -10,11 +10,11 @@ Skill alpha.24 / bundle alpha.39 已完成本复核要求的 Skill 改造，见[
 
 ## 1. 原始结论
 
-当前 WorkDSH 使用官方 Cordis/Harness 插件机制，但尚未兑现“每个功能都是独立可安装、可管理插件”的完整交付形态。目录组织可以保留；问题在入口、装配、生命周期和分发，不在文件夹叫不叫 plugins。
+当前 开物Praxis 使用官方 Cordis/Harness 插件机制，但尚未兑现“每个功能都是独立可安装、可管理插件”的完整交付形态。目录组织可以保留；问题在入口、装配、生命周期和分发，不在文件夹叫不叫 plugins。
 
 此前将“独立源码目录/包版本”与“独立运行、安装、卸载”并列描述不够准确。专家交接实施必须先补这项边界，不能延续直接调用初始化函数的集成方式。
 
-用户随后明确要求遵循 Harness 自身由插件组合的架构精神，已采纳为 [ADR-0018](../../adr/0018-composable-feature-plugins-and-shared-skills.md)。当前直接调用 helper 的装配方式属于必须修正的交付差距；不可把它固化为一个承载全部业务的 WorkDSH 核心。
+用户随后明确要求遵循 Harness 自身由插件组合的架构精神，已采纳为 [ADR-0018](../../adr/0018-composable-feature-plugins-and-shared-skills.md)。当前直接调用 helper 的装配方式属于必须修正的交付差距；不可把它固化为一个承载全部业务的 开物Praxis 核心。
 
 ## 2. 官方概念
 

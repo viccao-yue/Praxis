@@ -202,7 +202,7 @@ yield {type:'block-start',index:0,blockType:'text'};yield {type:'block-end',inde
       if (kind==='xlsx') await expect(page.frameLocator('iframe[title="Office 文档编辑"]').locator('#status')).toContainText('Excel 支持',{timeout:30000});
       await page.waitForTimeout(4000);
       await page.screenshot({path:join(artifacts,'editor-'+kind+'.png')});
-      pass('Native Open with selects WorkDSH Office editor: '+kind);
+      pass('Native Open with selects Praxis Office editor: '+kind);
     }
   }
 

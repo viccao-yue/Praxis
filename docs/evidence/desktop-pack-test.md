@@ -1,8 +1,8 @@
 # 官方 Desktop 测试打包
 
-用户于2026-09-12明确授权继续官方Desktop测试打包。本轮是隔离验证官方构建流程的例外，不将上游源码作为WorkDSH开发/运行依赖，不改官方实现或现有Web Profile，不引入自建Electron壳。
+用户于2026-09-12明确授权继续官方Desktop测试打包。本轮是隔离验证官方构建流程的例外，不将上游源码作为开物Praxis开发/运行依赖，不改官方实现或现有Web Profile，不引入自建Electron壳。
 
-官方能力复用：官方 apps/desktop README、对应 dsh-v0.1.5-rc.1 tag 的原样构建脚本。master Desktop 已0.1.5-rc.2，测试选与WorkDSH基线相同的rc.1；版本差异必须分开记录。GitHub最近5个release无安装包assets，npm @deepseek-ai/dsh-desktop 返回404，源码manifest private true。机器为macOS arm64，security find-identity显示0有效codesigning身份。官方构建/签名/插件加载分别验证，不将应用目录或源码编译当成已签名可发布安装包。
+官方能力复用：官方 apps/desktop README、对应 dsh-v0.1.5-rc.1 tag 的原样构建脚本。master Desktop 已0.1.5-rc.2，测试选与开物Praxis基线相同的rc.1；版本差异必须分开记录。GitHub最近5个release无安装包assets，npm @deepseek-ai/dsh-desktop 返回404，源码manifest private true。机器为macOS arm64，security find-identity显示0有效codesigning身份。官方构建/签名/插件加载分别验证，不将应用目录或源码编译当成已签名可发布安装包。
 
 隔离文件位于 .artifacts/desktop-pack-test，现有Web18989保持运行。正式签名、公证、安装升级和业务插件在Desktop中的运行尚未执行。没有自动上传、发布或推送。
 
@@ -12,16 +12,16 @@
 
 ## 2026-09-12 第二轮：方向澄清与官方 rc.1 流水线复跑
 
-用户澄清：目标是基于**官方仓库 apps/desktop 自行打包**的 WorkDSH 桌面端，不是社区版 DSH Desktop（anywhere）。第一轮在社区应用（/Applications/DSH Desktop.app 2.0.9）上所做的诊断按此纠正停止，其结论不再作为交付路径依据；此后以官方 rc.1 快照实际代码为准。
+用户澄清：目标是基于**官方仓库 apps/desktop 自行打包**的 开物Praxis 桌面端，不是社区版 DSH Desktop（anywhere）。第一轮在社区应用（/Applications/DSH Desktop.app 2.0.9）上所做的诊断按此纠正停止，其结论不再作为交付路径依据；此后以官方 rc.1 快照实际代码为准。
 
 ### 官方 rc.1 流水线事实核对（.artifacts/desktop-pack-test/upstream 实际代码）
 
 - 官方入口：根 `pnpm run prepare:desktop` = apps/desktop `prepare:package` = `package-target.ts --prepare-only`；正式打包 `package:desktop:mac:arm64` 等固定目标脚本。
 - 序列（package-target.ts main）：build:official → release:pack --family dsh → pack apps/desktop-host → release:pack --family vendor → native/system landlock → prepare:runtime → prepare:packages → prepare:seed → electron-builder（--publish never）。
 - macOS 签名硬门槛：① prepare-seed.ts 对 darwin 目标调用 resolveMacOSSigningEnvironment（要求 DSH_DESKTOP_MACOS_SIGNING_IDENTITY、DSH_DESKTOP_MACOS_TEAM_ID）并对种子 store 中每个 Mach-O 签名；② electron-builder.config.mjs 模块导入时即校验 DSH_DESKTOP_APP_ID、签名身份与公证凭据（三套方案之一）；③ mac.forceCodeSigning / notarize / hardenedRuntime 均为 true。
-- 品牌写死点：productName 'DeepSeek Harness'、artifactName 'deepseek-harness-…'（WorkDSH 品牌需改此处）；appId 来自 DSH_DESKTOP_APP_ID。
-- 桌面 profile 规则（project-manager.ts）：desktop 项目 bundles 必须以内置 ['@deepseek-ai/dsh-base','@deepseek-ai/dsh-web-app'] 开头，之后的包按插件管理；插件须声明 dsh.bundle.patch；运行时 plugin-add/update 仅接受 npm registry 包名@版本（file:/URL spec 被显式拒绝），因此 WorkDSH 预装必须走打包期种子扩展，不能靠运行时添加本地包。
-- 种子机制（prepare-seed.ts / core-package-set.ts）：desktop-packages.json 描述符 + desktop-packages/*.tgz 构成核心包集，包目录必须与描述符严格一致（多余文件即拒绝）；包集校验只强制 dsh 与 desktop-host 的版本等于 Electron 版本，其他包名/版本不设限；依赖通过 file: 覆盖注入（desktopCorePackageOverrides）。prepare-package-set.ts 从 dsh + desktop-host 依赖闭包选择可用包——WorkDSH 包作为根/可用输入加入即可进入包集，闭包算法本身无需改。
+- 品牌写死点：productName 'DeepSeek Harness'、artifactName 'deepseek-harness-…'（开物Praxis 品牌需改此处）；appId 来自 DSH_DESKTOP_APP_ID。
+- 桌面 profile 规则（project-manager.ts）：desktop 项目 bundles 必须以内置 ['@deepseek-ai/dsh-base','@deepseek-ai/dsh-web-app'] 开头，之后的包按插件管理；插件须声明 dsh.bundle.patch；运行时 plugin-add/update 仅接受 npm registry 包名@版本（file:/URL spec 被显式拒绝），因此 开物Praxis 预装必须走打包期种子扩展，不能靠运行时添加本地包。
+- 种子机制（prepare-seed.ts / core-package-set.ts）：desktop-packages.json 描述符 + desktop-packages/*.tgz 构成核心包集，包目录必须与描述符严格一致（多余文件即拒绝）；包集校验只强制 dsh 与 desktop-host 的版本等于 Electron 版本，其他包名/版本不设限；依赖通过 file: 覆盖注入（desktopCorePackageOverrides）。prepare-package-set.ts 从 dsh + desktop-host 依赖闭包选择可用包——开物Praxis 包作为根/可用输入加入即可进入包集，闭包算法本身无需改。
 - 无 COS 上传凭据不影响打包（仅 upload:* 步骤需要）。
 - corepack shim 本机损坏（ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING），须以 `node ~/.cache/node/corepack/v1/pnpm/11.7.0/bin/pnpm.mjs` 直接调用；`corepack pnpm` 会取到 11.22.0 并触发版本校验失败。
 
@@ -34,51 +34,51 @@
 - prepare:seed（日志 prepare-seed.log）：已完成锁文件生成与校验、--prod 冻结安装、离线安装验证（种子机制在无签名环境下全部工作），随后精确中止于签名门槛：`Error: desktop release environment: DSH_DESKTOP_MACOS_SIGNING_IDENTITY must be set to a non-empty value`（prepare-seed.ts:166 → resolveMacOSSigningEnvironment）。electron-builder 亦因 DSH_DESKTOP_APP_ID 与公证凭据缺失不可运行。
 - 本机 security find-identity 0 有效签名身份，无 DSH_DESKTOP_*/APPLE_* 环境变量；未生成 .app/DMG。
 
-### WorkDSH 预置设计（对照已复核）
+### 开物Praxis 预置设计（对照已复核）
 
-现有 preview profile（.test-runtime/preview）已验证组合可平移：dependencies 7 个 WorkDSH 包，bundles = 内置两层 + workdsh-bundle + 6 个插件/提供方。桌面种子预置预期改动面（测试快照内）：prepare-package-set.ts 增加 WorkDSH 根与 tarball 输入；project-manager.ts 种子/项目元数据写入扩展后的 bundles 列表；品牌两行与 appId 环境。未实施，待用户决策 Apple 凭据与品牌。
+现有 preview profile（.test-runtime/preview）已验证组合可平移：dependencies 7 个 开物Praxis 包，bundles = 内置两层 + workdsh-bundle + 6 个插件/提供方。桌面种子预置预期改动面（测试快照内）：prepare-package-set.ts 增加 开物Praxis 根与 tarball 输入；project-manager.ts 种子/项目元数据写入扩展后的 bundles 列表；品牌两行与 appId 环境。未实施，待用户决策 Apple 凭据与品牌。
 
 ### 未执行
 
-- electron-builder、真实签名/公证、安装启动、更新验收；WorkDSH 预置改动；未触碰 WorkDSH 根依赖与现有 Web 预览；无上传/发布。
+- electron-builder、真实签名/公证、安装启动、更新验收；开物Praxis 预置改动；未触碰 开物Praxis 根依赖与现有 Web 预览；无上传/发布。
 
-## 2026-09-12 第三轮：WorkDSH 未签名测试版打包与冒烟验证
+## 2026-09-12 第三轮：开物Praxis 未签名测试版打包与冒烟验证
 
-用户四项决策：① Apple 凭据暂无，先做未签名测试版（仅本机自用、不可分发）；② 品牌 WorkDSH；③ 预置全部 7 个 WorkDSH 包（与 preview profile 一致）；④ 应用 ID com.workdsh.app。
+用户四项决策：① Apple 凭据暂无，先做未签名测试版（仅本机自用、不可分发）；② 品牌 开物Praxis；③ 预置全部 7 个 开物Praxis 包（与 preview profile 一致）；④ 应用 ID com.workdsh.app。
 
 ### 快照补丁（5 文件，全部标注 WORKDSH TEST PATCH，仅存在于隔离快照）
 
 - src/project-manager.ts：新增 WORKDSH_PROFILE_BUNDLES（7 层，置于内置两层之后）；createSeedMetadata 的 dsh.profile.bundles 与 dependencies 扩展。dev 项目 metadata 刻意未改。
 - scripts/prepare-seed.ts：`WORKDSH_DESKTOP_UNSIGNED=1` 时跳过 darwin 种子签名门槛。
-- electron-builder.config.mjs（6 处）：productName 'WorkDSH'、artifactName 'workdsh-${version}-…'；unsigned 时跳过签名/公证导入校验；mac.identity=null、forceCodeSigning/notarize=false；dmg.sign=false；afterSign/artifactBuildCompleted 钩子守卫。
+- electron-builder.config.mjs（6 处）：productName '开物Praxis'、artifactName 'workdsh-${version}-…'；unsigned 时跳过签名/公证导入校验；mac.identity=null、forceCodeSigning/notarize=false；dmg.sign=false；afterSign/artifactBuildCompleted 钩子守卫。
 - scripts/desktop-build-paths.mjs 与 .d.mts：新增 packedWorkdsh 路径。
 - scripts/prepare-package-set.ts：WORKDSH_ROOT_PACKAGES 作为根加入闭包选择 + packedWorkdsh 作为默认输入。
 
 ### 构建与产物
 
-- 7 个 WorkDSH tarball 打包至 <build>/packed/workdsh（bundle alpha.40 / skills alpha.25 / access alpha.4 / audit alpha.3 / experts alpha.1 / office alpha.1 / identity-local alpha.4）。
-- prepare:packages 重建核心包集：248 包（241 官方 + 7 WorkDSH）。
+- 7 个 开物Praxis tarball 打包至 <build>/packed/workdsh（bundle alpha.40 / skills alpha.25 / access alpha.4 / audit alpha.3 / experts alpha.1 / office alpha.1 / identity-local alpha.4）。
+- prepare:packages 重建核心包集：248 包（241 官方 + 7 开物Praxis）。
 - prepare:seed（unsigned）：exit=0（prepare-seed-workdsh.log）。种子 bundles = 内置两层 + 7 层；248 dependencies；integrity.json 270 文件；无签名痕迹。
 - electron-builder（--dir, unsigned）：**exit=0**（electron-builder-workdsh.log）。首次运行卡在 GitHub release 直接下载（release-assets.githubusercontent.com 实测约 18KB/s），实测 npmmirror 镜像可用（HTTP 200，129.7MB）后中止进程并以 `ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/` 重启完成；日志确认 `skipped macOS code signing reason=identity explicitly is set to null` 与 `downloaded electron zip extracted successfully`。
-- 产物：.desktop-build/targets/mac-arm64/artifacts/mac-arm64/WorkDSH.app（总 1.0G）
-  - Info.plist：CFBundleName/CFBundleDisplayName=WorkDSH、CFBundleIdentifier=com.workdsh.app、CFBundleShortVersionString=0.1.5-rc.1。
+- 产物：.desktop-build/targets/mac-arm64/artifacts/mac-arm64/开物Praxis.app（总 1.0G）
+  - Info.plist：CFBundleName/CFBundleDisplayName=Praxis、CFBundleIdentifier=com.workdsh.app、CFBundleShortVersionString=0.1.5-rc.1。
   - Contents/Resources：app.asar、runtime（node 24.17.0 + pnpm 11.7.0）、seed（248 tarball + integrity.json + desktop-packages.json）。
   - 签名状态：`Signature=adhoc`（Electron 自带 linker-signed），无 Developer ID；无 quarantine 属性（com.apple.provenance 为系统溯源标记），本机可直接启动；内嵌 node 保持官方硬化签名。
-  - 图标：WorkDSH 品牌 icns 已接线（详见下文「第四轮：应用图标接线」）。
+  - 图标：开物Praxis 品牌 icns 已接线（详见下文「第四轮：应用图标接线」）。
 
-### 本机冒烟验证（WorkDSH.app 未签名，macOS 26.3 arm64）
+### 本机冒烟验证（开物Praxis.app 未签名，macOS 26.3 arm64）
 
 - 前置处理：`~/.dsh/profiles/desktop` 存在旧测试残留（bundles=dsh-better-sidebar/dsh-plugin-ssh，无 desktop-release.json），不符合 desktop 项目格式且会阻断 releaseFile() 读取；已备份重命名为 `~/.dsh/profiles/desktop.test-residue-20260912`（保留数据，未删除）。
 - 首启（smoke-launch.sh，日志 smoke-launch.log）：种子校验 → mergeSeedPnpmState → 离线安装 248 包至 ~/.dsh/profiles/desktop → staging healthCheck → 激活 → 正式 backend。安装结果：desktop-release.json=0.1.5-rc.1、node_modules 含全部 7 个 workdsh 包、bundles 列表正确。healthCheck 证据链 `[workdsh:probe] activated → disposed → activated`（探测启动/dispose/正式启动，probe 来自 packages/bundle/src/probe.ts）。backend host 以打包的 runtime/node 运行 dsh-desktop-host。
 - 二次启动（--remote-debugging-port=19222，日志 smoke-launch3.log）：快路径直接激活（不重装）。CDP target：title「用deepseek-harness复刻workbuddy — DeepSeek Harness」，url `dsh-app://app/index.html?workdsh-view=conversation`。
-- CDP 截图（smoke-ui.png，CDP Page.captureScreenshot 绕过屏幕录制权限）：WorkDSH 品牌 + 侧边导航（新会话/助理/项目/专家·技能·连接器/定时任务/资料库/工作区）+ 真实 session 轨迹（officecli skill 执行、运行统计 3 轮 15 步 · 218 tok/s · 缓存命中 82%）+ 右侧文件面板 + 模型选择 DeepSeek-V41-Flash High。这是 WorkDSH 插件页面在桌面壳中真实渲染的直接证据。
+- CDP 截图（smoke-ui.png，CDP Page.captureScreenshot 绕过屏幕录制权限）：开物Praxis 品牌 + 侧边导航（新会话/助理/项目/专家·技能·连接器/定时任务/资料库/工作区）+ 真实 session 轨迹（officecli skill 执行、运行统计 3 轮 15 步 · 218 tok/s · 缓存命中 82%）+ 右侧文件面板 + 模型选择 DeepSeek-V41-Flash High。这是 开物Praxis 插件页面在桌面壳中真实渲染的直接证据。
 - Electron 进程树完整：主进程 + gpu-process + renderer + utility 各 1；启动日志仅一条 IMKCFRunLoopWakeUpReliable 良性噪音，无其他 error/warn。
-- 结论：官方 rc.1 流水线在 WorkDSH 预置下从构建到「安装 → Host 启动 → WorkDSH 层激活 → UI 渲染」全链路贯通，无 Apple 凭据也可完成本机测试验收。
+- 结论：官方 rc.1 流水线在 开物Praxis 预置下从构建到「安装 → Host 启动 → 开物Praxis 层激活 → UI 渲染」全链路贯通，无 Apple 凭据也可完成本机测试验收。
 
 ### 本轮未执行
 
 - 正式 Developer ID 签名、公证、DMG/ZIP release 制品（本轮 --dir 仅目录产物）、分发与安装升级、自动更新通道验证（DSH_DESKTOP_AUTO_UPDATE_ENV=production 仅满足配置校验）、长会话稳定性与真实业务端到端。
-- 本产物仅本机冒烟，不可对外分发；根 WorkDSH 依赖、Web 预览与既有 Profile 未触碰；无上传/发布。
+- 本产物仅本机冒烟，不可对外分发；根 开物Praxis 依赖、Web 预览与既有 Profile 未触碰；无上传/发布。
 
 ## 2026-09-12 第四轮：应用图标接线（WORKDSH TEST PATCH 扩展）
 
@@ -87,7 +87,7 @@
 - 以品牌资产 assets/brand/workdsh-logo-concept.png（1254×1254）经 sips 生成 10 档 iconset（16–1024px，含 @2x）→ `iconutil -c icns` 生成 workdsh-icon.icns（1,549,686 字节，ic12 类型）。
 - 快照落盘 apps/desktop/workdsh-icon.icns；electron-builder.config.mjs 新增两处 WORKDSH TEST PATCH（`node:url` 导入 + `mac.icon` 指向该文件）。
 - 重新打包 exit=0（electron-builder-icon.log；Electron zip 命中镜像缓存，全流程约 3 分钟）。产物 `Contents/Resources/icon.icns` 与源 SHA-256 一致（af72f855…），Info.plist `CFBundleIconFile=icon.icns`；打包日志不再出现 `default Electron icon is used`。
-- icns 转回 PNG 人工复核：WorkDSH 品牌图（蓝色折叠 W + 青色火花 + 浅色圆角底座），非 Electron 默认图标。应用重启运行正常（本机 open 启动，host 正常激活）。
+- icns 转回 PNG 人工复核：开物Praxis 品牌图（蓝色折叠 W + 青色火花 + 浅色圆角底座），非 Electron 默认图标。应用重启运行正常（本机 open 启动，host 正常激活）。
 - 若 Dock 仍显示旧图标属 LaunchServices 缓存：将图标从 Dock 移除后重新打开，或 `killall Dock` 刷新。
 
 ## 2026-09-12 第五轮：窗口壳融合（macOS inset 标题栏）
@@ -131,7 +131,7 @@
 - `scripts/desktop/pack-desktop.mjs`（一键打包，241 行）：Node 22 自举（shell 默认 v21 时自动切换 nvm v22）、corepack 直调 pnpm、快照与补丁存档 SHA-256 逐文件比对（防漂移，`--sync-patches` 可同步）、打包前停止运行中实例、`build:desktop → electron-builder --dir --config …`（内置 unsigned 环境变量与 ELECTRON_MIRROR）、产物断言（plist 三字段 / icon.icns 哈希 / app.asar 内 hiddenInset+shellFrame+workdshShell+_logoRow）、`--restart`。参数：`--skip-build/--check-only/--sync-patches/--restart`。
 - `scripts/desktop/patches/upstream/`：9 个补丁文件存档（8 源文件 + workdsh-icon.icns），按快照相对路径存放。
 - `docs/DESKTOP-PACKAGING.md`：打包指南主体（用法、补丁用途表、快照重建步骤（含 7 包 tarball 重打路径）、Windows 说明、常见问题）——按用户要求打包资料集中 docs；`scripts/desktop/README.md` 保留为脚本目录速查并指向指南。
-- 技能：`.qoder/skills/workdsh-desktop-pack/SKILL.md` 保留为 Qoder 触发入口（内容指向 `docs/DESKTOP-PACKAGING.md`）；个人级 `~/.agents` 副本已移除，工程内 `.qoder/skills` 由 Qoder 直接发现。触发词覆盖“打包/重打 WorkDSH 桌面应用、WorkDSH.app、桌面测试版、Dock、Windows 桌面版”。
+- 技能：`.qoder/skills/workdsh-desktop-pack/SKILL.md` 保留为 Qoder 触发入口（内容指向 `docs/DESKTOP-PACKAGING.md`）；个人级 `~/.agents` 副本已移除，工程内 `.qoder/skills` 由 Qoder 直接发现。触发词覆盖“打包/重打 开物Praxis 桌面应用、开物Praxis.app、桌面测试版、Dock、Windows 桌面版”。
 
 ### 验证
 

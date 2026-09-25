@@ -20,7 +20,7 @@ await mkdir(runtimeOutput, { recursive: true });
 
 const pageServer = createServer((_request, response) => {
   response.setHeader('content-type', 'text/html; charset=utf-8');
-  response.end('<title>WorkDSH Browser Probe</title><main><h1>Browser Use Ready</h1><button>Verify</button></main>');
+  response.end('<title>Praxis Browser Probe</title><main><h1>Browser Use Ready</h1><button>Verify</button></main>');
 });
 pageServer.listen(0, '127.0.0.1');
 await once(pageServer, 'listening');

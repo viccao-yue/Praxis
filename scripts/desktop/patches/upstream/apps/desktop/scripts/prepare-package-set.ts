@@ -27,7 +27,7 @@ import { resolveDesktopTargetBuildPaths } from './desktop-build-paths.mjs'
 
 const DSH_PACKAGE = '@deepseek-ai/dsh'
 const ROOT_PACKAGES = [DSH_PACKAGE, DESKTOP_HOST_PACKAGE] as const
-// WORKDSH TEST PATCH: preseed the WorkDSH profile layers beside the official roots.
+// WORKDSH TEST PATCH: preseed the Praxis profile layers beside the official roots.
 const WORKDSH_ROOT_PACKAGES = [
   'workdsh-bundle',
   'workdsh-plugin-skills',
@@ -36,6 +36,9 @@ const WORKDSH_ROOT_PACKAGES = [
   'workdsh-plugin-experts',
   'workdsh-provider-identity-local',
   'workdsh-plugin-office',
+  // Third-party MIT appearance plugin. Exact version tarball must sit in packed/workdsh
+  // (e.g. dsh-ui-appearance-0.1.10.tgz from `npm pack dsh-ui-appearance@0.1.10`).
+  'dsh-ui-appearance',
 ] as const
 const APP_ROOT = resolve(import.meta.dirname, '..')
 const REPOSITORY_ROOT = resolve(APP_ROOT, '..', '..')
@@ -60,7 +63,7 @@ function dependencyNames(manifest: Readonly<Record<string, unknown>>, section: s
 
 /**
  * Select the complete available first-party dependency closures rooted at dsh, its private Host,
- * and the WORKDSH TEST PATCH WorkDSH layers.
+ * and the WORKDSH TEST PATCH Praxis layers.
  * @param available - Packed packages indexed by package name.
  * @returns Selected packages sorted by name.
  */

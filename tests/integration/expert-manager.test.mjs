@@ -537,6 +537,37 @@ test('AT-14 default experts cannot be edited/published; copy creates an editable
   } finally { await h.cleanup(); }
 });
 
+// ── delete drops the compiled preset from the Agent roster, including after restart ─
+
+test('deleting an archived expert removes its preset from the Agent roster and does not restore it', async () => {
+  const h = await boot();
+  let presetRef;
+  let expertId;
+  try {
+    const a = actor('owner-a');
+    await h.experts.list(a, {});
+    const published = await publishCopyOfDefault(h, a, 'del-preset', { name: '待删除顾问' });
+    expertId = published.expertId;
+    presetRef = published.receipt.presetRevisionRef;
+    assert.equal((await h.ctx.agentPresets.list()).some(row => row.id === presetRef), true, 'publish registers the preset');
+
+    await h.experts.setAvailability(a, expertId, 'archived', { operationId: 'op-del-archive' });
+    assert.equal((await h.ctx.agentPresets.list()).some(row => row.id === presetRef), true, 'archive keeps the preset');
+
+    await h.experts.deleteArchived(a, expertId, { operationId: 'op-del-expert' });
+    assert.equal((await h.ctx.agentPresets.list()).some(row => row.id === presetRef), false, 'delete drops the preset from the roster');
+    assert.equal((await h.ctx.agentPresets.resolve('standard')).id, 'standard', 'native presets stay');
+
+    const h2 = await boot(h.root);
+    try {
+      const restarted = actor('owner-a');
+      await h2.experts.list(restarted, {});
+      assert.equal((await h2.ctx.agentPresets.list()).some(row => row.id === presetRef), false, 'a cold start does not re-register a deleted expert preset');
+      await assert.rejects(h2.experts.get(restarted, expertId), (err) => err.code === 'experts/not-found');
+    } finally { await h2.cleanup(); }
+  } finally { await h.cleanup(); }
+});
+
 // ── AT-16: publish is idempotent per operationId and rejects a reused id ────────
 
 test('AT-16 publish replays the identical receipt for the same operationId and conflicts on a reused id', async () => {

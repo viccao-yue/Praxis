@@ -32,7 +32,7 @@ Host 负责领域数据的提交和持久化，浏览器负责交互/渲染/格�
 
 ### 1.1 本接口属于Office插件
 
-实施必须遵循[插件架构](PLUGIN-ARCHITECTURE.md)。`workdsh-plugin-office`是独立安装制品：根Host用`ctx.plugin`组合内容服务、工具与认证Connection适配；Client用官方模块图组合model、Tab与八类adapter。拟定`ctx.workdshOfficeContent`是该插件提供的领域服务，不是WorkDSH全局内核或第二套插件系统。六个工具是服务消费者，原生页面通过Client/Connection调用同服务；默认WorkDSH组合不得直接初始化Office内部实现。
+实施必须遵循[插件架构](PLUGIN-ARCHITECTURE.md)。`workdsh-plugin-office`是独立安装制品：根Host用`ctx.plugin`组合内容服务、工具与认证Connection适配；Client用官方模块图组合model、Tab与八类adapter。拟定`ctx.workdshOfficeContent`是该插件提供的领域服务，不是开物Praxis全局内核或第二套插件系统。六个工具是服务消费者，原生页面通过Client/Connection调用同服务；默认开物Praxis组合不得直接初始化Office内部实现。
 
 公共契约`workdsh-contracts/office`现已导出 U1 文档子集的类型；完整八类仍是目标设计。遵守ADR-0019的Host自包含要求，领域运行值/校验由Office拥有，不裸import private workspace contracts值。必需身份/授权/存储服务用官方inject；optional编辑器失败不能牵连全部页面。具体包与公开service名称在U1验证，不能以这段设计声明接口已存在。
 
@@ -287,7 +287,7 @@ U1—U5为有限切片，不另造模块版本。U4因许可/兼容可调整顺�
 
 ### 2026-09-12 原生文件交付增量
 
-content_export 已注册为受限 DOCX 交付工具：读取已授权保存修订、使用与浏览器下载共用的 DOCX codec，组合官方 bash/present 工具，输出真实路径/revision/status。官方 ui-deliverables 拥有文件卡片及打开菜单。WorkDSH 不新增自绘成果卡，不将 documentId 伪装文件路径。导出为一次保存修订的新文件；后续实时编辑不静默覆盖文件。仅此有限路径已实现，U3 全量导出任务/幂等/中断恢复协议仍待验。
+content_export 已注册为受限 DOCX 交付工具：读取已授权保存修订、使用与浏览器下载共用的 DOCX codec，组合官方 bash/present 工具，输出真实路径/revision/status。官方 ui-deliverables 拥有文件卡片及打开菜单。开物Praxis 不新增自绘成果卡，不将 documentId 伪装文件路径。导出为一次保存修订的新文件；后续实时编辑不静默覆盖文件。仅此有限路径已实现，U3 全量导出任务/幂等/中断恢复协议仍待验。
 
 ### 已存图片的 AI 引用（alpha.2 开发）
 

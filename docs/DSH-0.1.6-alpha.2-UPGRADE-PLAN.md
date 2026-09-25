@@ -4,7 +4,7 @@
 
 ## 1. 目标与范围
 
-- 把 WorkDSH 运行基线与全局精确锁定从 `0.1.6-alpha.1` 升到 `0.1.6-alpha.2`：根 overrides/devDependencies、各插件 package.json、bundle、锁文件与脚本引用统一。
+- 把 开物Praxis 运行基线与全局精确锁定从 `0.1.6-alpha.1` 升到 `0.1.6-alpha.2`：根 overrides/devDependencies、各插件 package.json、bundle、锁文件与脚本引用统一。
 - 修复 alpha.2 破坏性变化（Client Session 多实例化）影响的 6 个插件 client 文件。
 - 不改变业务功能范围；不动 contracts 领域模型；不新增业务模块；不改动已发布的既有验收结论。
 - 官方文档镜像（`docs/dsh-v0.1.6-alpha.2/`）仍为 alpha.1 语料；本批以 alpha.2 发布包类型与运行实测为准，镜像刷新单独记账（§7）。（2026-09-18 补记：镜像已于同日整批刷新为 alpha.2 快照（543 文件/337 md/规范对象 171）并完成全仓引用同步；`audit:harness-docs` PASS 127/171，证据 `.artifacts/dsh-0.1.6-alpha.2-upgrade/p5-doc-mirror-audit.{mjs,json}`。）
@@ -21,7 +21,7 @@
 | B2 | `SessionListState.current` 移除；「当前会话」改为派生：`byId` 中 `retainedBy.mainView > 0` 的会话 | sessions `service.d.ts` `SessionSummary.retainedBy`；ui-session client.js `publishMain` 同款推导 |
 | B3 | `binding()/scope()` 收紧为「借已 retain 的世代」，未 retain 返回 `undefined`；新增 `retain()/using()/retainInfo()`。`SessionReferenceSourceMap` 可声明合并扩展；`reference.ready` 为初始 open 的结算 Promise（成功给 binding、失败/释放 reject）；release 后访问 `binding` 抛错 | sessions.d.ts `ISessions`/`SessionReference`；client.js `retain/attachOpening/release/get binding` |
 | B4 | 插件依赖改运行时解析、支持运行时卸载，要求插件检查加载/卸载逻辑 | release notes 原文；实际行为 P4 验证 |
-| B5 | 文档预览 `DocumentContent` 新增第三变体 `{ kind:'renderer', revision, loaded, reload }`（渲染器自行加载的请求）；旧代码「非 bytes 即 text」的二分假设失效 | sidebar-documentpreview `document/contract.d.ts`；官方 OfficeBody/CodeBody 按 kind 显式收窄（CodeBody 对非 text 返回 null）。WorkDSH 影响：`office/src/csv/CsvDocument.tsx` 一处（P2 修复） |
+| B5 | 文档预览 `DocumentContent` 新增第三变体 `{ kind:'renderer', revision, loaded, reload }`（渲染器自行加载的请求）；旧代码「非 bytes 即 text」的二分假设失效 | sidebar-documentpreview `document/contract.d.ts`；官方 OfficeBody/CodeBody 按 kind 显式收窄（CodeBody 对非 text 返回 null）。开物Praxis 影响：`office/src/csv/CsvDocument.tsx` 一处（P2 修复） |
 
 ### 2.2 兼容确认（无需改动）
 
@@ -76,7 +76,7 @@
 
 ## 6. 新能力与默认值（P4）
 
-- 官方新增页面（插件管理、文件改动卡片、Office/浏览器/Subagent 侧栏、计划预览）：确认 preview 可用、与 WorkDSH Slot/面板无冲突；冲突只记录，不改官方 owner。
+- 官方新增页面（插件管理、文件改动卡片、Office/浏览器/Subagent 侧栏、计划预览）：确认 preview 可用、与 开物Praxis Slot/面板无冲突；冲突只记录，不改官方 owner。
 - 专家团：核对 8 子代理/深度 1 默认与既有 16 配置的关系（设置入口），复跑团队探针。
 - 运行时卸载：用官方插件管理禁用/启用本仓库插件，验证 `ctx.effect/ctx.on` 可撤销、无重复监听。
 
@@ -100,7 +100,7 @@
 | `binding/scope` 收紧导致运行期 undefined | 逐处设计（§4.2）+ P3 探针验证；activity 显式 retain |
 | `startTask` 发送依赖 retain 语义 | retain→ready→send→release；P3 专项探针 |
 | 新增包遗漏 override | `check:versions` 对锁文件断言 + install 输出核对 |
-| 官方新能力与 WorkDSH 页面冲突 | P4 逐项核对；只记录不改官方 owner |
+| 官方新能力与 开物Praxis 页面冲突 | P4 逐项核对；只记录不改官方 owner |
 | alpha 期 API 再变 | 本批只做 alpha.2；后续单独升级，不混搭 |
 
 ## 10. 执行记录
@@ -122,14 +122,14 @@
 - [x] P4 新能力与默认值核对
   - [x] P4-3 运行时卸载（2026-09-18）：官方插件管理页的包级开关=修改 `dsh.profile.bundles`（写 package.json、保留 dependencies 安装；`cordis.patch.yml` 本场景未触发）。运行层变更**需要重启 server**：不重启时 bundle 清单 rev 不变、strip/style 仍在、UI 静默无提示（hmr 存在时官方 `change()` 返回 applied）。禁用+重启后完全卸载（strip=0、style=0、bundle 清单移除、零错误）；启用+重启后恰好一次恢复（strip=1/style=1），无重复监听。结论：ctx.effect/ctx.provide/slot 贡献可完整撤销。证据：`.artifacts/dsh-0.1.6-alpha.2-upgrade/p4/`（p4-runtime-unload-2、p4-toggle-isolate、p4-unload-mechanism、p4-disable-notice、p4-restart-check-disabled、p4-reenable-precheck、p4-restart-check-reenabled 日志与截图 10~40）。UI 静默记为官方行为/UX 缺口，不改官方代码。
   - [x] P4-1 新页面核对（2026-09-18）：
-    - 官方新增页面均实弹核对通过：右栏 Start 启动页官方卡片（Workspace files / New terminal / Browser）与 WorkDSH「文档」卡片共存；Browser 页签可用（发送真实回合不影响）；回合文件改动卡片实弹（写文件回合尾渲染 `Edited 1 files | +1 -0 | alpha2-card-check.txt`）→ 点击卡片右栏自动打开官方 `Review · turn 2` diff 页签（diff 正确、0 页面错误）；子代理 lineage 实弹（会话头「N subagents ⌄」下拉 + Agent Team chip + 切换后只读标记）；插件管理页由 P4-3 覆盖。主视图 [Chat, Trajectory] 与右栏 [Start→Browser→Review] 页签体系相互独立、无冲突；不改官方 owner。证据：p4/p4-right-sidebar.log、p4-changes-card.log、p4-changes-review.log、p4-subagent-sidebar.log 与截图 62/64/65/67/68/69。
+    - 官方新增页面均实弹核对通过：右栏 Start 启动页官方卡片（Workspace files / New terminal / Browser）与 开物Praxis「文档」卡片共存；Browser 页签可用（发送真实回合不影响）；回合文件改动卡片实弹（写文件回合尾渲染 `Edited 1 files | +1 -0 | alpha2-card-check.txt`）→ 点击卡片右栏自动打开官方 `Review · turn 2` diff 页签（diff 正确、0 页面错误）；子代理 lineage 实弹（会话头「N subagents ⌄」下拉 + Agent Team chip + 切换后只读标记）；插件管理页由 P4-3 覆盖。主视图 [Chat, Trajectory] 与右栏 [Start→Browser→Review] 页签体系相互独立、无冲突；不改官方 owner。证据：p4/p4-right-sidebar.log、p4-changes-card.log、p4-changes-review.log、p4-subagent-sidebar.log 与截图 62/64/65/67/68/69。
     - 未触发项记录：计划预览（dsh-client-ui-plan）注册面已核对（turnTail / plan-review.actions / sidebar.right.pane.tab / input.plan），preview 数据中无计划模式的会话，标记「未触发」；侧栏布局持久化属官方行为，未专项验证。
-    - preset 挂载失败定性（子代理会话调查带出）：`wd-exp-expert-5c50f4ecf5c3-f500ea190ee7` 等 9 个 preset 含 `workflow-worker-thread` 行（Sep 12-13 编译，0.1.5 时代产物），alpha.2 无法解析 `@deepseek-ai/dsh-workflow-worker-thread`（npm 最高 0.1.5-rc.2；alpha.1/alpha.2 官方 dsh 均只依赖 workflow-ptc；alpha.2 官方 standard 与全部 7 个新 preset 均为 ptc 行）→ 属 0.1.5→alpha.1 迁移遗留的过期 preset，**非 alpha.2 回归**。实弹对照：活跃专家会话（session-e1a751973，ptc preset 40bb2c686ee4）打开无横幅、4 subagents lineage 正常、0 页面错误；worker-thread 旧会话（session-38af3e）错误横幅精确复现（探针有效性对照），WorkDSH 侧优雅降级仅提示、历史内容可读，符合「旧数据保留只读」决策。证据：p4/p4-ptc-preset-verify.log、截图 71（正常）/72（对照）。
+    - preset 挂载失败定性（子代理会话调查带出）：`wd-exp-expert-5c50f4ecf5c3-f500ea190ee7` 等 9 个 preset 含 `workflow-worker-thread` 行（Sep 12-13 编译，0.1.5 时代产物），alpha.2 无法解析 `@deepseek-ai/dsh-workflow-worker-thread`（npm 最高 0.1.5-rc.2；alpha.1/alpha.2 官方 dsh 均只依赖 workflow-ptc；alpha.2 官方 standard 与全部 7 个新 preset 均为 ptc 行）→ 属 0.1.5→alpha.1 迁移遗留的过期 preset，**非 alpha.2 回归**。实弹对照：活跃专家会话（session-e1a751973，ptc preset 40bb2c686ee4）打开无横幅、4 subagents lineage 正常、0 页面错误；worker-thread 旧会话（session-38af3e）错误横幅精确复现（探针有效性对照），开物Praxis 侧优雅降级仅提示、历史内容可读，符合「旧数据保留只读」决策。证据：p4/p4-ptc-preset-verify.log、截图 71（正常）/72（对照）。
     - 观察项（不阻塞升级）：根 package.json overrides 中 `dsh-code-runtime-worker-thread`、`dsh-workflow-worker-thread` 两条为 0.1.5 时代陈留、alpha.1 起无引用者（lock 仅 overrides 段列出、无解析条目），无害保留；若清理需单独记录。
   - [x] P4-2 子代理默认值与团队探针（2026-09-18）：
     - 默认值实现定位：`dsh-subagent` 的 `SubagentRuntime.Config`（alpha.2）为 `maxDepth: default(1)`、`maxActiveSubagents: default(8)`，经官方 settings section `'subagent'` 安装（`settingsSource` 可用户调整）。`maxActiveSubagents` 语义＝同一 root 链路「同时活跃的可继续对话子代理」上限（per-root `ActivationPool.reserve`），超限 materialize 抛 `ACTIVATION_LIMIT_REACHED`（提示等待现有子代理结束或在当前代理完成工作）。
-    - WorkDSH 核对：全仓无引用/覆盖两项配置（`portability.ts` 的 MAX_DEPTH=8 为专家包 zip 目录层级、与本项无关；preset-compiler 只重写 persona/skill-filesystem 行，其余行随官方 standard 继承默认值）；preview `settings.yaml` 无 `subagent` 段 → 使用官方默认 8/1，非既有自定义被覆盖。
-    - 「16 配置」核对：WorkDSH 专家团 2-16 位成员（`definition.ts` team/members 校验）与官方 Team `DEFAULT_MAX_MEMBERS=16`（`dsh-experimental-agent-team` roster 容量）数值一致、不冲突；层次差异记录：16＝名册静态容量， 8＝同时活跃上限，9-16 成员若被要求同时活跃运行会触及官方默认 8（当前 preview 实战 2-4 subagents 未触及；如未来需要可在官方设置调大，不改官方代码）。深度 1 核对：成员（depth 1）不可再派生（maxDepth=1 拒绝），与「成员不做二级委派、Lead 协调」语义兼容。
+    - 开物Praxis 核对：全仓无引用/覆盖两项配置（`portability.ts` 的 MAX_DEPTH=8 为专家包 zip 目录层级、与本项无关；preset-compiler 只重写 persona/skill-filesystem 行，其余行随官方 standard 继承默认值）；preview `settings.yaml` 无 `subagent` 段 → 使用官方默认 8/1，非既有自定义被覆盖。
+    - 「16 配置」核对：开物Praxis 专家团 2-16 位成员（`definition.ts` team/members 校验）与官方 Team `DEFAULT_MAX_MEMBERS=16`（`dsh-experimental-agent-team` roster 容量）数值一致、不冲突；层次差异记录：16＝名册静态容量， 8＝同时活跃上限，9-16 成员若被要求同时活跃运行会触及官方默认 8（当前 preview 实战 2-4 subagents 未触及；如未来需要可在官方设置调大，不改官方代码）。深度 1 核对：成员（depth 1）不可再派生（maxDepth=1 拒绝），与「成员不做二级委派、Lead 协调」语义兼容。
     - 团队探针复跑全 PASS（15 项 checks、4 场景全 completed、0 browser errors）：p4/p4-probe-team-web.log、`.artifacts/dsh-0.1.6-upgrade/native-team-web/result.json`。未触发：`ACTIVATION_LIMIT_REACHED` 边界（探针/真实会话均 ≤8 同时活跃）。
 - [x] P4 完成（P4-1 / P4-2 / P4-3 全过，2026-09-18）
 - [x] P5 证据与文档收口（2026-09-18）：

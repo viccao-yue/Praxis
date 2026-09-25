@@ -390,7 +390,7 @@ export interface SessionAccessBridgeConfig {
   readonly isolation?: RuntimeBindingRequest['isolation'];
 }
 
-/** Trusted Host ingress for WorkDSH Session creation and resume. */
+/** Trusted Host ingress for Praxis Session creation and resume. */
 export class SessionAccessBridge extends Service {
   static inject = ['sessionController', 'workdshIdentity', 'workdshAccess', 'workdshAudit'];
   private readonly runtimeId: string;
@@ -546,7 +546,7 @@ export class ToolAccessBridge extends Service {
     } catch (error) {
       const code = error instanceof GovernanceContractError ? error.code : 'access/tool-policy-failed';
       if (actor) await this.auditTool(actor, exec, 'denied', code);
-      return { kind: 'deny', reason: `WorkDSH denied this tool call (${code}).` };
+      return { kind: 'deny', reason: `Praxis denied this tool call (${code}).` };
     }
     return next();
   }

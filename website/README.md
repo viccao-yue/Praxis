@@ -1,6 +1,6 @@
-# WorkDSH product website
+# Praxis product website
 
-Static, bilingual marketing site for WorkDSH: an independent open-source implementation of the WorkBuddy style of AI workspace, built on DeepSeek Harness.
+Static, bilingual marketing site for Praxis: an independent open-source implementation of the WorkBuddy style of AI workspace, built on DeepSeek Harness.
 
 - `zh-CN.html`: Chinese website.
 - `index.html`: English website and the existing GitHub Pages default entry.
@@ -18,7 +18,7 @@ No build, model credentials, API service or remote font is required. Open either
 - Chinese changelog: https://techflag.github.io/workdsh/changelog.zh-CN.html
 - English changelog: https://techflag.github.io/workdsh/changelog.html
 
-Push changes under `website/` to `main` to run `.github/workflows/pages.yml`. The workflow publishes this directory to GitHub Pages; it does not build or deploy the WorkDSH application. The folder is also self-contained for deployment to another static host.
+Push changes under `website/` to `main` to run `.github/workflows/pages.yml`. The workflow publishes this directory to GitHub Pages; it does not build or deploy the Praxis application. The folder is also self-contained for deployment to another static host.
 
 ## Content and visual direction
 

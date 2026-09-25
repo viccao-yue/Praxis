@@ -4,7 +4,7 @@
 
 ## 背景
 
-WorkDSH 当前 Skill 0.1 已覆盖默认/本地技能的发现、详情、编辑、资源、启停、导入、创建、依赖检查、批量管理和可恢复卸载。产品当前没有公共 Skill 市场，也不需要自建公共目录；用户继续使用 Harness 默认技能和本地安装技能。
+开物Praxis 当前 Skill 0.1 已覆盖默认/本地技能的发现、详情、编辑、资源、启停、导入、创建、依赖检查、批量管理和可恢复卸载。产品当前没有公共 Skill 市场，也不需要自建公共目录；用户继续使用 Harness 默认技能和本地安装技能。
 
 WorkBuddy 企业后台把组织 Skill 管理分为 Skill 列表、分类管理、下发策略和成员自定义 Skill 策略。该流程说明企业能力需要中心化管理、组织权限和多端下发，不能扩展为浏览器直接管理某一台执行机器的文件目录。WorkBuddy 只作为产品参考；DeepSeek Harness 的 `ctx.skills`、provider、scope、官方 Skill Tool 和 Session 运行记录仍是技术执行底座。
 
@@ -19,13 +19,13 @@ WorkBuddy 企业后台把组织 Skill 管理分为 Skill 列表、分类管理�
 
 ```mermaid
 flowchart LR
-  A[企业管理 Web] -->|HTTPS + 企业身份| B[WorkDSH 企业服务端]
+  A[企业管理 Web] -->|HTTPS + 企业身份| B[开物Praxis 企业服务端]
   B --> C[(组织/成员/策略数据库)]
   B --> D[(不可变 SkillRevision 制品库)]
-  E[WorkDSH 用户 Web] -->|目录与状态| B
+  E[开物Praxis 用户 Web] -->|目录与状态| B
   F[Harness 执行节点<br/>本机或隔离 Worker] -->|设备身份 + 增量同步| B
   F --> G[受管 Skill 投影]
-  H[WorkDSH Skill Provider] --> G
+  H[Praxis Skill Provider] --> G
   H --> I[Harness ctx.skills]
   I --> J[官方 Skill Tool / Session]
   K[默认/个人/Workspace 技能] --> I
@@ -45,7 +45,7 @@ flowchart LR
 
 执行节点可以是用户机器上的 Harness Host，也可以是企业服务端调度的隔离 Worker。它以设备身份和当前主体同步被授权的精确 SkillRevision，验证路径、大小、摘要/签名和兼容性后原子物化，再通过公开 Skill provider 贡献给 `ctx.skills`。
 
-`/name`、模型自动选择、正文加载和执行仍由 Harness 官方 Skill Tool 与 Session 拥有。上传、同步和发布阶段不执行脚本；实际调用时同时经过 WorkDSH access、Harness approval 和 sandbox/runtime。历史 Session 保存精确 revision/provider/locator，不因同名更新改变正文。
+`/name`、模型自动选择、正文加载和执行仍由 Harness 官方 Skill Tool 与 Session 拥有。上传、同步和发布阶段不执行脚本；实际调用时同时经过 开物Praxis access、Harness approval 和 sandbox/runtime。历史 Session 保存精确 revision/provider/locator，不因同名更新改变正文。
 
 ## 企业领域边界
 

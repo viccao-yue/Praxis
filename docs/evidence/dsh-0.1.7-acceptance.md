@@ -70,7 +70,7 @@ node scripts/probe-library-release.mjs
 
 ## UI-017-03：能力中心与弹窗跟随主题（已修复）
 
-官方复用记录：P0-02；依据锁定 0.1.7 的 `docs/web-styling.zh.md` 与发布包 ui-theme 的公开 `--dsw-alias-*` CSS 变量。主题偏好与系统监听继续由官方 ui-theme/ui-layout 拥有；WorkDSH 仅将技能、专家和共享 Modal 的硬编码色替换为语义变量，不添加主题监听器或覆盖系统设置。验收：系统浅色→深色→浅色无需刷新，页面、卡片、按钮及专家弹窗同步变化。
+官方复用记录：P0-02；依据锁定 0.1.7 的 `docs/web-styling.zh.md` 与发布包 ui-theme 的公开 `--dsw-alias-*` CSS 变量。主题偏好与系统监听继续由官方 ui-theme/ui-layout 拥有；开物Praxis 仅将技能、专家和共享 Modal 的硬编码色替换为语义变量，不添加主题监听器或覆盖系统设置。验收：系统浅色→深色→浅色无需刷新，页面、卡片、按钮及专家弹窗同步变化。
 
 UI-017-03 实现：技能/专家样式的页面、卡片、输入、按钮、状态与详情颜色改用原生变量；共享 Modal 使用原生遮罩、表面和 elevation；保留 logo/内容图片原色。新增 `scripts/probe-preview-theme.mjs`，在运行中的开发预览逐页验证浅色→深色→浅色（含卡片/按钮/弹窗），无需模型调用。截图里的旧专家 preset 异常是独立的旧修订兼容提示，此次不重新发布或改写历史专家。
 

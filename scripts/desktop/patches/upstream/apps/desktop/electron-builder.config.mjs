@@ -50,8 +50,8 @@ export function createElectronBuilderConfig(
   const buildPaths = desktopTargetBuildPaths(update.target)
   return {
     appId,
-    // WORKDSH TEST PATCH: WorkDSH product branding.
-    productName: 'WorkDSH',
+    // WORKDSH TEST PATCH: Praxis product branding.
+    productName: 'Praxis',
     artifactName: 'workdsh-${version}-${os}-${arch}.${ext}',
     directories: { output: buildPaths.artifacts },
     asar: true,
@@ -67,7 +67,7 @@ export function createElectronBuilderConfig(
     ],
     mac: {
       category: 'public.app-category.developer-tools',
-      // WORKDSH TEST PATCH: WorkDSH branded application icon.
+      // WORKDSH TEST PATCH: Praxis branded application icon.
       icon: fileURLToPath(new URL('./workdsh-icon.icns', import.meta.url)),
       identity: workdshUnsigned ? null : macOSSigning?.signingIdentity,
       forceCodeSigning: !workdshUnsigned,

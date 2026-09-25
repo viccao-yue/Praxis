@@ -8,7 +8,7 @@
 
 企业管理后台负责组织治理、成员、共享能力、连接授权、模型策略、审计与用量。由 plugin-admin 提供独立管理布局和导航，通过领域服务操作，不另建一套专家、技能或连接器数据库。
 
-企业版采用独立 WorkDSH 服务端和独立管理 Web。用户 Web 与管理 Web 调用同一组服务端领域 API；Harness Host 或隔离 Worker 是执行节点，不承载企业数据真源。当前阶段只保留设计与模块 ToDo，不创建服务端、管理页面或伪造企业数据。
+企业版采用独立 开物Praxis 服务端和独立管理 Web。用户 Web 与管理 Web 调用同一组服务端领域 API；Harness Host 或隔离 Worker 是执行节点，不承载企业数据真源。当前阶段只保留设计与模块 ToDo，不创建服务端、管理页面或伪造企业数据。
 
 ## 2. 管理模块与阶段
 
@@ -51,13 +51,13 @@ Skill 管理遵循 [ADR 0015](adr/0015-skill-control-plane-and-runtime-projectio
 
 ## 5. 参考
 
-[企业版概述](https://www.workbuddy.cn/docs/enterprise/Overview)、[企业 Skill 管理](https://www.workbuddy.cn/docs/enterprise/adminguide/Skill%E7%AE%A1%E7%90%86)、[企业连接器管理](https://www.workbuddy.cn/docs/enterprise/adminguide/Connector%E7%AE%A1%E7%90%86)、[企业智能体](https://www.workbuddy.cn/docs/enterprise/adminguide/CloudAgent)。这类产品能力作为需求参考；内部实现为 WorkDSH 自有设计，不声称复用腾讯后台。
+[企业版概述](https://www.workbuddy.cn/docs/enterprise/Overview)、[企业 Skill 管理](https://www.workbuddy.cn/docs/enterprise/adminguide/Skill%E7%AE%A1%E7%90%86)、[企业连接器管理](https://www.workbuddy.cn/docs/enterprise/adminguide/Connector%E7%AE%A1%E7%90%86)、[企业智能体](https://www.workbuddy.cn/docs/enterprise/adminguide/CloudAgent)。这类产品能力作为需求参考；内部实现为 开物Praxis 自有设计，不声称复用腾讯后台。
 
 用户端与管理端的首期拓扑、数据所有权及数据库实施顺序见 [部署与存储](DEPLOYMENT-AND-STORAGE.md)。首期同 Host、独立界面与服务端权限；各领域 SQLite 和资产文件存储，不为两个前端复制业务数据库。
 
 ## 6. 设置与秘密的管理边界
 
-管理端同时展示三类状态，但数据来源不同：插件运行设置来自官方 Settings descriptor，组织策略和对象治理来自 WorkDSH Domain，连接秘密来自 Credentials 的只写/状态接口。界面可以统一视觉组件，不能用同一份通用配置 JSON 保存三类数据。
+管理端同时展示三类状态，但数据来源不同：插件运行设置来自官方 Settings descriptor，组织策略和对象治理来自 开物Praxis Domain，连接秘密来自 Credentials 的只写/状态接口。界面可以统一视觉组件，不能用同一份通用配置 JSON 保存三类数据。
 
 - Settings 页面仅加载脱敏 descriptor，编辑携带 expected revision；冲突提示重新载入，`applies` 只展示生效方式。
 - 凭据页面只显示引用路径、来源、是否配置、是否可写和授权状态；不提供读取明文、复制令牌或把 secret 放进浏览器状态的接口。

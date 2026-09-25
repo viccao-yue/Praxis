@@ -9,9 +9,9 @@
 
 - 官方 CLI 安装 tarball，Host 载入包根入口。
 - 官方 Client Modules 启动图包含且仅包含一个 workdsh-bundle 行；浏览器执行 ./client 构建产物。
-- Harness 官方 Sidebar 保持唯一 owner；WorkDSH 只注册品牌 Slot，诊断参数启用时再通过 sidebar.panellist 增加独立验证入口。未替换 root、未创建第二套 React 根。
-- 实际浏览器确认官方新建会话、添加工作区、搜索、视图选项、工作区/会话树和设置均存在；官方 DOM 同时提供工作区与会话操作按钮。旧 WorkDSH 聚合入口和双侧栏往返入口均不存在。
-- 用户点击读取按钮，通过 ctx.remote.pluginInventory.list() 返回真实 Host 条目，断言 WorkDSH 条目 active。
+- Harness 官方 Sidebar 保持唯一 owner；开物Praxis 只注册品牌 Slot，诊断参数启用时再通过 sidebar.panellist 增加独立验证入口。未替换 root、未创建第二套 React 根。
+- 实际浏览器确认官方新建会话、添加工作区、搜索、视图选项、工作区/会话树和设置均存在；官方 DOM 同时提供工作区与会话操作按钮。旧 开物Praxis 聚合入口和双侧栏往返入口均不存在。
+- 用户点击读取按钮，通过 ctx.remote.pluginInventory.list() 返回真实 Host 条目，断言 开物Praxis 条目 active。
 - 浏览器刷新后，再次选择页面与查询通过。此项验证页面重建，不代表 WebSocket 中断重连或运行恢复已验证。
 - 测试不填写 API Key；通过官方 Continue / Configure later 按钮完成初始化提示。
 - Chromium 无未捕获 pageerror；截图人工检查并修复浅色主题对比度。
@@ -44,7 +44,7 @@ probe:browser 创建隔离 DSH_HOME/Profile，保留测试产物，结束时关�
 - Playwright WebSocket 路由连接真实 Host，双向转发原始帧，不伪造响应。主动关闭浏览器与 Host 两端连接（1012），不刷新页面，断言官方客户端建立新连接并收到新帧。
 - 切到 New Session 再返回探针，先断言“尚未发起查询”，消除旧结果干扰；重新点击查询，捕获 pluginInventory 的实际 HTTP POST 成功响应，再断言 active。
 - 普通 Remote unary 使用 HTTP POST；WebSocket 用于逻辑流。连接恢复不等同于长任务或订阅精确续传。依据为 rc.1 发布包 dsh-client-connection README 的传输说明。
-- CLI 停服移除 bundle 后，重启 Host 并重新认证，在新的 Chromium 中确认 Client 启动图、导航、页面都不含 WorkDSH。此项不证明运行中热卸载清理。
+- CLI 停服移除 bundle 后，重启 Host 并重新认证，在新的 Chromium 中确认 Client 启动图、导航、页面都不含 开物Praxis。此项不证明运行中热卸载清理。
 - 同一命令继续验证重装激活；finally 关闭 Host 和浏览器。测试不需要模型或外部业务账号。
 
 执行命令：`corepack pnpm probe:browser`。早期断言曾错误地把 New Session 当 button、把 unary 查询当 WebSocket 消息；已按实际 UI 与公开传输契约修正，最终结果以完整重跑为准。
@@ -57,13 +57,13 @@ probe:browser 创建隔离 DSH_HOME/Profile，保留测试产物，结束时关�
 
 ## 品牌与默认面板探针
 
-通过公开 Slots priority=-10 注册 sidebar.brand.name/mark；通过 main 声明感知回调注册后调用 layout.selectPanel 选择探针首页。真实 Chromium 验证启动无需点击即看到探针、WorkDSH 品牌可见、刷新后仍默认进入探针；返回会话与再次进入可用，卸载并重启后 WorkDSH 品牌和页面均消失。build/typecheck/probe:browser 通过。
+通过公开 Slots priority=-10 注册 sidebar.brand.name/mark；通过 main 声明感知回调注册后调用 layout.selectPanel 选择探针首页。真实 Chromium 验证启动无需点击即看到探针、开物Praxis 品牌可见、刷新后仍默认进入探针；返回会话与再次进入可用，卸载并重启后 开物Praxis 品牌和页面均消失。build/typecheck/probe:browser 通过。
 
 这是隔离 Profile 内的覆盖机制验证，未修改上游。正式产品组合仍应按官方品牌包说明选择品牌提供者，而非无限叠加优先级；优先级 -10 是本探针的局部约定。当前首页仍为诊断页面，不是原型迁移完成；刷新会重新选择首页，尚未实现恢复最后页面或深链接优先级。
 
 ## 页面 URL 与刷新恢复
 
-通过公开 usePanelInfo hook 读取布局选择，shell.overlay 注册无视觉内容的观察组件；URL 只同步展示位置，不持久化 Session 或权限。`conversation`、无参数、旧 `home` 和无效值都返回原生 `main.conversation`；skills 与 diagnostics 仍进入对应 WorkDSH 面板。workbench alpha.5 删除自建首页输入器，“新建任务”调用官方 Session clear 后显示原生空会话，因此 `/`、`@`、附件、权限、模型及 preset 沿用官方 Conversation 提交链。
+通过公开 usePanelInfo hook 读取布局选择，shell.overlay 注册无视觉内容的观察组件；URL 只同步展示位置，不持久化 Session 或权限。`conversation`、无参数、旧 `home` 和无效值都返回原生 `main.conversation`；skills 与 diagnostics 仍进入对应 开物Praxis 面板。workbench alpha.5 删除自建首页输入器，“新建任务”调用官方 Session clear 后显示原生空会话，因此 `/`、`@`、附件、权限、模型及 preset 沿用官方 Conversation 提交链。
 
 alpha.13 本地预览实测：旧 `workdsh-view=home` 自动归一化为 `conversation`；输入 `/` 出现 compact/export/feedback/goal/permission/plan/model 及真实技能候选，输入 `@` 出现工作区目录、文件和会话候选。草稿随后清空，没有提交模型请求。
 
@@ -75,6 +75,6 @@ alpha.13 本地预览实测：旧 `workdsh-view=home` 自动归一化为 `conver
 
 ## 原生 Sidebar 所有权恢复
 
-workbench alpha.6 删除自有 Sidebar occupant，skills alpha.4 删除旧“专家 · 技能 · 连接器”panellist，bundle alpha.14 只组合官方 Sidebar、WorkDSH 品牌和独立业务页面。这样工作区创建、折叠、重命名、删除，以及会话选择、时间、重命名、分叉、归档全部继续由 `@deepseek-ai/dsh-client-ui-workspace` 实现。
+workbench alpha.6 删除自有 Sidebar occupant，skills alpha.4 删除旧“专家 · 技能 · 连接器”panellist，bundle alpha.14 只组合官方 Sidebar、开物Praxis 品牌和独立业务页面。这样工作区创建、折叠、重命名、删除，以及会话选择、时间、重命名、分叉、归档全部继续由 `@deepseek-ai/dsh-client-ui-workspace` 实现。
 
 本地 18989 预览刷新后确认旧入口为 0，原生侧栏控件和操作按钮均存在。只查看了控件结构，没有执行删除、分叉、归档或模型请求。Node 22.23.2 下 typecheck、build 与 tarball 生成通过；浏览器探针断言已同步为官方侧栏模型。

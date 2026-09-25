@@ -3,13 +3,13 @@ import readline from 'node:readline';
 const resources = [
   {
     uri: 'workdsh://guide/start',
-    name: 'WorkDSH resource probe',
+    name: 'Praxis resource probe',
     description: 'A deterministic text resource used to verify the official DSH MCP resource bridge.',
     mimeType: 'text/plain',
   },
   {
     uri: 'workdsh://guide/second-page',
-    name: 'WorkDSH paginated resource',
+    name: 'Praxis paginated resource',
     description: 'The second page used to verify MCP resource cursors.',
     mimeType: 'text/plain',
   },
@@ -44,7 +44,7 @@ input.on('line', (line) => {
         protocolVersion: request.params?.protocolVersion ?? '2025-06-18',
         capabilities: { resources: {} },
         serverInfo: { name: 'workdsh-resource-probe', version: '1.0.0' },
-        instructions: 'This local server exists only for WorkDSH integration verification.',
+        instructions: 'This local server exists only for Praxis integration verification.',
       });
       break;
     case 'ping':
@@ -59,7 +59,7 @@ input.on('line', (line) => {
       result(request.id, {
         resourceTemplates: [{
           uriTemplate: 'workdsh://guide/{topic}',
-          name: 'WorkDSH topic guide',
+          name: 'Praxis topic guide',
           description: 'Reads a deterministic guide for the selected topic.',
           mimeType: 'text/plain',
         }],
@@ -68,10 +68,10 @@ input.on('line', (line) => {
     case 'resources/read': {
       const uri = request.params?.uri;
       if (uri === 'workdsh://guide/start') {
-        result(request.id, { contents: [{ uri, mimeType: 'text/plain', text: 'WorkDSH MCP resources are ready.' }] });
+        result(request.id, { contents: [{ uri, mimeType: 'text/plain', text: 'Praxis MCP resources are ready.' }] });
       } else if (typeof uri === 'string' && uri.startsWith('workdsh://guide/')) {
         const topic = decodeURIComponent(uri.slice('workdsh://guide/'.length));
-        result(request.id, { contents: [{ uri, mimeType: 'text/plain', text: `WorkDSH guide topic: ${topic}` }] });
+        result(request.id, { contents: [{ uri, mimeType: 'text/plain', text: `Praxis guide topic: ${topic}` }] });
       } else {
         failure(request.id, -32002, `Resource not found: ${String(uri)}`);
       }

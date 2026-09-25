@@ -4,7 +4,7 @@ import { ExpertsError } from '../domain/values.js';
 export type PackageAssets = NonNullable<ExpertDefinition['packageAssets']>;
 export function packagePath(path: string): void {
   if (!path || path.length > 512 || path.startsWith('/') || /[\\\0]/.test(path) || /^[a-z]:/i.test(path) || path.split('/').some(p => !p || p === '.' || p === '..') || path.split('/').length > 8
-    || !/^(README\.md|team\.md|settings\.json|LICENSE(?:\.[^/]+)?|NOTICE(?:\.[^/]+)?|\.(?:workdsh-expert|codebuddy-plugin)\/plugin\.json|agents\/[a-z][a-z0-9-]{1,63}\.md|(?:avatars|assets|bin)\/.+|skills\/[a-z][a-z0-9-]+\/.+)$/.test(path)) throw new ExpertsError('experts/invalid-definition', `非法专家资源路径：${path}`);
+    || !/^(README\.md|team\.md|settings\.json|LICENSE(?:\.[^/]+)?|NOTICE(?:\.[^/]+)?|\.(?:workdsh-expert|codebuddy-plugin)\/plugin\.json|agents\/[a-z][a-z0-9-]{1,63}\.md|(?:avatars|assets|bin)\/.+|skills\/[a-z][a-z0-9-]+\/.+)$/.test(path)) throw new ExpertsError('experts/invalid-definition', `非法数字员工资源路径：${path}`);
 }
 export function assetBytes(path: string, asset: PackageAssets[string]): Buffer {
   packagePath(path);
@@ -29,7 +29,7 @@ export function validateResources(files: Readonly<Record<string, string>>, asset
   let total = 0;
   for (const [path, text] of Object.entries(files)) { packagePath(path); if (typeof text !== 'string') throw new ExpertsError('experts/invalid-definition', '文档必须为文本。'); total += Buffer.byteLength(text); }
   for (const [path, asset] of Object.entries(assets)) total += assetBytes(path, asset).length;
-  if (total > 20 * 1024 * 1024) throw new ExpertsError('experts/invalid-definition', '专家资源总大小超过20MiB。');
+  if (total > 20 * 1024 * 1024) throw new ExpertsError('experts/invalid-definition', '数字员工资源总大小超过20MiB。');
 }
 export function packageAvatar(files: Readonly<Record<string, string>>, assets: PackageAssets = {}): string | undefined {
   const path = files['.workdsh-expert/plugin.json'] ?? files['.codebuddy-plugin/plugin.json'];

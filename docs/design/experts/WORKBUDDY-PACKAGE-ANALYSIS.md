@@ -40,7 +40,7 @@ my-expert/
 - 修改保留未要求变动的内容与稳定身份；校验后重新注册，使展示与运行入口更新。
 - 头像由真实角色内容推导，统一团队画风；失败明确记录，不能声称已有头像。
 
-## 当前 WorkDSH 实施的偏差
+## 当前 开物Praxis 实施的偏差
 
 本轮未收口的代码仍以 ExpertDefinition 四段 prose 加 team 嵌套对象为制作主体，Markdown 是序列化投影，不能称为原版体系已经接入。
 
@@ -54,9 +54,9 @@ my-expert/
 | 没有单成员直调 | 接入真实指定成员任务，同样保留固定修订和回传 |
 | 一次确认被当成整套交付 | 文件包、注册、内容预览、版本发布与文件输出分别具有真实回执 |
 
-## WorkDSH 技术落点
+## 开物Praxis 技术落点
 
-学习的是文件包和生命周期，不机械复制 WorkBuddy 插件加载机制。一个 WorkDSH experts 功能插件管理多份专家包；每份包不是 npm/Cordis 插件。官方 Storage Domain 保存归属、索引、修订、操作与审计；官方 Agent Presets 从已验收包编译不可变执行快照；官方 Skill 服务管理附带能力和资源；已有 Session/受控委派承接成员执行。UI 与 AI 工具通过同一 Host 服务。
+学习的是文件包和生命周期，不机械复制 WorkBuddy 插件加载机制。一个 开物Praxis experts 功能插件管理多份专家包；每份包不是 npm/Cordis 插件。官方 Storage Domain 保存归属、索引、修订、操作与审计；官方 Agent Presets 从已验收包编译不可变执行快照；官方 Skill 服务管理附带能力和资源；已有 Session/受控委派承接成员执行。UI 与 AI 工具通过同一 Host 服务。
 
 文件内容是创作源，已发布修订是任务运行源。编辑文件产生新草稿，不能静默更改已绑定任务。注册是可发现的产品对象，并不表示公开上架或自动授予权限。文件目录必须位于应用管理的数据根，不固化到 preview/test-runtime。
 
@@ -64,4 +64,4 @@ my-expert/
 
 ## 静态核对的边界
 
-规范强于这份脚本实现：register CLI 的完整性检查较浅，不等同全量 validate；package_expert.py 未实现测试所期待的 MAX_PACKAGE_BYTES；batch_create.py 明确只有流程示例，没有 AI 内容生成逻辑。因此复用内容和架构时，仍需 WorkDSH 自己验证资源路径、安装一致性与真实运行，不能照抄脚本后就宣称可靠。
+规范强于这份脚本实现：register CLI 的完整性检查较浅，不等同全量 validate；package_expert.py 未实现测试所期待的 MAX_PACKAGE_BYTES；batch_create.py 明确只有流程示例，没有 AI 内容生成逻辑。因此复用内容和架构时，仍需 开物Praxis 自己验证资源路径、安装一致性与真实运行，不能照抄脚本后就宣称可靠。

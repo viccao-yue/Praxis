@@ -146,13 +146,13 @@ flowchart TD
 |---|---|---|
 | 专家成员 | 领域经验、分析方法、技能、具体成果；发布修订固定 | 成员不是一段临时角色名字；必须确认真实子 Agent 使用该专家完整组合 |
 | SOP领域契约 | 哪位成员做哪一步、接受哪些输入、前置验收、并行条件、成果标准、评审与有界返工 | 业务验收不是 Agent loop 的停止原因；不能由主持人一句“已完成”跳过 |
-| 原生运行底座 | Workflow执行脚本、子Agent生命周期、模型/工具执行、审批、取消与资源清理 | WorkDSH不复制loop、不自己new Worker、不将UI日志当控制句柄 |
+| 原生运行底座 | Workflow执行脚本、子Agent生命周期、模型/工具执行、审批、取消与资源清理 | 开物Praxis不复制loop、不自己new Worker、不将UI日志当控制句柄 |
 
 主持人可在 workflow 段返回后的原生步骤补充问题、判断质量、提出返工，在声明范围内选择下一分支；段内判断由受信规则或指定的独立评审成员完成。改变必需阶段、成员修订、权限或返工上限属于计划变更，须形成可审阅变更并由受信入口确认；不能模型自行改写发布SOP。审批等待应复用已验证的原生机制；跨用户输入的暂停/恢复衔接未验证前，不宣称workflow worker可无期限持久挂起。
 
 ### 8.2 SOP首先是业务数据
 
-建议阶段字段：`stageId / memberId / dependsOn / inputRefs / outputContract / acceptance / reviewer / onReject / maxAttempts`。这些是拟议WorkDSH契约，不是Harness原生参数。前向阶段图无环；返工以有界新attempt记录，不能通过删改原结果让失败消失。一个成员可承担多个阶段，每个阶段/attempt有独立原生任务关联，首版不要求常驻群聊或成员互发邮箱。
+建议阶段字段：`stageId / memberId / dependsOn / inputRefs / outputContract / acceptance / reviewer / onReject / maxAttempts`。这些是拟议开物Praxis契约，不是Harness原生参数。前向阶段图无环；返工以有界新attempt记录，不能通过删改原结果让失败消失。一个成员可承担多个阶段，每个阶段/attempt有独立原生任务关联，首版不要求常驻群聊或成员互发邮箱。
 
 发布校验覆盖：成员与主持人存在且可用、修订可解析、输入引用来源、无环、必需交付可达、评审角色、有限返工/总调用预算、并行写冲突。不能只校验JSON形状。自然语言制作可以生成该业务草稿；用户预览的是“谁先做、交接什么、如何验收”，任意脚本不成为导入格式。
 
@@ -250,7 +250,7 @@ Host只把已校验的TeamRevision编译为受信脚本，使用顺序等待、�
 
 已读本机 expert-manager/SKILL.md 与 references/team-spec.md。参考的是创建和协作体验，未执行其脚本，也未复制第三方角色、提示词全文或注册机制。
 
-| 参考做法 | WorkDSH 采用方式 |
+| 参考做法 | 开物Praxis 采用方式 |
 |---|---|
 | 先明确目标、成员职责、主理人和 SOP | 支持自然语言创建及资料转化，先生成可审阅草稿；可复用已有专家，也可按用户“创建整团”的请求同时生成成员草稿，不要求预先手工建好所有成员；不自动执行业务任务 |
 | 成员独立产出，不能主持人代写 | 各阶段绑定真实专家修订和原生子任务；主持人汇编必须引用这些产物，缺产物不能生成假成员结论 |
@@ -317,7 +317,7 @@ TM-01 输出能力矩阵、有限探针与推荐路径。有公开能力缺口�
 
 | 优先级 | 原方案接点及影响 | 本轮设计处置 / 仍需证据 |
 |---|---|---|
-| P1 | 完整专家 preset 不等于子代理 persona。当前普通 in-process 路径 composeFrom 继承父组合；WorkDSH 的 expert pre-step 守卫还会拒绝没有自己 ExecutionBinding 的 wd-exp 子 Session | TM-01 必须证明：精确子组合、子 Session 自身专家与主体绑定在首步前就绪；绑定缺失/版本错误仍拒绝。不能关闭守卫、复用父绑定、只替换名字，或用 createExecution 新开普通会话冒充子代理。公开 provider/Agent setup 是候选，尚未运行验证 |
+| P1 | 完整专家 preset 不等于子代理 persona。当前普通 in-process 路径 composeFrom 继承父组合；开物Praxis 的 expert pre-step 守卫还会拒绝没有自己 ExecutionBinding 的 wd-exp 子 Session | TM-01 必须证明：精确子组合、子 Session 自身专家与主体绑定在首步前就绪；绑定缺失/版本错误仍拒绝。不能关闭守卫、复用父绑定、只替换名字，或用 createExecution 新开普通会话冒充子代理。公开 provider/Agent setup 是候选，尚未运行验证 |
 | P1 | 主持人等待整个 workflow 工具返回时，流程又需要同一主持人作中间判断，存在循环等待风险；官方 engine 的中间子结果也不会自动交给父模型 | 固定 SOP 可分成多段原生 workflow。遇到主持人/用户决策先完成并释放当前段，返回实际成果和待处理理由，再执行下一段；不得等待父 Agent 在未返回的工具内部发起新模型步骤。段内可用独立评审成员。段完成不等于团队业务完成 |
 | P2 | memberId、业务子任务、原生 childId 和 runId 未明确区分，重复阶段与返工可能覆盖映射或丢上下文 | 使用 teamExecutionId → stageId/attempt → delegationId → nativeChildRef；另关联每段 nativeWorkflowRunId。固定成员修订，保存每次输入/输出版本。continuable 另记录消息和结果对应证据，不从一次 idle 判定所有任务完成 |
 | P2 | 泛称 child cancel/stop 容易把 interrupt 当全部停止，或取消整个父树误伤无关工作 | workflow 按本次真实句柄清理；continuable 优先按记录成员调用公开 drainContinuableChildren。仅在父 Agent 整体拆卸时使用后代 drain。加入同父无关子任务不被取消的验收 |
@@ -328,7 +328,7 @@ TM-01 输出能力矩阵、有限探针与推荐路径。有公开能力缺口�
 
 当前单专家编译器挂载冻结 Skill 目录时同时保留 includeDefaultRoots。因此“配备技能固定”表示指定依赖版本固定，不表示这些是成员唯一可见或唯一允许使用的技能。团队应按实际可用目录说明能力；如将来需要成员技能白名单，应另行验证原生可见性和 Host 授权，不能在本次设计中虚称已有强隔离。
 
-首版业务层仅保存团队定义、版本、阶段验收与原生执行引用。运行进度由原生事件/投影呈现，消息与激活复用原生能力。若未来接入官方 Agent Teams，则其名册、消息与 task blockers 直接复用，不再维护一份同职责运行任务板；WorkDSH 继续拥有发布定义与专业成果验收。
+首版业务层仅保存团队定义、版本、阶段验收与原生执行引用。运行进度由原生事件/投影呈现，消息与激活复用原生能力。若未来接入官方 Agent Teams，则其名册、消息与 task blockers 直接复用，不再维护一份同职责运行任务板；开物Praxis 继续拥有发布定义与专业成果验收。
 
 验收与权限确认分开：输出形状、文件可读和实际测试回执等自动核验，专业评审由指定成员或主持人执行；无需每阶段都要求用户点击批准。只有缺少必须业务信息、原生权限审批或超出已批准计划才请求用户介入。首个有限测试证明真实协作和正确交付关联，不扩展为所有专业领域的模型效果保证。
 
@@ -336,7 +336,7 @@ TM-01 输出能力矩阵、有限探针与推荐路径。有公开能力缺口�
 
 - 本地官方镜像：docs/dsh-v0.1.6-alpha.2/subsystems/subagent.md、workflow.md、agent-team.md、core.md；在线交叉核对 [Subagent](https://deepseek-harness.github.io/deepseek-harness/reference/subsystems/subagent) 与 [Workflow](https://deepseek-harness.github.io/deepseek-harness/reference/subsystems/workflow)。Agent Teams 在线页本次读取失败，其描述仅按本地官方镜像记录。
 - 锁定 0.1.5-rc.1 发布声明：dsh-subagent 根公开 SubagentRuntime/StartRequest/ContinuableStartSpec/Provider；dsh-agent 的 CreateAgentOptions.setup；dsh-agent-presets 的 mount/composeFrom；dsh-workflow 的 WorkflowStartRequest/WorkflowRun；dsh-workflow-worker-thread README。continuable provider 的 CreateSpec 仅提供 seed，没有 preset/setup 钩子，不能从 one-shot 适配推导其可行性。
-- 实际 WorkDSH 源码：[专家执行守卫](../../../packages/plugins/experts/src/runtime/execution-guard.ts)、[专家服务](../../../packages/plugins/experts/src/services/experts-manager.ts)、[预设编译](../../../packages/plugins/experts/src/runtime/preset-compiler.ts)。普通专家创建与子代理绑定的生命周期不同，复用业务校验需经过领域公开服务，不能从适配器直接写内部绑定表。
+- 实际 开物Praxis 源码：[专家执行守卫](../../../packages/plugins/experts/src/runtime/execution-guard.ts)、[专家服务](../../../packages/plugins/experts/src/services/experts-manager.ts)、[预设编译](../../../packages/plugins/experts/src/runtime/preset-compiler.ts)。普通专家创建与子代理绑定的生命周期不同，复用业务校验需经过领域公开服务，不能从适配器直接写内部绑定表。
 - 本轮未变更运行代码、依赖或 Preview，未运行真实模型或团队探针。设计与公开契约复核完成，团队运行仍待 TM-01。
 
 ## 12. WorkBuddy 整团创建与官方 Agent Teams 再核对（2026-09-13）
@@ -352,11 +352,11 @@ TM-01 输出能力矩阵、有限探针与推荐路径。有公开能力缺口�
 
 用户不应先手工创建所有成员才能开始。真实发布成员是使用前约束，不是自然语言制作的门槛。缺Skill明确指出可复用/待配置/需另建，不把生成一个技能名称当已经拥有能力。
 
-agent-md-spec另有重要规则：成员覆盖能独立回答问题的专业域；单一维度问题直接调对应成员，综合性问题才走多人流程。WorkDSH应保留这类触发规则，避免每次简单提问都运行全团。这里的单成员路由与综合SOP要显式定义，不能以“动态路由”跳过该场景的必需阶段。
+agent-md-spec另有重要规则：成员覆盖能独立回答问题的专业域；单一维度问题直接调对应成员，综合性问题才走多人流程。开物Praxis应保留这类触发规则，避免每次简单提问都运行全团。这里的单成员路由与综合SOP要显式定义，不能以“动态路由”跳过该场景的必需阶段。
 
 ### Agent Teams 是原生团队协作能力
 
-官方Agent Teams由Lead与可继续子Agent组成，增加名册、持久消息和共享任务依赖；它与subagent是组合关系，而非完全不同的执行引擎。WorkDSH专家团是在此类运行能力上增加可创建/发布的专业成员配置、经验、Skill引用、SOP与成果呈现。官方成员有名字不等于已经绑定WorkDSH专家修订。
+官方Agent Teams由Lead与可继续子Agent组成，增加名册、持久消息和共享任务依赖；它与subagent是组合关系，而非完全不同的执行引擎。开物Praxis专家团是在此类运行能力上增加可创建/发布的专业成员配置、经验、Skill引用、SOP与成果呈现。官方成员有名字不等于已经绑定开物Praxis专家修订。
 
 本轮纠正“未安装所以后置”的选型依据：正确官方包名是 `@deepseek-ai/dsh-experimental-agent-team` 和 `@deepseek-ai/dsh-experimental-tool-agent-team`；两者的 **0.1.5-rc.1 均可从 npm 查询**，peer范围声明覆盖当前同版本族与Cordis4.0.2。当前lock/bundle/node_modules确实未包含，但同版本评估不要求先升级Harness。按不带experimental的短名查询所得404是包名查询错误，不能当不可发布证据。
 
@@ -364,7 +364,7 @@ agent-md-spec另有重要规则：成员覆盖能独立回答问题的专业域�
 
 ### 路线决定的修订
 
-TM-01优先评估同版本Agent Teams的公开装配与业务适配，重点是成员修订、原生任务与SOP阶段对应、成果验收、消息/取消恢复。如果可用，直接复用其名册/消息/任务板，不再新建同职责实现。SOP不等于WorkflowEngine；采用Agent Teams时，先核对其原生task blockers是否足够表达阶段依赖，额外的专业验收由WorkDSH管理。
+TM-01优先评估同版本Agent Teams的公开装配与业务适配，重点是成员修订、原生任务与SOP阶段对应、成果验收、消息/取消恢复。如果可用，直接复用其名册/消息/任务板，不再新建同职责实现。SOP不等于WorkflowEngine；采用Agent Teams时，先核对其原生task blockers是否足够表达阶段依赖，额外的专业验收由开物Praxis管理。
 
 workflow+subagent保留为固定执行段候选；仅当确有需要且生命周期与权限可验证时组合使用，不能默认同时运行两套任务调度。若Agent Teams不能通过公开面绑定专家，记录具体缺口，与one-shot公开扩展比较后再决定。首版要求仍是多位真实专家、SOP和完整交付，不把通用设计器/任意群聊作为隐性前置。
 

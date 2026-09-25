@@ -1,15 +1,15 @@
-<p align="center"><img src="assets/brand/workdsh-logo.svg" width="104" alt="WorkDSH"></p>
-<h1 align="center">WorkDSH</h1>
+<p align="center"><img src="assets/brand/workdsh-logo.svg" width="104" alt="Praxis"></p>
+<h1 align="center">Praxis</h1>
 <p align="center"><strong>Give AI a job. Watch it work. Open the result.</strong></p>
 <p align="center">English · <a href="README.zh-CN.md">简体中文</a></p>
 
-WorkDSH is an open-source AI workspace built on the official DeepSeek Harness. Organize conversations, material and capabilities in projects, reuse your local Library, and review editable deliverables alongside the task.
+Praxis is an open-source AI workspace built on the official DeepSeek Harness. Organize conversations, material and capabilities in projects, reuse your local Library, and review editable deliverables alongside the task.
 
 **Desktop v2.0.5-alpha.12 · Web/plugins v0.1.0-alpha.9 · Alpha preview**
 
 [Desktop downloads](https://github.com/techflag/workdsh/releases/tag/desktop-v2.0.5-alpha.12) · [Web/plugin download](https://github.com/techflag/workdsh/releases/tag/v0.1.0-alpha.9) · [Release notes](docs/releases/v0.1.0-alpha.9.md) · [Quick start](#quick-start) · [Website](https://techflag.github.io/workdsh/) · [Gitee mirror](https://gitee.com/techflag/workdsh)
 
-## Download WorkDSH Desktop
+## Download Praxis Desktop
 
 | System | Installer |
 | --- | --- |
@@ -17,9 +17,9 @@ WorkDSH is an open-source AI workspace built on the official DeepSeek Harness. O
 | macOS Apple Silicon | [Download arm64 DMG](https://github.com/techflag/workdsh/releases/download/desktop-v2.0.5-alpha.12/dsh-plugin-desktop-macos-arm64--WorkDSH-2.0.5-arm64.dmg) |
 | macOS Intel | [Download x64 DMG](https://github.com/techflag/workdsh/releases/download/desktop-v2.0.5-alpha.12/dsh-plugin-desktop-macos-x64--WorkDSH-2.0.5-x64.dmg) |
 
-These Alpha installers bundle WorkDSH v0.1.0-alpha.9. macOS DMGs are unsigned previews; checksums are in the [Desktop release](https://github.com/techflag/workdsh/releases/tag/desktop-v2.0.5-alpha.12).
+These Alpha installers bundle Praxis v0.1.0-alpha.9. macOS DMGs are unsigned previews; checksums are in the [Desktop release](https://github.com/techflag/workdsh/releases/tag/desktop-v2.0.5-alpha.12).
 
-![WorkDSH project home — full application in dark mode](docs/assets/screenshots/workdsh-projects-alpha8-dark.png)
+![Praxis project home — full application in dark mode](docs/assets/screenshots/workdsh-projects-alpha8-dark.png)
 
 ## What you can do
 
@@ -41,14 +41,14 @@ Full application captures from a local workspace; example projects, installed sk
 <details>
 <summary>Light theme — project home</summary>
 
-![WorkDSH project home — full application in light mode](docs/assets/screenshots/workdsh-projects-alpha8-light.png)
+![Praxis project home — full application in light mode](docs/assets/screenshots/workdsh-projects-alpha8-light.png)
 
 </details>
 
 <details>
 <summary>Skills — local installed catalog</summary>
 
-![WorkDSH skills — full application](docs/assets/screenshots/workdsh-skills-alpha8-dark.png)
+![Praxis skills — full application](docs/assets/screenshots/workdsh-skills-alpha8-dark.png)
 
 </details>
 
@@ -103,7 +103,7 @@ corepack pnpm preview
 
 ## Architecture and development
 
-WorkDSH extends the published Harness packages through plugins, services and UI slots. It does not maintain a modified upstream runtime. Business modules own their data; the bundle composes navigation and presentation.
+Praxis extends the published Harness packages through plugins, services and UI slots. It does not maintain a modified upstream runtime. Business modules own their data; the bundle composes navigation and presentation.
 
 ```sh
 corepack pnpm typecheck
@@ -121,7 +121,7 @@ This is an alpha preview. Cross-platform installation, long-running real-model t
 
 Thank you to these projects and their maintainers. This list covers major direct dependencies; package manifests, the lockfile and generated license inventories describe the full dependency set.
 
-| Project | Use in WorkDSH | License |
+| Project | Use in Praxis | License |
 | --- | --- | --- |
 | [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) / Cordis | Native tasks, model execution, skills, Loader, Profile, services and UI extension APIs | MIT |
 | [React](https://github.com/facebook/react) | Feature pages and editor UI | MIT |
@@ -135,9 +135,9 @@ Thank you to these projects and their maintainers. This list covers major direct
 | [Noto Sans SC](https://github.com/google/fonts/tree/main/ofl/notosanssc) | Bundled static Chinese font; license and derivation metadata retained | SIL Open Font License 1.1 |
 | [i18next](https://github.com/i18next/i18next) / [react-i18next](https://github.com/i18next/react-i18next) | Chinese localization for the PPT editor | MIT |
 | [Lucide](https://github.com/lucide-icons/lucide) | PPT toolbar icons | ISC |
-| [dsh-cost-meter](https://github.com/Han-1413141/dsh-cost-meter) | Separately installed spending plugin in the local preview Profile; not bundled in WorkDSH releases | See the independent project's license |
+| [dsh-cost-meter](https://github.com/Han-1413141/dsh-cost-meter) | Separately installed spending plugin in the local preview Profile; not bundled in Praxis releases | See the independent project's license |
 
-WorkDSH explicitly takes **WorkBuddy / CodeBuddy** as a product-experience reference: a real task should expose its process and end in an editable artifact. Skill-market organization, grouped toolbars, and PPT design guidance also draw on those experiences. WorkDSH is an independent open-source implementation for DeepSeek Harness; it does not reuse WorkBuddy branding or claim an official partnership, endorsement, or Tencent PPT engine integration.
+Praxis explicitly takes **WorkBuddy / CodeBuddy** as a product-experience reference: a real task should expose its process and end in an editable artifact. Skill-market organization, grouped toolbars, and PPT design guidance also draw on those experiences. Praxis is an independent open-source implementation for DeepSeek Harness; it does not reuse WorkBuddy branding or claim an official partnership, endorsement, or Tencent PPT engine integration.
 
 Third-party skills and materials retain their providers' terms. Generated archives retain copyright and license texts for dependencies actually bundled; see [Office third-party notices](packages/plugins/office/THIRD-PARTY-NOTICES.md).
 

@@ -72,7 +72,7 @@ const dshHome = resolve(process.env.DSH_HOME || join(homedir(), '.dsh'));
 const versionResult = execute(['--version'], { always: true, capture: true });
 const actualHarness = versionResult?.stdout?.trim();
 if (actualHarness !== expectedHarness) {
-  throw new Error(`WorkDSH ${manifest.version} requires dsh ${expectedHarness}; found ${actualHarness || 'unknown'}. Pass --dsh /absolute/path/to/a-compatible-dsh.`);
+  throw new Error(`Praxis ${manifest.version} requires dsh ${expectedHarness}; found ${actualHarness || 'unknown'}. Pass --dsh /absolute/path/to/a-compatible-dsh.`);
 }
 
 const profileManifest = join(dshHome, 'profiles', profile, 'package.json');
@@ -144,7 +144,7 @@ if (!dryRun) {
   if (result.error) throw result.error;
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
-// Profiles disable automatic peers, because WorkDSH's build-only workspace peers
+// Profiles disable automatic peers, because Praxis's build-only workspace peers
 // are bundled and not published to npm. Install the official runtime peer closure
 // explicitly so a clean Profile can boot without relying on the developer repo.
 if (!dryRun) {
@@ -170,5 +170,5 @@ if (!dryRun) {
   }
 }
 const profileCli = join(dshHome, 'profiles', profile, 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'bin.js');
-console.log(`\nWorkDSH ${manifest.version} ${dryRun ? 'installation plan verified' : 'is installed'} in profile ${profile}.`);
+console.log(`\nPraxis ${manifest.version} ${dryRun ? 'installation plan verified' : 'is installed'} in profile ${profile}.`);
 console.log(`Start it with: node ${JSON.stringify(profileCli)} --profile ${JSON.stringify(profile)}`);

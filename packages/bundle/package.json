@@ -3,7 +3,7 @@
   "version": "0.1.0-alpha.48",
   "private": true,
   "type": "module",
-  "description": "WorkDSH default Harness bundle and client composition",
+  "description": "Praxis default Harness bundle and client composition",
   "exports": {
     "./probe": {
       "types": "./dist/probe.d.ts",

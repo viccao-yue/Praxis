@@ -4,7 +4,7 @@
 
 ## 当前产品边界
 
-当前 WorkDSH 面向可信本机用户，继续使用 DeepSeek Harness 的默认/本地 Skill、原生 Session、Conversation、Workspace、权限预设和执行链。WorkDSH 已建立可复用的本地治理基础：Host 解析主体、个人组织、资源授权、Session owner/runtime binding 和审计，并通过官方 Storage Domain 持久化。
+当前 开物Praxis 面向可信本机用户，继续使用 DeepSeek Harness 的默认/本地 Skill、原生 Session、Conversation、Workspace、权限预设和执行链。开物Praxis 已建立可复用的本地治理基础：Host 解析主体、个人组织、资源授权、Session owner/runtime binding 和审计，并通过官方 Storage Domain 持久化。
 
 这些基础保证本地数据从创建起具备明确 owner 和修订，但不等于企业远程认证或多人隔离已经完成。当前组合不得直接暴露为公网多人服务。
 

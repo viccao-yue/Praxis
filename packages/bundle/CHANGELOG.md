@@ -1,6 +1,7 @@
 ## 0.1.0-alpha.48 — Unreleased（2026-09-22）
 
 - 适配 DeepSeek Harness 0.1.7-alpha.1、Cordis 4.0.3，更新精确依赖。
+- 产品 Web 服务在未传入 `--port` 时默认监听 8517；启动参数里的端口仍然优先。开发预览（`pnpm preview`）默认同为 8517，可用 `WORKDSH_PREVIEW_PORT` 覆盖。
 
 # 0.1.0-alpha.47 — 2026-09-20
 
@@ -46,7 +47,7 @@
 # 0.1.0-alpha.38
 
 - 组合共享 UI alpha.4：公开入口、TSX 组件、设计令牌与样式模块分离，保持现有组件 API 兼容。
-- 增加 WorkDSH 品牌 Logo 的可维护 SVG 与应用图标视觉稿。
+- 增加 开物Praxis 品牌 Logo 的可维护 SVG 与应用图标视觉稿。
 
 # 0.1.0-alpha.37
 
@@ -127,7 +128,7 @@
 
 # 0.1.0-alpha.16
 
-组合 workbench alpha.8：在官方 Sidebar 骨架中恢复 WorkBuddy 参考的 WorkDSH 业务导航和能力中心入口，同时保留原生工作区/会话能力。
+组合 workbench alpha.8：在官方 Sidebar 骨架中恢复 WorkBuddy 参考的 开物Praxis 业务导航和能力中心入口，同时保留原生工作区/会话能力。
 
 # 0.1.0-alpha.14
 
@@ -147,7 +148,7 @@
 
 # 0.1.0-alpha.10
 
-组合 workbench alpha.3：默认 home 改为 WorkDSH 新任务入口，使用 Harness 官方工作区、Session 与 Conversation 服务创建任务；接入验证移至 `workdsh-view=diagnostics`。
+组合 workbench alpha.3：默认 home 改为 开物Praxis 新任务入口，使用 Harness 官方工作区、Session 与 Conversation 服务创建任务；接入验证移至 `workdsh-view=diagnostics`。
 
 # 0.1.0-alpha.9
 

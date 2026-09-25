@@ -1,4 +1,4 @@
-// U16-V1: official Team + per-Agent composition, without WorkDSH ExpertsManager.
+// U16-V1: official Team + per-Agent composition, without Praxis ExpertsManager.
 // Deterministic model I/O; real Loader, AgentLoop, tools, skills and persistence.
 // First run: node scripts/probe-official-expert-composition.mjs --prepare
 // Cached: node scripts/probe-official-expert-composition.mjs

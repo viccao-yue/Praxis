@@ -89,7 +89,7 @@ try {
     writeFileSync(resolve(home, 'storages/workspace.json'), `${JSON.stringify({
       unit: { name: 'workspace', version: 2 },
       global: { initialized: true, workspaceIds: [workspaceId], archivedSessionIds: [] },
-      tables: { workspaces: { [workspaceId]: { path: root, title: 'WorkDSH Probe', sessionIds: [], createdAt: now, updatedAt: now } } },
+      tables: { workspaces: { [workspaceId]: { path: root, title: 'Praxis Probe', sessionIds: [], createdAt: now, updatedAt: now } } },
     }, null, 2)}\n`);
     const skillDir = resolve(home, 'agents/skills/workdsh-browser-fixture');
     mkdirSync(skillDir, { recursive: true });

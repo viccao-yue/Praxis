@@ -5,7 +5,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client';
 import { BusinessPanelIcon, businessPanels } from '../client/components/BusinessPanel.js';
 
 /**
- * Keep the official Sidebar and Conversation occupants in place. WorkDSH only
+ * Keep the official Sidebar and Conversation occupants in place. Praxis only
  * contributes business navigation through public Slots, and every entry pairs
  * with a main panel registered by the owning feature plugin. Panels marked
  * pending (助理、定时任务、更多) have no domain implementation yet: they register

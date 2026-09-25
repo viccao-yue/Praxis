@@ -10,7 +10,7 @@ ZIP检查：保存文件包含5个原生chart XML，分别pieChart/barChart/line
 
 本轮未执行：原生图表属性面板手工数据编辑、全部23类型、图片/表格往返、真实AI/Harness Slot联测、完整宿主键盘事件与样式隔离、PowerPoint/WPS打开视觉及数据编辑、发布门禁。五页是功能样本，不是设计成品。公开接口控制证明可实现跟随，未证明真实AI已接入或逐页模型制作通过。
 
-人工体验：http://127.0.0.1:19093/，仅隔离React编辑器，服务绑定本机，原WorkDSH未替换。
+人工体验：http://127.0.0.1:19093/，仅隔离React编辑器，服务绑定本机，原开物Praxis未替换。
 
 # 两个OfficeCLI项目区分
 
@@ -95,7 +95,7 @@ scripts/pptx-trial/probe-thumbnail-sync.mjs浏览器测试：更新第一页文�
 
 2026-09-13按用户七张参考图要求定制，使用frontend-design技能整理深色图标分组。组合样板新增Ribbon.tsx/ribbon.css，开始/插入/视图三个工具页，低频原生功能通过全部工具展开保留。常用动作继续调用公开ToolbarProps/SlideCanvasProps和handle；图表下拉选项直接调用onAddChart，移除独立快捷图表栏。新增页、撤销/重做、字体/段落菜单、文本/形状/表格、图表菜单、视图缩放/网格/标尺接线；图片文件输入尚未接，按钮禁用且提示，不宣称可用。其余四页未定制。
 
-scripts/pptx-trial/probe-ribbon.mjs在600px验证折线图和表格插入、新增页、网格线、工具页切换，pageerror0。首次连续点击表格失败，定位Action在Ribbon内定义导致选择变化时重挂载、点击丢失；提至稳定组件后复测通过。probe-insert-line更新到新菜单，插入/保存独立回读/重开通过。视觉复核当前开始页紧凑无截断、缩略图原页和空白页网格正常；其他页视觉和完整编辑流程仍需验证。样板仅隔离体验，未替换正式WorkDSH。
+scripts/pptx-trial/probe-ribbon.mjs在600px验证折线图和表格插入、新增页、网格线、工具页切换，pageerror0。首次连续点击表格失败，定位Action在Ribbon内定义导致选择变化时重挂载、点击丢失；提至稳定组件后复测通过。probe-insert-line更新到新菜单，插入/保存独立回读/重开通过。视觉复核当前开始页紧凑无截断、缩略图原页和空白页网格正常；其他页视觉和完整编辑流程仍需验证。样板仅隔离体验，未替换正式开物Praxis。
 
 ### 中文切换、动画分组
 

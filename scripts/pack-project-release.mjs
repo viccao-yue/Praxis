@@ -51,7 +51,7 @@ for (const directory of packageDirectories) {
 packages.sort((left, right) => left.name.localeCompare(right.name));
 await writeFile(join(destination, 'SHA256SUMS'), packages.map(item => `${item.sha256}  ${item.filename}`).join('\n') + '\n');
 await writeFile(join(destination, 'release-manifest.json'), JSON.stringify({
-  project: 'WorkDSH',
+  project: 'Praxis',
   version: project.version,
   tag,
   channel: 'github-release',

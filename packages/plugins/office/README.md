@@ -1,6 +1,6 @@
 > 2026-09-13 最新范围：不开发画布与多维表格，停止新建候选展示（保留历史引用解析）；PDF 首版已实现新建分页工作副本、AI 按页更新、人工文字保存、真实 PDF.js 预览与 PDF 下载/导出；已有任意 PDF 导入、OCR 和图片编辑未接入。已有 HTML 实时预览保留。下文历史八类规划以此决定为准。
 
-# WorkDSH Office 浏览器编辑插件
+# 开物Praxis Office 浏览器编辑插件
 
 当前 alpha.5 候选仅保留 pptx-react-viewer 3.16.5 / pptx-viewer-core 3.14.3 作为 PPT 编辑器，沿用已确认的中文桌面工具栏与原生图表侧栏。PPTist、CreatPPT、旧 PPT 预览/画布适配已删除。Word 已发布 alpha.2；当前源码继续增加结构化原生图表能力，发布版本以新的候选验收为准。
 
@@ -17,7 +17,7 @@ Word 预览版 `0.1.0-alpha.2`（表格/图片增量；历史文本预览版为 
 
 后续交付范围已扩展为Word、PPT、Excel、PDF、画布、多维表格、HTML、Markdown八类，见[组件采用方案](../../../docs/design/office/OPEN-SOURCE-STACK.md)与[统一AI接口](../../../docs/design/office/UNIFIED-API.md)。HTML源码/实时预览、Markdown正文/源码编辑均须接入同一内容服务。当前原生 document 新建/编辑/修订同步已打通；以下文件表格是原有适配器范围，完整八类统一接口尚未完成。
 
-插件复审后的实施边界见[PLUGIN-ARCHITECTURE](../../../docs/design/office/PLUGIN-ARCHITECTURE.md)：本包独立分发；Host根通过官方ctx.plugin组合内容服务、工具和Connection，Client进入官方模块图，默认WorkDSH组合仅装配本包。Host 内容服务、六个原生工具和原生 Tiptap 页现已实现；package的private标记不等于已发布npm。新增能力必须通过OP-T01—07的干净安装、生命周期、恢复和资源制品验收。
+插件复审后的实施边界见[PLUGIN-ARCHITECTURE](../../../docs/design/office/PLUGIN-ARCHITECTURE.md)：本包独立分发；Host根通过官方ctx.plugin组合内容服务、工具和Connection，Client进入官方模块图，默认开物Praxis组合仅装配本包。Host 内容服务、六个原生工具和原生 Tiptap 页现已实现；package的private标记不等于已发布npm。新增能力必须通过OP-T01—07的干净安装、生命周期、恢复和资源制品验收。
 
 新原生文档：AI 调用 `content_open` 新建即自动打开当前会话右侧、`content_edit` 分批提交后页面自动更新；`content_present` 仅用于再次展示；用户点击“编辑”后直接在正文修改，完成编辑后 AI 用 `content_read` 获取最新内容。`content_capabilities` 列出已实现操作。Host/页面共享有修订和幂等收据的工作副本，不需要子智能体或外部 MCP。只接受可信 Session 绑定及同工作区授权。
 
@@ -78,7 +78,7 @@ corepack pnpm preview:install
 
 ## 安装、卸载与内容保留
 
-发布物是独立 `.tgz`：Host入口、Client模块、`cordis.patch.yml`、编辑器资源、版本说明和许可说明都随包交付。安装使用官方 `dsh plugin --profile <名称> add <Office.tgz>`，并显式提供本地身份、授权、审计基础插件及匹配 Harness `0.1.6-alpha.2` Web Profile。已有 WorkDSH Profile 可复用这些治理依赖，不需要装专家、技能管理或工作台插件。Word-only 预览制品见 [GitHub prerelease](https://github.com/techflag/workdsh/releases/tag/office-v0.1.0-alpha.1)；不将其宣称为完整 Office 正式版。
+发布物是独立 `.tgz`：Host入口、Client模块、`cordis.patch.yml`、编辑器资源、版本说明和许可说明都随包交付。安装使用官方 `dsh plugin --profile <名称> add <Office.tgz>`，并显式提供本地身份、授权、审计基础插件及匹配 Harness `0.1.6-alpha.2` Web Profile。已有 开物Praxis Profile 可复用这些治理依赖，不需要装专家、技能管理或工作台插件。Word-only 预览制品见 [GitHub prerelease](https://github.com/techflag/workdsh/releases/tag/office-v0.1.0-alpha.1)；不将其宣称为完整 Office 正式版。
 
 通过官方 `dsh plugin --profile <名称> remove workdsh-plugin-office` 移除安装，按官方Profile流程重新启动/加载配置。Office菜单、文档引用来源、六个工具、写作guide、预览与实时页注册一起撤销；保留用户已保存内容和原文件。已存在输入标签属于草稿，不能替用户删除，插件缺失时引用无法解析、发送失败；删除标签后可正常输入。重装对应制品后入口恢复，同一Profile中已保存记录和修订保留；未承诺自动恢复卸载时未保存的浏览器缓冲。
 

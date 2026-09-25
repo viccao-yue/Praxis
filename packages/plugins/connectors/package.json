@@ -3,7 +3,7 @@
   "version": "0.1.0-alpha.3",
   "private": false,
   "type": "module",
-  "description": "MCP connector management and a verified local example for WorkDSH",
+  "description": "MCP connector management and a verified local example for Praxis",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

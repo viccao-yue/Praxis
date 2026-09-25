@@ -1,10 +1,10 @@
-# WorkDSH Roadmap / 开发路线图
+# 开物Praxis Roadmap / 开发路线图
 
 [English](#english) | [简体中文](#简体中文)
 
 ## English
 
-WorkDSH is developed as a collection of independently versioned modules. Each module begins with its own `0.1` line when implementation starts. A new product area does not force an artificial version increase for an already delivered module.
+Praxis is developed as a collection of independently versioned modules. Each module begins with its own `0.1` line when implementation starts. A new product area does not force an artificial version increase for an already delivered module.
 
 ### Current preview
 
@@ -45,7 +45,7 @@ Detailed task IDs, prerequisites, and exit criteria remain authoritative in the 
 
 ## 简体中文
 
-WorkDSH 按独立版本化的模块开发。每个模块开始实现时建立自己的 `0.1` 版本线；开始新模块不会迫使已经交付的模块进行没有实际变化的版本升级。
+开物Praxis 按独立版本化的模块开发。每个模块开始实现时建立自己的 `0.1` 版本线；开始新模块不会迫使已经交付的模块进行没有实际变化的版本升级。
 
 ### 当前预览
 

@@ -26,7 +26,7 @@
 
 日期：2026-09-12 · 设计基线：1.1 · 状态：方案已整理，待实施验证。**不是功能已交付声明。**
 
-本包面向接手 WorkDSH 的开发者及其他编程工具。用户要求参考 WorkBuddy 的专家详情、专家团详情和对话式制作专家，同时遵守 DeepSeek Harness 官方规范。本文档属于 **`workdsh` 仓库**，不属于 `dsh-ssh-desktop`；两者包管理器、上游接入方式不同，不能混用。
+本包面向接手 开物Praxis 的开发者及其他编程工具。用户要求参考 WorkBuddy 的专家详情、专家团详情和对话式制作专家，同时遵守 DeepSeek Harness 官方规范。本文档属于 **`workdsh` 仓库**，不属于 `dsh-ssh-desktop`；两者包管理器、上游接入方式不同，不能混用。
 
 当前实施状态补充（2026-09-12）：D04 A+B的真实配备技能/使用详情和C的对话创建指南/完整已保存发布前预览已有候选实现；47/47集成、真实独立包浏览器与两次冷重启通过。D实际模型专业场景及E稳定性收尾仍未完成。见[当前状态](../../STATUS.md)与[修复证据](../../evidence/d04-experts-review-fixes.md)。下表及后文“本次不修改业务实现”等陈述属于原始设计交接时点，不覆盖当前实施状态。
 
@@ -70,11 +70,11 @@
 - 本地 identity/access/audit、Session 受控入口、原生工作台、Skill 管理和共享 Modal 已存在。
 - Skill 管理具备正文/资源管理、冲突摘要、启停和可恢复卸载；**尚不能据此声称已具备业务不可变 SkillRevision、专家依赖快照租约或全入口多用户授权**。
 - 当前锁定 `@deepseek-ai/dsh-*@0.1.5-rc.1`、Cordis `4.0.2`；新版本网页不能替代锁定版本的 exports、声明和探针。
-- 专家团相关文档中出现的实验性 Agent Team 不在当前 lockfile 中；原生 subagent/workflow 的存在也不证明 WorkDSH 的团队适配已完成。
+- 专家团相关文档中出现的实验性 Agent Team 不在当前 lockfile 中；原生 subagent/workflow 的存在也不证明 开物Praxis 的团队适配已完成。
 
 ## 4. 可直接给开发工具的任务说明
 
-> 请在 WorkDSH 仓库中实施 D04 专家模块 0.1。先读 AGENTS.md、docs/STATUS.md、docs/development-order.json 和 docs/design/experts/README.md，再按该目录 PRD、UX、HLD、CONTRACTS、IMPLEMENTATION-AND-ACCEPTANCE 实施。保持专家团 D11 和企业管理 Web 后置。
+> 请在 开物Praxis 仓库中实施 D04 专家模块 0.1。先读 AGENTS.md、docs/STATUS.md、docs/development-order.json 和 docs/design/experts/README.md，再按该目录 PRD、UX、HLD、CONTRACTS、IMPLEMENTATION-AND-ACCEPTANCE 实施。保持专家团 D11 和企业管理 Web 后置。
 >
 > 先对照 STATUS 和 evidence，复用已完成 EP-01 等公开接口验证，核对仍缺证据的项目；特别验证 persona 的作用域、不可变 preset、绑定 Session 的所有恢复入口、明确声明的 Skill 依赖快照、原生 draft 交接及外部包 Remote。失败时按文档给出有限替代或明确阻断，不改上游、不私自升级、不用假数据兜底。
 >
@@ -86,7 +86,7 @@
 
 - “需求”表示目标；“已存在”必须有源码或证据链接；“建议/待验证”不是官方 API 承诺。
 - 本包规定核心行为与默认决策。实现可以调整内部文件组织，但改变范围、运行语义、权限或版本边界必须更新 ADR/PRD 和验收映射。
-- 用户截图仅作交互参考；不得将 WorkBuddy 头像、案例、用量数字和商标当 WorkDSH 自有内容。
+- 用户截图仅作交互参考；不得将 WorkBuddy 头像、案例、用量数字和商标当 开物Praxis 自有内容。
 - 文档采用 Markdown，便于仓库审查和编程工具读取；截图随包保存，避免依赖临时目录。
 
 2026-09-13 下一步专家团规划见 [EXPERT-TEAMS 第10节](EXPERT-TEAMS.md#10-下一步专家团规划2026-09-13)：WorkBuddy 参考取舍、创建至交付旅程、TM-01～04有限实施及验收终点。仅规划，D11仍todo，未执行运行探针或改变主线顺序。

@@ -28,7 +28,7 @@ type FormState = {
   examples: ExampleRow[]; skillRequirements: { name: string; skillId?: string }[];
 };
 
-function messageOf(cause: unknown): string { return cause instanceof Error ? cause.message : '专家操作失败，请重试。'; }
+function messageOf(cause: unknown): string { return cause instanceof Error ? cause.message : '数字员工操作失败，请重试。'; }
 function codeOf(cause: unknown): string { const code = (cause as unknown as { code?: unknown })?.code; return typeof code === 'string' ? code : ''; }
 
 function fromDefinition(definition: ExpertDefinition): FormState {
@@ -162,8 +162,8 @@ export function ExpertDraftEditor({ expertId, management, onClose, onSaved, onPu
   }
 
   if (busy || !form) {
-    return <Modal open label="编辑专家草稿" className="editor-dialog" onClose={onClose}>
-      <div className="editor-head"><h2>编辑专家草稿</h2></div>
+    return <Modal open label="编辑数字员工草稿" className="editor-dialog" onClose={onClose}>
+      <div className="editor-head"><h2>编辑数字员工草稿</h2></div>
       <div className="editor-scroll">
 <p className="muted">{error || '正在加载草稿…'}</p></div>
     </Modal>;
@@ -172,16 +172,16 @@ export function ExpertDraftEditor({ expertId, management, onClose, onSaved, onPu
   const nameInvalid = form.name.trim().length === 0 || form.name.length > EXPERT_LIMITS.nameMax;
   const descInvalid = form.description.length > EXPERT_LIMITS.descriptionMax;
 
-  return <Modal open label="编辑专家草稿" className="editor-dialog" onClose={onClose}>
+  return <Modal open label="编辑数字员工草稿" className="editor-dialog" onClose={onClose}>
     <div className="editor-head">
-      <h2>{form.name.trim() || '编辑专家草稿'}</h2>
+      <h2>{form.name.trim() || '编辑数字员工草稿'}</h2>
       {savedAt && <span className="saved-at">已保存 {savedAt.toLocaleTimeString()}</span>}
     </div>
 
     <div className="editor-scroll">
       <div className="notice" role="status"><div className="notice-body">
         <strong>{publishedBaseline === undefined ? '正在编辑未发布草稿' : JSON.stringify(form) !== publishedBaseline ? '草稿有修改，尚未发布' : '正在编辑草稿'}</strong>
-        <span>保存草稿仅保存编辑内容；明确确认发布后，专家详情与之后召唤的新任务才会使用此版本。已有任务保持原版本。</span>
+        <span>保存草稿仅保存编辑内容；明确确认发布后，数字员工详情与之后召唤的新任务才会使用此版本。已有任务保持原版本。</span>
       </div></div>
       {conflict && <div className="conflict">
         <h4>草稿冲突</h4>
@@ -200,7 +200,7 @@ export function ExpertDraftEditor({ expertId, management, onClose, onSaved, onPu
       {error && !conflict && <div className="issues"><h4>无法完成操作</h4><ul><li>{error}</li></ul></div>}
 
       {(form.packageDocuments || form.agentDocument) ? <section className="group">
-        <h3>专家制作文件</h3>
+        <h3>数字员工制作文件</h3>
         <p className="hint">编辑完整角色说明和专业资源；保存时一起校验，发布后作为同一作品使用。</p>
         {form.packageDocuments && <Select aria-label="选择制作文件" value={selectedFile || Object.keys(form.packageDocuments)[0]} onChange={event => setSelectedFile(event.currentTarget.value)}>
           {Object.keys(form.packageDocuments).map(path => <option key={path} value={path}>{path}</option>)}
@@ -235,12 +235,12 @@ export function ExpertDraftEditor({ expertId, management, onClose, onSaved, onPu
         <h3>基本信息</h3>
         <div className={`field ${nameInvalid ? 'invalid' : ''}`}>
           <label htmlFor="ex-name">名称 <Counter value={form.name.length} max={EXPERT_LIMITS.nameMax} /></label>
-          <Input id="ex-name" value={form.name} maxLength={EXPERT_LIMITS.nameMax + 20} onChange={event => set('name', event.currentTarget.value)} placeholder="例如：合同审查专家" />
+          <Input id="ex-name" value={form.name} maxLength={EXPERT_LIMITS.nameMax + 20} onChange={event => set('name', event.currentTarget.value)} placeholder="例如：合同审查数字员工" />
           {nameInvalid && <p className="field-error">名称为必填，且不超过 {EXPERT_LIMITS.nameMax} 个字符。</p>}
         </div>
         <div className={`field ${descInvalid ? 'invalid' : ''}`}>
           <label htmlFor="ex-desc">简介 <Counter value={form.description.length} max={EXPERT_LIMITS.descriptionMax} /></label>
-          <Textarea id="ex-desc" value={form.description} onChange={event => set('description', event.currentTarget.value)} placeholder="一句话说明这个专家能帮你做什么" />
+          <Textarea id="ex-desc" value={form.description} onChange={event => set('description', event.currentTarget.value)} placeholder="一句话说明这个数字员工能帮你做什么" />
           {descInvalid && <p className="field-error">简介不超过 {EXPERT_LIMITS.descriptionMax} 个字符。</p>}
         </div>
         <div className="field">
@@ -259,7 +259,7 @@ export function ExpertDraftEditor({ expertId, management, onClose, onSaved, onPu
         <h3>专业角色与方法</h3>
         <div className="field">
           <label htmlFor="ex-role">专业角色 <Counter value={form.role.length} max={EXPERT_LIMITS.proseMax} /></label>
-          <Textarea id="ex-role" className="prose" value={form.role} onChange={event => set('role', event.currentTarget.value)} placeholder="这个专家是谁、具备哪些专业背景与判断标准" />
+          <Textarea id="ex-role" className="prose" value={form.role} onChange={event => set('role', event.currentTarget.value)} placeholder="这个数字员工是谁、具备哪些专业背景与判断标准" />
         </div>
         <div className="field">
           <label htmlFor="ex-method">工作方法 <Counter value={form.methodology.length} max={EXPERT_LIMITS.proseMax} /></label>
@@ -298,7 +298,7 @@ export function ExpertDraftEditor({ expertId, management, onClose, onSaved, onPu
         <div className="list-editor">
           {form.examples.map((example, index) => <div className="example-editor-row" key={example.id || index}>
             <Input value={example.title} aria-label={`示例 ${index + 1} 标题`} placeholder="示例标题（可选）" onChange={event => set('examples', form.examples.map((e, i) => (i === index ? { ...e, title: event.currentTarget.value } : e)))} />
-            <Textarea value={example.prompt} aria-label={`示例 ${index + 1} 内容`} placeholder="点击示例即可用它召唤专家（仅填入草稿）" maxLength={2000} onChange={event => set('examples', form.examples.map((e, i) => (i === index ? { ...e, prompt: event.currentTarget.value } : e)))} />
+            <Textarea value={example.prompt} aria-label={`示例 ${index + 1} 内容`} placeholder="点击示例即可用它召唤数字员工（仅填入草稿）" maxLength={2000} onChange={event => set('examples', form.examples.map((e, i) => (i === index ? { ...e, prompt: event.currentTarget.value } : e)))} />
             <Button variant="ghost" size="sm" className="remove" aria-label={`删除示例 ${index + 1}`} onClick={() => set('examples', form.examples.filter((_, i) => i !== index))}>删除示例</Button>
           </div>)}
           {form.examples.length < EXPERT_LIMITS.examplesMax && <Button className="add-row" onClick={() => set('examples', [...form.examples, { id: '', title: '', prompt: '' }])}>+ 添加示例任务</Button>}

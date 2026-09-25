@@ -76,7 +76,7 @@ skills: [{skill-name}]   # 启动时预加载的 Skill
 
 ## 正文结构：主理人
 
-> ⚠️ 文件名不可使用通用的 `team-lead.md`，必须加上专家团前缀，如 `trading-team-lead.md`
+> ⚠️ 文件名不可使用通用的 `team-lead.md`，必须加上数字员工团前缀，如 `trading-team-lead.md`
 
 ### Frontmatter
 

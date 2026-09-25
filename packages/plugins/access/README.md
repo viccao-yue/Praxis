@@ -19,6 +19,6 @@
 
 `ToolAccessBridge` 使用官方 `tools/pre-execute` 做异步授权，并用最终 `tools/result` 形成结果审计；`session/flush` 和插件卸载会等待审计排空。个人 Profile 可在首次工具调用时绑定 Session，企业组合必须关闭该选项并在受信创建入口显式调用 `bindSession()`。
 
-`SessionAccessBridge` 是 WorkDSH 内部 Host 入口：创建时先生成 Session id 并持久绑定 owner，再委托官方 `sessionController.create()`；显式 id 首次绑定前用官方 `inspect()` 拒绝采用已有但无 owner 的 Session。恢复时先按当前身份和 grant 授权，再委托 `resolveAgent()`。它不会修改或包装官方服务，也不会在本版本声明为生成式 Remote。企业组合后续必须只暴露 WorkDSH 受控 Remote，并撤下外部裸 Session Remote。
+`SessionAccessBridge` 是 开物Praxis 内部 Host 入口：创建时先生成 Session id 并持久绑定 owner，再委托官方 `sessionController.create()`；显式 id 首次绑定前用官方 `inspect()` 拒绝采用已有但无 owner 的 Session。恢复时先按当前身份和 grant 授权，再委托 `resolveAgent()`。它不会修改或包装官方服务，也不会在本版本声明为生成式 Remote。企业组合后续必须只暴露 开物Praxis 受控 Remote，并撤下外部裸 Session Remote。
 
 下一步生成受控 Session Remote，再将相同服务装配到文件、其他 Remote 与订阅入口，并验证成员撤权后的在途取消。完成对应 PLAN 任务及 [验收矩阵](../../../docs/ACCEPTANCE.md) 场景后才结束 P1-09。

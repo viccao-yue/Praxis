@@ -36,8 +36,8 @@
 ## 新能力与默认值（P4）
 
 - P4-3 运行时卸载：官方插件管理页的包级开关=写 `dsh.profile.bundles`；运行层变更需重启 server（不重启时 UI 静默无提示，hmr 存在时官方 `change()` 返回 applied）。禁用+重启后完全卸载（strip=0/style=0/bundle 清单移除/零错误），启用+重启后恰好一次恢复（strip=1/style=1），无重复监听 → `ctx.effect/provide/slot` 贡献可完整撤销。UI 静默记为官方行为/UX 缺口，不改官方代码。
-- P4-1 新页面核对：右栏 Start 官方卡片（Workspace files/New terminal/Browser）与 WorkDSH「文档」卡片共存；Browser 页签可用；回合文件改动卡片实弹渲染并点击打开官方 `Review · turn 2` diff 页签；子代理 lineage 下拉 + Agent Team chip 正常；主视图 [Chat, Trajectory] 与右栏页签体系独立无冲突。
-- preset 挂载失败定性：9 个含 `workflow-worker-thread` 行的旧 preset（Sep 12-13 编译、0.1.5 时代产物）在 alpha.2 无法解析该包（npm 最高 0.1.5-rc.2）→ 属过期 preset 遗留，**非 alpha.2 回归**。实弹对照：活跃专家会话（ptc preset）无横幅、4 subagents lineage 正常；worker-thread 旧会话错误横幅精确复现（探针有效性对照），WorkDSH 侧优雅降级、历史可读，符合「旧数据保留只读」决策。
+- P4-1 新页面核对：右栏 Start 官方卡片（Workspace files/New terminal/Browser）与 开物Praxis「文档」卡片共存；Browser 页签可用；回合文件改动卡片实弹渲染并点击打开官方 `Review · turn 2` diff 页签；子代理 lineage 下拉 + Agent Team chip 正常；主视图 [Chat, Trajectory] 与右栏页签体系独立无冲突。
+- preset 挂载失败定性：9 个含 `workflow-worker-thread` 行的旧 preset（Sep 12-13 编译、0.1.5 时代产物）在 alpha.2 无法解析该包（npm 最高 0.1.5-rc.2）→ 属过期 preset 遗留，**非 alpha.2 回归**。实弹对照：活跃专家会话（ptc preset）无横幅、4 subagents lineage 正常；worker-thread 旧会话错误横幅精确复现（探针有效性对照），开物Praxis 侧优雅降级、历史可读，符合「旧数据保留只读」决策。
 - P4-2 默认值：官方 `dsh-subagent` 的 `maxDepth=1`、`maxActiveSubagents=8`（settings section `'subagent'`）；本仓无引用/覆盖，preview `settings.yaml` 无 `subagent` 段 → 使用官方默认。专家团 2-16 成员校验与官方 Team `DEFAULT_MAX_MEMBERS=16` 数值一致：16＝名册静态容量，8＝同一 root 链路的「同时活跃」上限，层次不同不冲突；深度 1 与「成员不做二级委派」语义兼容。
 - 团队探针复跑 15 项 checks、4 场景全 completed、0 browser errors。
 

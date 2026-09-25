@@ -4,7 +4,7 @@ Native document editing uses the MIT-licensed Tiptap core, StarterKit and ProseM
 
 The existing browser file adapters continue to bundle Univer OSS (Apache-2.0), ExcelJS, docx-preview and their required dependencies. They are distinct from the new native document working-copy API.
 
-The CSV table preview delegates RFC 4180 parsing and delimiter detection to PapaParse 5.7.0 (MIT); byte decoding (UTF-8/GB18030/UTF-16 BOM) and the display limits remain WorkDSH code. Its complete license text is collected into `dist/THIRD-PARTY-LICENSES.txt`, and it is absent from `dist/license-review.json`.
+The CSV table preview delegates RFC 4180 parsing and delimiter detection to PapaParse 5.7.0 (MIT); byte decoding (UTF-8/GB18030/UTF-16 BOM) and the display limits remain Praxis code. Its complete license text is collected into `dist/THIRD-PARTY-LICENSES.txt`, and it is absent from `dist/license-review.json`.
 
 Each build writes `dist/THIRD-PARTY-LICENSES.txt` with the license/copyright/notice texts found in every dependency actually bundled by esbuild, and `dist/bundled-dependencies.json` with its exact version. These files travel inside the prebuilt plugin archive. Framework peer dependencies remain owned by the Harness installation. This inventory is not a claim that DOCX/PPTX conversion is lossless or that optional commercial SDKs have been licensed.
 

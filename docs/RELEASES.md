@@ -1,36 +1,36 @@
-## 2026-09-22 WorkDSH 项目级 alpha.8
+## 2026-09-22 开物Praxis 项目级 alpha.8
 
 Harness 基线升级到 `0.1.7-alpha.1`，整包增加项目和资料库，共11个模块。项目主页、菜单、导航与主题统一调整。安装器校验资产并使用 Profile 内匹配的运行时。详见 [alpha.8 更新说明](releases/v0.1.0-alpha.8.md)；旧专家需显式重新发布，历史绑定不自动迁移。
 
-## 2026-09-20 WorkDSH 项目级 alpha.7
+## 2026-09-20 开物Praxis 项目级 alpha.7
 
 [`v0.1.0-alpha.7`](https://github.com/techflag/workdsh/releases/tag/v0.1.0-alpha.7) 是 Harness `0.1.6-alpha.2` 基线上的维护版。九个可安装包中四个模块更新：skills `alpha.31`、experts `alpha.7`、connectors `alpha.2`、bundle `alpha.47`；identity-local、audit、access、office、activity 沿用当前已验收版本。
 
 修复设置页「外观」切换不生效：工作台客户端不再强制 `workdsh` 深色主题、不再拦截 `theme/change`，外观改由官方 ThemeRuntime 与用户偏好驱动，浅色/深色/跟随系统即时生效。能力中心删除「行业应用」标签（用户决定，暂用不到）；修复设置导航重复的「Agent 预设」页，移除对官方 `settings.section` 增量槽的包装式注册。构建、typecheck、集成 110/110、活动 14/14、规划 2/2 与精确版本门禁通过；macOS 已覆盖九包隔离安装与冷启动；Windows、Linux、卸载与自动回滚仍未验收。相对 alpha.6，专家团长任务探针、真实模型两阶段交接、连接器隔离探针与腾讯文档实连未在本批制品上复跑。
 
-## 2026-09-19 WorkDSH 项目级 alpha.6
+## 2026-09-19 开物Praxis 项目级 alpha.6
 
 [`v0.1.0-alpha.6`](https://github.com/techflag/workdsh/releases/tag/v0.1.0-alpha.6) 将项目组合升级到 DeepSeek Harness `0.1.6-alpha.2`。九个可安装包中五个模块随升级与开发推进更新：skills `alpha.30`、experts `alpha.5`、office `alpha.7`、activity `alpha.4`、bundle `alpha.46`；identity-local、audit、access、connectors 沿用当前已验收版本。
 
 六个客户端插件完成 Client Session 迁移：当前会话按官方 `SessionSummary.retainedBy.mainView` 推导，打开会话使用官方 `uiWorkspace.openSession` 导航，专家成员会话改用官方 `sessions.subagentAddress` 解析。Office 新增 CSV 只读表格预览并收窄 word-only 制品范围；安装器集成测试断言已同步到 Harness `0.1.6-alpha.2`。macOS 已覆盖全新 Profile 安装与冷启动；Windows、Linux、卸载与自动回滚仍未验收。projects 与 library 源码同步推进到 `0.1.0-alpha.2`，不进入本次安装组合。
 
-## 2026-09-16 WorkDSH 项目级 alpha.5
+## 2026-09-16 开物Praxis 项目级 alpha.5
 
 [`v0.1.0-alpha.5`](https://github.com/techflag/workdsh/releases/tag/v0.1.0-alpha.5) 修复项目安装器的升级路径。安装器现在区分新 Profile 与现有 Profile：新装时初始化官方 Web Profile，升级时保留原配置、专家、技能、连接器与凭据，不再重复使用 `--from-default-profile`。安装器还会在修改 Profile 前校验 Harness CLI 必须为 `0.1.6-alpha.1`，避免旧 CLI 产生部分安装。
 
 九个插件包沿用 alpha.4 已验收字节和模块版本；本次更新的是项目发行版本、安装器与升级验收。macOS 已覆盖全新 Profile 冷启动和 `alpha.4 → alpha.5` 原地升级；Windows、Linux、卸载与自动回滚仍未验收。
 
-## 2026-09-16 WorkDSH 项目级 alpha.4
+## 2026-09-16 开物Praxis 项目级 alpha.4
 
 [`v0.1.0-alpha.4`](https://github.com/techflag/workdsh/releases/tag/v0.1.0-alpha.4) 更新专家团韧性和协作状态展示。正式打包 Web 验收覆盖长任务、浏览器重连、人工停止后由原成员继续、任务与消息交接、成员失败提示及 Host 冷恢复；显式真实模型验收完成 lead→analyst→reviewer 两阶段任务交接。
 
 本次项目 Release 附九个可安装 `.tgz`、`SHA256SUMS`、`release-manifest.json`、发行说明和校验型安装器。专家插件为 `workdsh-plugin-experts@0.1.0-alpha.4`，活动插件为 `workdsh-plugin-activity@0.1.0-alpha.3`；其他模块沿用当前已验收版本。小时级资源稳定性和官方 fork 成员浏览器历史仍未签收。
 
-## 2026-09-15 WorkDSH 项目级 alpha.2
+## 2026-09-15 开物Praxis 项目级 alpha.2
 
-[`v0.1.0-alpha.2`](https://github.com/techflag/workdsh/releases/tag/v0.1.0-alpha.2) 是当前 WorkDSH 模块的项目级发行，基于 DeepSeek Harness `0.1.6-alpha.1`。它在既有 Skill 单模块项目预览之后，第一次用一个项目 Release 汇总当前组合所需的九个预构建插件包、统一校验文件和发布清单。
+[`v0.1.0-alpha.2`](https://github.com/techflag/workdsh/releases/tag/v0.1.0-alpha.2) 是当前 开物Praxis 模块的项目级发行，基于 DeepSeek Harness `0.1.6-alpha.1`。它在既有 Skill 单模块项目预览之后，第一次用一个项目 Release 汇总当前组合所需的九个预构建插件包、统一校验文件和发布清单。
 
-本次新增可安装的 `workdsh-plugin-connectors@0.1.0-alpha.1`：支持多个 stdio/Streamable HTTP MCP 实例、官方凭据存储、工具与资源发现、启停、增删改和按会话工具隔离。腾讯文档令牌连接实测发现 224 个工具，并在 WorkDSH 会话内完成只读账号文档查询。新会话默认不选连接器；选择后详情弹窗关闭并在输入框旁显示连接器名称。交互式 OAuth、多账号和公共授权尚未验收。
+本次新增可安装的 `workdsh-plugin-connectors@0.1.0-alpha.1`：支持多个 stdio/Streamable HTTP MCP 实例、官方凭据存储、工具与资源发现、启停、增删改和按会话工具隔离。腾讯文档令牌连接实测发现 224 个工具，并在 开物Praxis 会话内完成只读账号文档查询。新会话默认不选连接器；选择后详情弹窗关闭并在输入框旁显示连接器名称。交互式 OAuth、多账号和公共授权尚未验收。
 
 完整变化、验证和边界见[项目发行说明](releases/v0.1.0-alpha.2.md)。各插件仍保留独立包版本，不因项目 tag 统一改号。
 
@@ -38,7 +38,7 @@ Harness 基线升级到 `0.1.7-alpha.1`，整包增加项目和资料库，共11
 
 源码发行提交：`bbda262fd0f7d3332d1a9a864d24e0114b2dc811`。main 与 5 个模块 tag 已推送，5 个 GitHub prerelease 均已公开；共 23 个附件完成无认证 HTTP 200 回读，并与本地发行制品逐字节 SHA-256 一致。
 
-本批使用 DeepSeek Harness `0.1.6-alpha.1`，以官方 Team 替代 WorkDSH 自建专家团执行器。五个独立模块版本为 experts alpha.3、skills alpha.29、activity alpha.2、office alpha.5、bundle alpha.42；专家发行附 identity-local alpha.5、audit alpha.4、access alpha.5。安装包、摘要和 manifest 见各模块发布页；未发布 npm。完整变化、验证与已知边界见[本批发布说明](releases/2026-09-15-dsh-0.1.6-alpha.1.md)。
+本批使用 DeepSeek Harness `0.1.6-alpha.1`，以官方 Team 替代 开物Praxis 自建专家团执行器。五个独立模块版本为 experts alpha.3、skills alpha.29、activity alpha.2、office alpha.5、bundle alpha.42；专家发行附 identity-local alpha.5、audit alpha.4、access alpha.5。安装包、摘要和 manifest 见各模块发布页；未发布 npm。完整变化、验证与已知边界见[本批发布说明](releases/2026-09-15-dsh-0.1.6-alpha.1.md)。
 
 | 模块 | 安装包版本 | 下载 |
 | --- | --- | --- |
@@ -161,15 +161,15 @@ dsh --profile workdsh --from-default-profile web --dump-config
 # Required for Skill management. Replace the absolute file path.
 dsh plugin --profile workdsh add /absolute/path/workdsh-plugin-skills-0.1.0-alpha.24.tgz
 
-# Optional WorkDSH brand/theme/workbench layer.
+# Optional Praxis brand/theme/workbench layer.
 dsh plugin --profile workdsh add /absolute/path/workdsh-bundle-0.1.0-alpha.39.tgz
 
 dsh --profile workdsh
 ```
 
-启动后打开“专家 · 技能 · 连接器 → 技能”。Skill 独立安装不提供 WorkDSH URL 路由，直接使用侧栏入口。展示包提供 `workdsh-view` 深链接，但它不包含 Skill 功能实现。
+启动后打开“专家 · 技能 · 连接器 → 技能”。Skill 独立安装不提供 开物Praxis URL 路由，直接使用侧栏入口。展示包提供 `workdsh-view` 深链接，但它不包含 Skill 功能实现。
 
-Open **专家 · 技能 · 连接器 → 技能** after boot. Standalone Skill uses its sidebar entry; the optional presentation bundle owns WorkDSH deep links and does not contain the Skill implementation.
+Open **专家 · 技能 · 连接器 → 技能** after boot. Standalone Skill uses its sidebar entry; the optional presentation bundle owns 开物Praxis deep links and does not contain the Skill implementation.
 
 停止 Profile 后移除管理插件：
 

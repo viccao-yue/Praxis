@@ -16,7 +16,7 @@
 
 U16-0/U16-1 的隔离升级与基础启动已完成；下一执行项为 U16-2 剩余协议、旧数据及长任务回归。V1—V3 的剩余专业场景与故障检查继续跟踪，不再以保留旧执行器作为过渡条件。主线 D04/TM-01 完成状态及后续业务步骤不变，现有历史证据不代表 0.1.6 验收。
 
-本次升级同时交付官方新能力接入，不能只恢复旧功能。专项计划已列 U16-F01—F12：终端/归档/预览、官方 Team、浏览器操作、电脑操作、MCP 资源、SSH 工作区、Headless、自动审核、长任务/PTC、图片与 Messages、可见过程/重连及插件配置恢复。逐项验证有效 Profile/preset、实际用户入口或调用示例、真实任务及失败路径；外部条件未就绪保持待办，包已安装不等于可用。优先继承官方所有者，WorkDSH 负责现有业务适配和必要组合，不另建执行、审批、连接或调度底座。
+本次升级同时交付官方新能力接入，不能只恢复旧功能。专项计划已列 U16-F01—F12：终端/归档/预览、官方 Team、浏览器操作、电脑操作、MCP 资源、SSH 工作区、Headless、自动审核、长任务/PTC、图片与 Messages、可见过程/重连及插件配置恢复。逐项验证有效 Profile/preset、实际用户入口或调用示例、真实任务及失败路径；外部条件未就绪保持待办，包已安装不等于可用。优先继承官方所有者，开物Praxis 负责现有业务适配和必要组合，不另建执行、审批、连接或调度底座。
 
 专家专项进一步以减少自有实现为目标：不预设保留整套 ExpertsManager、preset 编译器与协作服务。先验证不依赖旧专家绑定的官方 Team/Persona/Skill，再按实际业务差异留下最小导入、编辑、授权与成果验收适配；保留用户作品和历史，不要求旧内部结构原样沿用。
 
@@ -28,7 +28,7 @@ U16-0/U16-1 的隔离升级与基础启动已完成；下一执行项为 U16-2 �
 
 ## 当前追加：内置技能工程化
 
-用户要求纠正所有工程内置技能的存储与交付，按所属插件统一 resources/skills/<name>/SKILL.md；腾讯适配回工程并随包交付，原始研究资料保留 docs。七个现有WorkDSH内置的登记、Markdown源、包内资源及preview迁移验收，不扩展其他业务阶段。
+用户要求纠正所有工程内置技能的存储与交付，按所属插件统一 resources/skills/<name>/SKILL.md；腾讯适配回工程并随包交付，原始研究资料保留 docs。七个现有开物Praxis内置的登记、Markdown源、包内资源及preview迁移验收，不扩展其他业务阶段。
 
 ## 每周发行排期
 
@@ -60,7 +60,7 @@ U16-0/U16-1 的隔离升级与基础启动已完成；下一执行项为 U16-2 �
 
 ## 技能市场对标 WorkBuddy（2026-09-13）
 
-用户要求技能页与 WorkBuddy 相同体验；三项决策已确认：一体式市场（目录与已安装同页）、复制为 WorkDSH 自有目录、按真实状态分区（无假推荐）。已交付 skills alpha.26：真实分类标签、品牌图标、中文名/中文描述、「可安装」分区「＋」直接安装；目录安装复用官方 installImport 名称锁与原子发布；目录缺失/损坏降级为诚实诊断。验证：集成 20/20、probe:skills 7/7、18989 活预览截图。后续：目录数据随官方技能市场迭代更新；不新增第二套 registry 或安装路径。
+用户要求技能页与 WorkBuddy 相同体验；三项决策已确认：一体式市场（目录与已安装同页）、复制为 开物Praxis 自有目录、按真实状态分区（无假推荐）。已交付 skills alpha.26：真实分类标签、品牌图标、中文名/中文描述、「可安装」分区「＋」直接安装；目录安装复用官方 installImport 名称锁与原子发布；目录缺失/损坏降级为诚实诊断。验证：集成 20/20、probe:skills 7/7、18989 活预览截图。后续：目录数据随官方技能市场迭代更新；不新增第二套 registry 或安装路径。
 
 ## PPT体验以完整编辑流程对标（2026-09-13）
 
@@ -72,7 +72,7 @@ U16-0/U16-1 的隔离升级与基础启动已完成；下一执行项为 U16-2 �
 
 ## PPTist 下一步（2026-09-13）
 
-常见图表能力验证已通过（8类型+原生PPTX），转向PPTist薄适配器：先明确源构建/嵌入契约与AGPL分发条件，复用Office存储/授权/审计/AI工具，保留逐页提交和明确焦点；旧CreatPPT稿件保留，迁移后只保留一个默认编辑器。完整字体资源、安装生命周期、WorkDSH真实模型与Office/WPS图表编辑视觉验收待做，不把独立原生体验算作应用接入完成。
+常见图表能力验证已通过（8类型+原生PPTX），转向PPTist薄适配器：先明确源构建/嵌入契约与AGPL分发条件，复用Office存储/授权/审计/AI工具，保留逐页提交和明确焦点；旧CreatPPT稿件保留，迁移后只保留一个默认编辑器。完整字体资源、安装生命周期、开物Praxis真实模型与Office/WPS图表编辑视觉验收待做，不把独立原生体验算作应用接入完成。
 
 ## 本轮 PPT 制作契约收口（2026-09-12）
 
@@ -122,7 +122,7 @@ U16-0/U16-1 的隔离升级与基础启动已完成；下一执行项为 U16-2 �
 
 编辑器范围继续覆盖 Word/PPT/Excel/PDF/画布/多维表格，依赖优先 MIT/Apache-2.0；按[宽松许可候选验证计划](evidence/browser-editors-permissive-selection.md)先做 PPT 真文件直接编辑与导出重开探针，再决定迁移。原 Univer 商业组件装配通过不代表许可或产品验收完成。
 
-# WorkDSH 详细开发计划
+# 开物Praxis 详细开发计划
 
 2026-09-12 Office U2 增量：成果卡片/右侧 DOCX 下载/自动跟随已完成有限验收，见 [文档交付记录](evidence/office-document-delivery-u2.md)。下载当前保存修订；完整表格、保真导入/导出和八类实时链路仍按既有后续计划推进，主线与 activeSlice 不变。
 
@@ -205,7 +205,7 @@ D11 前置仍是 D10；后续 TM-01～04 交付真实成员、唯一主持人、
 
 DOC-06 已完成 127/127 份文档审查；[收尾清单](research/harness-review-closure.md) 登记 C01—C06 与版本差异。下一项实际编码为 C01：扩展现有 probe:presets，验证两个同时存活 Session 的技能目录和正文按需加载。然后继续自有生成 Remote、取消与 D01 剩余门槛，不能把阅读完成作为产品准入证据。
 
-接续：C01 已通过双 Session 目录、发布包正文接口、Session 内正文消费、正常关闭后的磁盘恢复，以及两个同时存活 Agent Session 的同名技能调用与同伴卸载隔离，证据见 [预设探针](evidence/d01-presets.md)。Skill 管理的认证请求超时、流式上传取消、提交前取消和重试也已通过。WorkDSH 不可变 SkillRevision 绑定仍属于后续业务契约；Typert 外部 workspace 生成问题作为上游兼容项保留。每项编码遵守 AGENTS.md 的官方优先复用约束，并填写 PLUGIN-DELIVERY 中的复用记录。
+接续：C01 已通过双 Session 目录、发布包正文接口、Session 内正文消费、正常关闭后的磁盘恢复，以及两个同时存活 Agent Session 的同名技能调用与同伴卸载隔离，证据见 [预设探针](evidence/d01-presets.md)。Skill 管理的认证请求超时、流式上传取消、提交前取消和重试也已通过。开物Praxis 不可变 SkillRevision 绑定仍属于后续业务契约；Typert 外部 workspace 生成问题作为上游兼容项保留。每项编码遵守 AGENTS.md 的官方优先复用约束，并填写 PLUGIN-DELIVERY 中的复用记录。
 
 - 验证原生预设发现、创建或受控生成、挂载、空会话选择、首次执行和恢复接口。
 - 验证两种专家组合并发工作时技能目录及可变状态隔离。
@@ -242,8 +242,8 @@ DOC-06 已完成 127/127 份文档审查；[收尾清单](research/harness-revie
 - 按 TEAM-DESIGN 定义 ActorContext、Organization、Membership、ResourceOwner、AccessGrant、RuntimeBinding 和 AuditEvent。
 - 定义身份/授权/审计提供方契约；本地模式以可信 local provider 生成唯一主体和个人组织，测试覆盖多主体，不能直接信任前端 ID。
 - 本地版本验证受控 Session Host 入口和官方工具路径的 owner、授权与审计；不把内部 Host Service 宣称为企业公网 API。
-- 验证 `ctx.fs` 的 observation policy、sandbox/runtime provider 与 WorkDSH 授权同时生效；先读后写仅视为新鲜度保护，不能代替目录和资产权限。
-- 验证 Permission Preset 不会提升 WorkDSH access 或连接授权；Sandbox 返回 partial 时团队强隔离任务失败关闭，网络外发由独立策略阻断。
+- 验证 `ctx.fs` 的 observation policy、sandbox/runtime provider 与 开物Praxis 授权同时生效；先读后写仅视为新鲜度保护，不能代替目录和资产权限。
+- 验证 Permission Preset 不会提升 开物Praxis access 或连接授权；Sandbox 返回 partial 时团队强隔离任务失败关闭，网络外发由独立策略阻断。
 - 确定本地与团队 runtime 的隔离规则：团队不允许多个不互信用户共享可任意执行的 OS 身份/工作目录。
 - 企业 Remote、Session-follow、文件、子任务、成员撤权和在途取消的全路径验证进入[企业版架构说明](ENTERPRISE-EDITION.md) E01—E05；未通过前禁止开放团队远程服务，但不阻塞本地版本。
 - 产物：本地治理契约与验证证据、企业信任边界和后期工作包。
@@ -349,7 +349,7 @@ DOC-06 已完成 127/127 份文档审查；[收尾清单](research/harness-revie
 ## 后期企业版 ToDo（不属于当前本地版本）
 
 - 当前不建设公共 Skill 市场，使用 Harness 默认/本地技能。
-- 后期建设独立 WorkDSH 企业服务端与管理 Web，组织 Skill 元数据、不可变制品、分类、版本、下发策略和成员上传策略由服务端统一拥有。
+- 后期建设独立 开物Praxis 企业服务端与管理 Web，组织 Skill 元数据、不可变制品、分类、版本、下发策略和成员上传策略由服务端统一拥有。
 - Harness Host/隔离 Worker 作为执行节点同步精确授权修订并投影到官方 Skill provider；管理 Web 不直接操作执行节点文件目录。
 - 企业模块开始实现时分别建立自己的 0.1 版本线；不预先命名为 Skill 0.2。完整架构和 E01—E05 工作包见[企业版架构说明](ENTERPRISE-EDITION.md)，Skill 投影决策见 ADR 0015。
 

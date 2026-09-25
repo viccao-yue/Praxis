@@ -4,7 +4,7 @@
 
 ## 已落地
 
-- 根 Host 用 `ctx.plugin` 装配 ContentService、Connection、Tools；必需治理依赖显式声明。安装不需要 experts、skills、workbench 或默认 WorkDSH bundle。
+- 根 Host 用 `ctx.plugin` 装配 ContentService、Connection、Tools；必需治理依赖显式声明。安装不需要 experts、skills、workbench 或默认 开物Praxis bundle。
 - `workdsh-contracts/office` 只导出 TypeScript 类型；Host 构建不内联 Cordis/Harness，也不引用 private contracts 运行值。
 - 一个 StorageDomain 文档记录拥有内容、修订、幂等收据和审计 outbox；同工作区可信 Session / owner 授权。审计临时失败不把已提交内容谎报为未提交。
 - 注册五个原生工具 `content_open/read/capabilities/edit/present`。新建/重开、严格段落操作、最新修订读取与 Session 定向展示可用。`content_export` 未实现，不注册空工具。

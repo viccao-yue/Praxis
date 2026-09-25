@@ -9,7 +9,7 @@ import { withoutRedundantAgentTeamProfile } from './preview-agent-team.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const previewHome = process.env.WORKDSH_PREVIEW_HOME ?? resolve(root, '.test-runtime/preview');
 const agentsHome = process.env.DSH_AGENTS_HOME ?? resolve(homedir(), '.agents');
-const port = process.env.WORKDSH_PREVIEW_PORT ?? '18989';
+const port = process.env.WORKDSH_PREVIEW_PORT ?? '8517';
 // Preview currently needs a larger startup heap; this does not fix the underlying growth.
 const heapMb = process.env.WORKDSH_PREVIEW_HEAP_MB ?? '8192';
 if (!/^\d+$/.test(heapMb) || Number(heapMb) < 512) throw new Error('WORKDSH_PREVIEW_HEAP_MB must be an integer >= 512');
@@ -20,7 +20,7 @@ if (existsSync(profileManifestPath)) {
   const normalizedManifest = withoutRedundantAgentTeamProfile(profileManifest);
   if (normalizedManifest) {
     writeFileSync(profileManifestPath, `${JSON.stringify(normalizedManifest, null, 2)}\n`);
-    console.log('Removed redundant standalone Agent Team profile; WorkDSH experts owns Team composition.');
+    console.log('Removed redundant standalone Agent Team profile; Praxis experts owns Team composition.');
   }
 }
 const dsh = resolve(profile, 'node_modules/@deepseek-ai/dsh/lib/bin.js');

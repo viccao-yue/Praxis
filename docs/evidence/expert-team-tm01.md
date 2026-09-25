@@ -139,7 +139,7 @@
 
 ## 可复现方式
 
-实现：[scripts/probe-expert-team.mjs](../../scripts/probe-expert-team.mjs)。Node 22.23.2，既有 WorkDSH dist 为前提。两份官方同版本 tarball 通过 `npm pack --ignore-scripts` 下载，解压到每次独立的临时目录；依赖只链接到已安装的锁定发布包，运行时逐一检查 Harness 版本。随后由官方 Cordis Loader 加载服务/工具，AgentLoop 实际执行确定性模型适配器；不模拟子 Agent、TeamService、专家业务服务或 Skill 工具。
+实现：[scripts/probe-expert-team.mjs](../../scripts/probe-expert-team.mjs)。Node 22.23.2，既有 开物Praxis dist 为前提。两份官方同版本 tarball 通过 `npm pack --ignore-scripts` 下载，解压到每次独立的临时目录；依赖只链接到已安装的锁定发布包，运行时逐一检查 Harness 版本。随后由官方 Cordis Loader 加载服务/工具，AgentLoop 实际执行确定性模型适配器；不模拟子 Agent、TeamService、专家业务服务或 Skill 工具。
 
 ```sh
 node scripts/probe-expert-team.mjs --prepare  # 首次获取精确版本归档
@@ -176,7 +176,7 @@ node scripts/probe-expert-team.mjs --team    # 生产入口：插件托管provid
 2. **需要专家域自己的子任务绑定接口。**现有 createExecution 仅创建根任务；下一步应在现有 ExpertsService 内补受控“准备委派/绑定已授权原生子 Session”契约，固定 actor、父任务、专家修订、工作区、operationId 和原生子身份，执行前验证，失败不留下可运行的半绑定任务。不能由模型提交任意 preset、childId 或 owner。
 3. **原生 Teams 精确组合仍有公开接点缺口。**当前 spawn 与 continuable prepare 不能直接传 setup；全局 factory 替换不可用。暂不确定采用它作为首版执行路线，不修改上游、不复制 driver。需记录是否有满足语义的公开扩展；不能把补一个业务绑定接口当成已解决 preset 选择。
 4. **固定段备选具有较小的可验证接点。**SubagentProvider.start 可以在公开 AgentRegistry.create 的 setup 中选择成员 preset；本轮只验证了 setup，尚未实现 provider 的完整交付/取消与专家绑定事务。下一项仍属于 TM-01：验证这一最小公开 provider + 专家域绑定适配，再决定是否采用 workflow 固定段。它继续使用原生 AgentLoop，不是新执行引擎。
-5. **SOP验收独立于原生task completed。**WorkDSH阶段准入必须检查真实评审与产物版本；受控业务工具与直接原生工具路径一起验证。未通过前不能声称依赖图已经强制全部业务规则。
+5. **SOP验收独立于原生task completed。**开物Praxis阶段准入必须检查真实评审与产物版本；受控业务工具与直接原生工具路径一起验证。未通过前不能声称依赖图已经强制全部业务规则。
 
 ## 第一批结束时的未执行与状态（历史）
 

@@ -1,15 +1,15 @@
-# WorkDSH 开发规则
+# 开物Praxis 开发规则
 
 ## 项目目标与用户已确认决策
 
-WorkDSH 是基于 DeepSeek Harness 公开插件接口的 Web 工作平台，参考 WorkBuddy 的应用能力。项目独立于 dsh-ssh-desktop。
+开物Praxis 是基于 DeepSeek Harness 公开插件接口的 Web 工作平台，参考 WorkBuddy 的应用能力。项目独立于 dsh-ssh-desktop。
 
 1. 仅依赖官方开发文档和已发布 npm 包；禁止要求上游源码 checkout、引入上游子模块、复制上游私有实现或修改上游源码。
 2. 基线为 `@deepseek-ai/dsh@0.1.7-alpha.1`。DSH 直接依赖按该版本族精确锁定；Cordis 等遵守公开 peerDependencies。不得使用浮动 latest、alpha 混搭，升级必须单独记录兼容证据（本次升级见 [docs/DSH-0.1.7-UPGRADE-PLAN.md](docs/DSH-0.1.7-UPGRADE-PLAN.md)；历史 alpha.1→alpha.2 证据见 [docs/evidence/dsh-0.1.6-alpha.2-upgrade.md](docs/evidence/dsh-0.1.6-alpha.2-upgrade.md)）。
 3. 专家、技能、连接器、行业应用、项目、资料库、自动化、工作台是功能插件。每个插件管理多个业务对象。禁止将每个用户专家强制变为独立 npm 包。
 4. 每个功能的页面操作和 Agent 工具使用同一业务服务；对话式创建专家和技能属于 P1 必做能力。
 5. 插件必须互通：通过公开契约、服务注入和工具组合协作，禁止直接读写其他插件的数据表或导入其内部实现。
-   - 遵循 Harness 自身的插件组合精神：官方底座和 WorkDSH 业务能力统一由官方 Loader/Profile/Cordis 装配，不另建业务大核心或插件框架。默认 bundle 只组合，不用直接调用 applyX(ctx) 隐藏初始化多个功能；各功能使用正式插件入口、独立生命周期与可安装制品。专家引用共享 Skill 对象与修订，不复制技能插件实现。详见 [ADR-0018](docs/adr/0018-composable-feature-plugins-and-shared-skills.md)。
+   - 遵循 Harness 自身的插件组合精神：官方底座和 开物Praxis 业务能力统一由官方 Loader/Profile/Cordis 装配，不另建业务大核心或插件框架。默认 bundle 只组合，不用直接调用 applyX(ctx) 隐藏初始化多个功能；各功能使用正式插件入口、独立生命周期与可安装制品。专家引用共享 Skill 对象与修订，不复制技能插件实现。详见 [ADR-0018](docs/adr/0018-composable-feature-plugins-and-shared-skills.md)。
 6. 默认 Web 运行，使用官方 dsh / Profile / bundle 安装启动；禁止另建 Agent loop、插件加载器、模型路由或 Electron 壳。
 7. 专家切换通过关联新任务交接。专家修订不能静默替换运行中任务的组合。
 8. 所有规划模块目录首期即创建。规划中模块保留 README、职责、任务 ID 和验收条件，不得删除、遗漏或宣称完成。
@@ -42,7 +42,7 @@ WorkDSH 是基于 DeepSeek Harness 公开插件接口的 Web 工作平台，参�
 - 左侧主导航只通过官方 `sidebar.panellist` 等已声明 Slot 增量贡献，并与 `main` 的同 key 页面配对；不得替换或复制官方 Workspace/Session/New Session/Settings owner。`sidebar-right` 只用于当前 Session 的文件、目录、成果或上下文页面，不承担全局主导航和全局管理页面。
 - 普通 Slot 贡献使用 `ctx.slots.inject(key, callback)` 等待 owner 生命周期；独立 registry/service/listener/timer/watcher/subprocess 等注册必须由 `ctx.effect()`、`ctx.on()` 或官方自动托管 API 拥有并可完整撤销。组件 props 从官方 `PropsRuntime<K>`/标准 owner props 推导，不复制框架 props，也不把 `ctx` 传入 React 组件。
 
-- 每项功能编码前，在对应设计或证据文档填写“官方能力复用记录”：任务 ID、官方文档路径、锁定发布包/公开入口、已有探针、WorkDSH 需补的业务差异、验收与缺口。模板见 docs/PLUGIN-DELIVERY.md；缺记录先补记录再编码。
+- 每项功能编码前，在对应设计或证据文档填写“官方能力复用记录”：任务 ID、官方文档路径、锁定发布包/公开入口、已有探针、开物Praxis 需补的业务差异、验收与缺口。模板见 docs/PLUGIN-DELIVERY.md；缺记录先补记录再编码。
 - 选择顺序为：直接复用官方能力 → 通过公开 service/provider/tool/Remote/Slot 扩展 → 仅实现官方不拥有的业务领域。不得以 UI 不同、接口不熟或赶进度为由另造同类底座。
 - Session/Agent loop、preset 组装、Skill 解析与运行、模型路由、MCP 传输、Storage backend、Remote transport、Conversation renderer 均使用官方底座。自有代码负责业务对象、修订、授权、关联与差异 UI；禁止复制上游内部实现。
 - 文档说明、发布包类型、真实运行证据分开登记。镜像与锁定版本不一致时先做最小探针，不猜接口，也不静默升级。复用不能省略组织授权、运行隔离与外部写入回执。
@@ -60,11 +60,11 @@ WorkDSH 是基于 DeepSeek Harness 公开插件接口的 Web 工作平台，参�
 - ui 仅包含展示组件，不引入 Host、数据库、凭据或执行器。
 - 使用官方 Remote / Client model / Slots / Conversation / Sidebar 扩展；组件不持有第二套执行状态。
 - 默认开发数据必须使用隔离的测试 Harness home / Profile，不改用户其他 Profile。
-- 人工交互预览与自动化探针分开：`corepack pnpm preview` 使用项目预览 Profile，但默认读取当前用户 `~/.agents` 的官方技能目录；自动化探针使用临时 Agents home。禁止用空的探针目录启动 18989 人工预览并据此判断用户技能已丢失。
+- 人工交互预览与自动化探针分开：`corepack pnpm preview` 使用项目预览 Profile，但默认读取当前用户 `~/.agents` 的官方技能目录；自动化探针使用临时 Agents home。禁止用空的探针目录启动 8517 人工预览并据此判断用户技能已丢失。
 
 ## 数据与执行
 
-- Harness 日志拥有执行事实；WorkDSH 数据只拥有对象、修订、绑定、项目和资产关系。
+- Harness 日志拥有执行事实；开物Praxis 数据只拥有对象、修订、绑定、项目和资产关系。
 - 模型可见输入走公开注入与持久日志机制；按官方契约扩展事件与投影，不直接改日志文件。
 - 连接定义、连接实例和账号凭据分离。实例选择必须明确；禁止跨账号回退。
 - 插件 scope 和工具可见性不是权限隔离。实际操作仍需服务端检查并遵守 Harness 审批/沙箱。

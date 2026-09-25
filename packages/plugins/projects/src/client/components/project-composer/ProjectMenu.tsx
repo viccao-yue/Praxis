@@ -9,7 +9,7 @@ export type ProjectMenuProps = {
   close: () => void;
   loading?: boolean;
 };
-const labels: Record<ProjectMenuKind,string> = { file:'添加文件', mode:'模式与命令', expert:'专家', skill:'技能', connector:'连接器' };
+const labels: Record<ProjectMenuKind,string> = { file:'添加文件', mode:'模式与命令', expert:'数字员工', skill:'技能', connector:'连接器' };
 const paths: Record<ProjectMenuKind,string> = {file:'m8 12 6-6a3 3 0 0 1 4 4l-8 8a5 5 0 0 1-7-7l9-9 M7 13l7-7',mode:'M4 20 8 8 20 3l-5 12-11 5 M8 16l8-8',expert:'M8 4h8l4 6-2 9-6 3-6-3-2-9 4-6 M8 11h1 M15 11h1 M9 16h6',skill:'m8 5-6 7 6 7 M16 5l6 7-6 7 M14 3l-4 18',connector:'m9 14 6-6 M8 16l-2 2a4 4 0 0 1-5-5l5-5a4 4 0 0 1 5 0 M13 8l2-2a4 4 0 0 1 7 5l-5 5a4 4 0 0 1-5 0'};
 export function ProjectMenu({items,pick,close,loading}:ProjectMenuProps) {
   const [kind,setKind]=React.useState<ProjectMenuKind>(),[query,setQuery]=React.useState(''),[busy,setBusy]=React.useState(false),[error,setError]=React.useState('');
@@ -21,15 +21,15 @@ export function ProjectMenu({items,pick,close,loading}:ProjectMenuProps) {
   const rows=kind?(items[kind]??[]).filter(x=>(x.label+' '+(x.description??'')).toLowerCase().includes(query.toLowerCase())):[];
   return <div ref={root} className={`wd-project-menu${kind?' has-submenu':''}`} onKeyDown={e=>{if(e.key==='ArrowLeft'){setKind(undefined);root.current?.querySelector<HTMLButtonElement>('[aria-expanded="true"]')?.focus();e.preventDefault()}if(e.key==='ArrowDown'||e.key==='ArrowUp'){const group=(e.target as HTMLElement).closest('[role="menu"]');const buttons=group?Array.from(group.querySelectorAll<HTMLButtonElement>('button:not(:disabled)')):[];const index=buttons.indexOf(e.target as HTMLButtonElement);if(index>=0){buttons[(index+(e.key==='ArrowDown'?1:buttons.length-1))%buttons.length]?.focus();e.preventDefault()}}}}>
     <style>{projectMenuCss}</style>
-    <div className="wd-project-menu-main" role="menu" aria-label="项目添加菜单">
+    <div className="wd-project-menu-main" role="menu" aria-label="协同空间添加菜单">
       {(Object.keys(labels) as ProjectMenuKind[]).filter(k=>k!=='mode'||items.mode!==undefined).map(k=><button type="button" role="menuitem" key={k} aria-haspopup="menu" aria-expanded={kind===k} onMouseEnter={()=>{if(window.innerWidth>700&&!busy)choose(k)}} onClick={()=>choose(k)} onKeyDown={e=>{if(e.key==='ArrowRight'){choose(k);e.preventDefault()}}}><svg viewBox="0 0 24 24" aria-hidden="true"><path d={paths[k]}/></svg><span>{labels[k]}</span><span aria-hidden="true">›</span></button>)}
     </div>
     {kind&&<section className="wd-project-menu-sub" aria-label={`${labels[kind]}选择`}>
       <header><button type="button" className="wd-project-menu-back" onClick={()=>setKind(undefined)}>‹ 返回</button><span>{labels[kind]}</span></header>
       {(items[kind]?.length??0)>4&&<Input aria-label={`搜索${labels[kind]}`} placeholder={`搜索${labels[kind]}`} value={query} onChange={e=>setQuery(e.target.value)}/>}
       {error&&<p role="alert" className="wd-project-menu-error">{error}</p>}
-      <div className="wd-project-menu-options" role="menu" aria-label={labels[kind]}>{loading?<p role="status">正在加载…</p>:rows.length?rows.map(item=><button type="button" role={kind==='connector'?'menuitemcheckbox':'menuitem'} aria-checked={kind==='connector'?Boolean(item.selected):undefined} disabled={busy||item.disabled} key={item.id} onClick={()=>void run(item)}><span className="wd-project-menu-avatar" aria-hidden="true">{item.label.slice(0,1)}</span><span className="wd-project-menu-copy"><strong>{item.label}</strong>{item.description&&<small>{item.description}</small>}</span>{item.selected&&<span className="wd-project-menu-check">✓</span>}</button>):<div className="wd-project-menu-empty">{query?'没有匹配结果':`暂无可用${labels[kind]}`}<small>{query?'请尝试其他关键词':'请在项目配置中添加'}</small></div>}</div>
-      {kind==='expert'&&rows.length>0&&<footer>选择专家将创建关联的新任务</footer>}
+      <div className="wd-project-menu-options" role="menu" aria-label={labels[kind]}>{loading?<p role="status">正在加载…</p>:rows.length?rows.map(item=><button type="button" role={kind==='connector'?'menuitemcheckbox':'menuitem'} aria-checked={kind==='connector'?Boolean(item.selected):undefined} disabled={busy||item.disabled} key={item.id} onClick={()=>void run(item)}><span className="wd-project-menu-avatar" aria-hidden="true">{item.label.slice(0,1)}</span><span className="wd-project-menu-copy"><strong>{item.label}</strong>{item.description&&<small>{item.description}</small>}</span>{item.selected&&<span className="wd-project-menu-check">✓</span>}</button>):<div className="wd-project-menu-empty">{query?'没有匹配结果':`暂无可用${labels[kind]}`}<small>{query?'请尝试其他关键词':'请在协同空间配置中添加'}</small></div>}</div>
+      {kind==='expert'&&rows.length>0&&<footer>选择数字员工将创建关联的新任务</footer>}
       {kind==='connector'&&rows.length>0&&<footer>仅用于当前任务</footer>}
     </section>}
   </div>;

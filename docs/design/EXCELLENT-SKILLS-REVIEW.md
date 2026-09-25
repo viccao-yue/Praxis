@@ -4,11 +4,11 @@
 
 ## 来源与接入现状
 
-| 对象 | 实际来源 | WorkDSH 现状 |
+| 对象 | 实际来源 | 开物Praxis 现状 |
 | --- | --- | --- |
 | tencent-pptx（入口 version v20260727） | WorkBuddy builtin-plugins/tencent-pptx/skills/tencent-pptx | 本机 WorkBuddy 内置技能，非本仓自有技能。Office authoring.ts 已借鉴叙事、视觉焦点及日报版式；未接入 slidep 运行时。 |
 | ppt-implement | WorkBuddy cb_teams_marketplace/plugins/ppt-implement | 本机网页演示技能，非当前 PPT 编辑器实现；依赖预配置网页模板、页面脚本和导出工具。 |
-| skill-creator：市场副本 | WorkDSH 本机 catalog payloads/skill-creator 与 .agents/skills/skill-creator | catalog 可安装副本含入口、两份参考和初始化/校验/打包脚本；不能据目录存在宣称这些脚本已在 WorkDSH 执行验收。 |
+| skill-creator：市场副本 | 开物Praxis 本机 catalog payloads/skill-creator 与 .agents/skills/skill-creator | catalog 可安装副本含入口、两份参考和初始化/校验/打包脚本；不能据目录存在宣称这些脚本已在 开物Praxis 执行验收。 |
 | skill-creator：WorkBuddy builtin | workbuddy-builtin/skills/skill-creator | 较完整版本，包含安装后修改标记和 CodeBuddy 管理约定；与市场精简副本不是同一正文。 |
 | skill-creator：Codex system | Codex .system/skill-creator | 当前系统版强调精确触发、尊重范围、按风险决定步骤严密度；不是市场副本的自动升级。 |
 
@@ -50,7 +50,7 @@
 - 创建、编辑、发布分开；修改用户安装副本应有来源与防覆盖策略。
 - 校验器必须匹配宿主允许的元数据。市场 quick_validate.py 有字段白名单，不能直接作为 Harness 的权威解析器；WorkBuddy 的 agent_created/userModified 标记也不是本项目权限依据。
 
-## 对 WorkDSH 整体的整理原则
+## 对 开物Praxis 整体的整理原则
 
 | 层次 | 负责什么 | 验收关注 |
 | --- | --- | --- |
@@ -67,4 +67,4 @@
 
 ## Preview 运行来源补充
 
-已通过真实 preview 管理接口核对，当前 bundled skill-creator 为 WorkDSH 专用只读指南，非前述本机通用副本；tencent-pptx/ppt-implement 不在本次运行 list/catalog。整套已配备能力见 [Preview 实际技能清单](PREVIEW-SKILLS-INVENTORY.md)。
+已通过真实 preview 管理接口核对，当前 bundled skill-creator 为 开物Praxis 专用只读指南，非前述本机通用副本；tencent-pptx/ppt-implement 不在本次运行 list/catalog。整套已配备能力见 [Preview 实际技能清单](PREVIEW-SKILLS-INVENTORY.md)。

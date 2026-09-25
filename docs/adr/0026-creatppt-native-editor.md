@@ -4,7 +4,7 @@
 
 ## 需求与决定
 
-用户已在 19091 独立页面体验并确认 CreatPPT，要求在 WorkDSH 内体验，AI 创建后右侧打开，每次提交实时显示，保留原生编辑、保存和 PPTX 下载。Word 暂停扩展。
+用户已在 19091 独立页面体验并确认 CreatPPT，要求在 开物Praxis 内体验，AI 创建后右侧打开，每次提交实时显示，保留原生编辑、保存和 PPTX 下载。Word 暂停扩展。
 
 只使用 @seekskyworld/creatppt 0.1.4（Apache-2.0）的已发布包。公共根入口的 DeckSpec/parseDeck/deckFromBrief/ensureDeckElements/rebuildSlideElements 为唯一 PPT 模型及布局算法。此前自建 Konva/PptxGenJS 模型仅保留探针，不进入新产品路径；不引入 PPTist，不映射双模型。
 

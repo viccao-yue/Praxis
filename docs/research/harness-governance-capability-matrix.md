@@ -2,9 +2,9 @@
 
 状态：H06 文档审查完成；基于锁定文档镜像，发布包运行探针仍归 P0-04。
 
-本矩阵规定 WorkDSH 如何使用 DeepSeek Harness 的 Settings、Credentials、Approval、Permission Presets、Sandbox 与 API Gateway。它们分别解决不同问题，不能互相替代，也不能合并成一个笼统的“权限系统”。
+本矩阵规定 开物Praxis 如何使用 DeepSeek Harness 的 Settings、Credentials、Approval、Permission Presets、Sandbox 与 API Gateway。它们分别解决不同问题，不能互相替代，也不能合并成一个笼统的“权限系统”。
 
-| 官方能力 | 可直接复用 | WorkDSH 必须补充 | 禁止误用 |
+| 官方能力 | 可直接复用 | 开物Praxis 必须补充 | 禁止误用 |
 | --- | --- | --- | --- |
 | Settings | 命名空间、schema/default/base/user 合并、修订冲突、脱敏描述、更新事件 | 插件偏好、部署参数和可编辑运行设置的页面；管理动作授权与审计 | 保存业务对象、组织策略真源或密钥；把 `applies` 当成实际热更新机制 |
 | Credentials | CredentialRef 分层解析、CredentialKey 授权记录、按操作解析、轮换后下次操作生效、远端单向写入 | 连接实例与凭据引用绑定、外部主体指纹、使用范围、轮换/撤销审计 | 将明文写入 Settings、领域对象、Session、Remote 返回或模型上下文 |
@@ -19,7 +19,7 @@ Settings 只承载某个插件或部署组合允许用户编辑的运行偏好�
 
 每个外部 Settings 读取入口都使用 `describe({ redactSecrets: true })`。secret role 字段不会以普通配置值进入 descriptor；管理端只能显示 `{ path, set }` 这类槽位状态并发起单向写入。`applies: restart` 等元数据是 UI 提示，实际重启或重组仍由对应 owner 实现和验证。
 
-OrganizationPolicy、AccessGrant、Membership、ConnectorInstance、ExpertRevision 等仍是 WorkDSH 领域对象。它们需要所有者、预期修订、授权和审计，不能装进用户配置文档。
+OrganizationPolicy、AccessGrant、Membership、ConnectorInstance、ExpertRevision 等仍是 开物Praxis 领域对象。它们需要所有者、预期修订、授权和审计，不能装进用户配置文档。
 
 ## 凭据和连接实例
 
@@ -31,7 +31,7 @@ connectors 领域保存 ConnectionInstance、credential reference、target finge
 
 一次工具执行至少经过四层独立判断：
 
-1. WorkDSH access：发起主体是否能对业务对象执行该动作。
+1. 开物Praxis access：发起主体是否能对业务对象执行该动作。
 2. 连接授权：该主体能否使用指定 ConnectionInstance 与外部账号。
 3. Harness approval：这一次具体工具调用是否需要人类确认。
 4. runtime/sandbox：执行环境能否满足文件、进程和租户隔离要求。
@@ -46,9 +46,9 @@ Permission Preset 只组合第 3、4 层的部分旋钮。默认中即使存在 
 
 ## Remote 与流协议
 
-WorkDSH Host 服务仅把明确标记的一元方法生成到 Client。参数与返回值使用 Client-safe JSON 类型，复杂 Host 对象通过受控 lookup/context provider 解析；每次调用仍在业务方法入口恢复 ActorContext 并执行授权。业务组件只依赖自己调用的 `remote.<namespace>`，Client 组合显式选择允许挂载的 Remote contribution。
+开物Praxis Host 服务仅把明确标记的一元方法生成到 Client。参数与返回值使用 Client-safe JSON 类型，复杂 Host 对象通过受控 lookup/context provider 解析；每次调用仍在业务方法入口恢复 ActorContext 并执行授权。业务组件只依赖自己调用的 `remote.<namespace>`，Client 组合显式选择允许挂载的 Remote contribution。
 
-H09 校正：一元是 WorkDSH 首期选择，不是 Typert 全部能力限制。镜像 `subsystems/typert.zh.md` 还描述 stream descriptor/Gateway，需核对 rc.1 发布产物再采用。流式传输不能替代领域 baseline/cursor、授权、重放与去重，详见 [收尾 C03](harness-review-closure.md)。
+H09 校正：一元是 开物Praxis 首期选择，不是 Typert 全部能力限制。镜像 `subsystems/typert.zh.md` 还描述 stream descriptor/Gateway，需核对 rc.1 发布产物再采用。流式传输不能替代领域 baseline/cursor、授权、重放与去重，详见 [收尾 C03](harness-review-closure.md)。
 
 新增或修改 Remote 签名后必须按 Host 生成、Client 编译顺序构建，不能只重编前端。开发时的 SRC fallback 校验较弱，不能作为发布验收。会话 follow、领域增量、分页列表和长任务进度使用各自 baseline/cursor/subscription 协议，不伪装成 Remote 一元调用。
 
@@ -57,13 +57,13 @@ H09 校正：一元是 WorkDSH 首期选择，不是 Typert 全部能力限制�
 - 锁定发布包是否完整暴露上述 Settings/Credentials/Approval/Sandbox 服务与 Remote contribution。
 - Credential provider 在本地与团队部署的存储位置、权限和备份恢复行为。
 - `partial` sandbox 的平台探针及企业组合失败策略。
-- ActorContext 如何进入每个 WorkDSH Remote、Fetch、工具、Session follow 与资源流入口。
+- ActorContext 如何进入每个 开物Praxis Remote、Fetch、工具、Session follow 与资源流入口。
 - 配置目录、Loader/Profile 修改和 Settings 更新之间的真实重组边界。
 
 ## 配置目录带来的制品分类
 
-官方配置目录按部署轴区分四类制品：声明配置的可加载插件、无配置的可加载插件、只能由具体 provider 实现的 seam 包、只能被代码导入的库包。WorkDSH 插件管理页必须按发布 manifest 与 Loader 实际状态识别类别，不能把 npm 包存在、Client UI 无配置或 seam 类型声明误报为可直接启停的业务插件。
+官方配置目录按部署轴区分四类制品：声明配置的可加载插件、无配置的可加载插件、只能由具体 provider 实现的 seam 包、只能被代码导入的库包。开物Praxis 插件管理页必须按发布 manifest 与 Loader 实际状态识别类别，不能把 npm 包存在、Client UI 无配置或 seam 类型声明误报为可直接启停的业务插件。
 
-`Requires` 只列 Harness 包通过 `inject` 声明的服务，不能据此推断 vendored Cordis 依赖或组织授权。每个 WorkDSH Profile 仍要显式组合具体 provider、稳定 Loader entry id 和依赖诊断。
+`Requires` 只列 Harness 包通过 `inject` 声明的服务，不能据此推断 vendored Cordis 依赖或组织授权。每个 开物Praxis Profile 仍要显式组合具体 provider、稳定 Loader entry id 和依赖诊断。
 
-配置目录还确认以下部署约束：preset 的 user root 与 shell 访问同等信任；sandbox-policy 默认 `read-only`；storage-domain 按 Domain 路由 backend；Settings 和 Credentials 使用不同文件/provider；Connection 的 trustedHosts 与浏览器认证是 Host 信任围栏。某些第三方适配器虽然允许在 YAML 中填写 literal key/header/env，WorkDSH 正式 Profile 仍优先 credential reference 和最小环境，不让管理页面把秘密写入普通配置。
+配置目录还确认以下部署约束：preset 的 user root 与 shell 访问同等信任；sandbox-policy 默认 `read-only`；storage-domain 按 Domain 路由 backend；Settings 和 Credentials 使用不同文件/provider；Connection 的 trustedHosts 与浏览器认证是 Host 信任围栏。某些第三方适配器虽然允许在 YAML 中填写 literal key/header/env，开物Praxis 正式 Profile 仍优先 credential reference 和最小环境，不让管理页面把秘密写入普通配置。

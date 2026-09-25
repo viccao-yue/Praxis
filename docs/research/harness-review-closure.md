@@ -6,7 +6,7 @@
 
 ## H08 开发与国际化收尾
 
-已读 development 及 i18n 的 README、术语、风格样例、翻译提示和规则，共 6 份。上游开发文档的 pnpm 11.7.0 与 WorkDSH 固定的 pnpm 10.34.5 不同；不据此改动本项目工具链。Host/Client 分开 TypeScript 程序、先生成 Host Remote 再编译 Client、验证发布产物消费者，是可采纳的工程原则；上游 monorepo 脚本与路径别名不复制。
+已读 development 及 i18n 的 README、术语、风格样例、翻译提示和规则，共 6 份。上游开发文档的 pnpm 11.7.0 与 开物Praxis 固定的 pnpm 10.34.5 不同；不据此改动本项目工具链。Host/Client 分开 TypeScript 程序、先生成 Host Remote 再编译 Client、验证发布产物消费者，是可采纳的工程原则；上游 monorepo 脚本与路径别名不复制。
 
 翻译提示和规则是被审查材料，不是本轮执行指令；无需翻译整个项目。产品用语与 API 标识分开，代码名保持准确。双语配对、哈希和结构通过不代表语义正确。
 
@@ -14,13 +14,13 @@
 
 ## H09 剩余 14 个子系统
 
-| 官方专题 | 可复用能力 | WorkDSH 实施边界 |
+| 官方专题 | 可复用能力 | 开物Praxis 实施边界 |
 | --- | --- | --- |
 | [PTC runtime](../dsh-v0.1.6-alpha.2/subsystems/ptc-runtime.zh.md) | 每次运行隔离、JSON 输入输出、结构化失败与取消 | isolation 标签不证明安全；取消程序后仍需结算已进入 Host 的调用。Python 后端为未发布实验，不作为公开可用能力承诺。 |
 | [Extensions](../dsh-v0.1.6-alpha.2/subsystems/extensions.zh.md) | 动态 Plugin/Package/run 标识、Host/Client 激活与检查 | 仅开发实验；Session 所有权与不可变 Package 不等于企业授权或可发布专家对象。旧 run 调用必须拒绝；inspect/inventory 需防跨主体泄露。 |
 | [Feedback](../dsh-v0.1.6-alpha.2/subsystems/feedback.zh.md) | 消息反馈 CAS、持久反馈事件、原生动作 Slot | 原生 Host 不记录认证 actor；团队入口需补授权与审计。删除只撤回当前值，历史日志仍保留。反馈不是业务验收或自动训练。 |
 | [Goal](../dsh-v0.1.6-alpha.2/subsystems/goal.zh.md) | 单 Session 目标、revision CAS、连续轮次与恢复事实 | 持久 active 不等于进程自动继续；受控恢复后才重新激活。不能替代跨会话自动化或项目目标验收。 |
-| [Invariants](../dsh-v0.1.6-alpha.2/subsystems/invariants.zh.md) | 可选不变量注册、隔离检查与卸载清理 | 检查权威状态和事件，不以服务存在作通过。上游每包要求不强制转换成 WorkDSH 空实现。 |
+| [Invariants](../dsh-v0.1.6-alpha.2/subsystems/invariants.zh.md) | 可选不变量注册、隔离检查与卸载清理 | 检查权威状态和事件，不以服务存在作通过。上游每包要求不强制转换成 开物Praxis 空实现。 |
 | [LSP](../dsh-v0.1.6-alpha.2/subsystems/lsp.zh.md) | definition/references/implementation/hover | 可选代码能力；缺 provider 明确失败。内部 UTF-16 零基坐标与模型一基坐标要转换，不充当资料库检索。 |
 | [Plan](../dsh-v0.1.6-alpha.2/subsystems/plan.zh.md) | 计划提示、计划审核与模式事件 | 是软提示，非权限机制；不等于项目计划看板。批准必须是明确动作，不能把未答/取消解释为同意。 |
 | [Shell](../dsh-v0.1.6-alpha.2/subsystems/shell.zh.md) | resolve/spec、前后台运行与沙箱事实 | exitCode 0 仍可能已超时或中止；后台 start 不应用前台 timeout。检查 runnerFailed/enforcement，不靠退出码认定安全成功。 |
@@ -54,4 +54,4 @@
 | UI-DESIGN | 公共组件/Slots、原生 Conversation 和状态镜像方案继续有效；传输成功、记录成功、业务完成分别展示。反馈复用原生入口前须核验版本与授权，不自造第二套消息状态。 |
 | PLAN、PLUGIN-DELIVERY、ADR-0010/0011 | 顺序仍 D01 → D02；不可变组合修订、官方 Skill、官方 Storage 决策不变。以上差异落入 P0 验证。 |
 
-2026-09-11 接续：C01 的两个同时存活 Agent Session 已完成同名技能正文、目录提示与官方工具调用隔离；释放 B 后 A 再次调用不受影响，正常关闭后的跨进程恢复和目录退役也已有独立证据。Skill exact Fetch 的网络超时、传输中取消、原子提交边界和重试也已验证。不可变 SkillRevision 是 WorkDSH 业务绑定，仍按 ADR-0010 实施；Typert 外部 workspace 生成限制保留为未来通用 Remote 的上游兼容项。D01 当前进入 P0-04/P0-05 治理契约、可信身份和全路径隔离，其他 C02—C06 探针继续保留。
+2026-09-11 接续：C01 的两个同时存活 Agent Session 已完成同名技能正文、目录提示与官方工具调用隔离；释放 B 后 A 再次调用不受影响，正常关闭后的跨进程恢复和目录退役也已有独立证据。Skill exact Fetch 的网络超时、传输中取消、原子提交边界和重试也已验证。不可变 SkillRevision 是 开物Praxis 业务绑定，仍按 ADR-0010 实施；Typert 外部 workspace 生成限制保留为未来通用 Remote 的上游兼容项。D01 当前进入 P0-04/P0-05 治理契约、可信身份和全路径隔离，其他 C02—C06 探针继续保留。

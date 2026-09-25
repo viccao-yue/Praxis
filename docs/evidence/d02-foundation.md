@@ -10,7 +10,7 @@
 
 ## 当前工作
 
-D02 只收口 P1-01 的工作台和共享 UI `0.1`：在 Harness 官方 Sidebar、Workspace、Session 与 Conversation 所有权下提供 WorkDSH 业务导航、真实状态和公共展示组件，并保持本地身份、授权与审计服务可由后续领域插件复用。
+D02 只收口 P1-01 的工作台和共享 UI `0.1`：在 Harness 官方 Sidebar、Workspace、Session 与 Conversation 所有权下提供 开物Praxis 业务导航、真实状态和公共展示组件，并保持本地身份、授权与审计服务可由后续领域插件复用。
 
 首个代码切片为 workbench `0.1.0-alpha.9` / bundle `0.1.0-alpha.36`：公开 `src/index.ts` 只导出 Harness 装配函数，Slot 注册移到 `src/harness/client.ts`，页面结构使用独立 `BusinessPanel.tsx`，样式使用独立模块。该重构不创建 React root，也不改变官方 Sidebar/Conversation 的所有权。Node 22.23.2 下 workbench/bundle build 与 typecheck、32/32 集成测试和完整打包浏览器探针通过；浏览器覆盖官方 Sidebar 所有权、业务面板、会话往返、重连、停服移除和重装。
 

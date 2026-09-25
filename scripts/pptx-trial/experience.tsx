@@ -34,7 +34,7 @@ const card=(b:any,x:number,y:number,w:number,h:number,color='#EFF6FF')=>b.addSha
 const titles=['工作日报','今日成果总览','功能完成情况','已完成工作','风险与待办','下一步计划'];
 for(let i=0;i<6;i++){
  const b=createSlide();card(b,0,0,960,540,'#FFFFFF');card(b,45,38,6,40,blue);text(b,titles[i],65,35,820,60,32,ink,true);
- text(b,'WorkDSH · 体验样板（演示数据）',50,495,650,24,12,'#64748B');text(b,`${i+1} / 6`,845,495,75,24,12,'#64748B');
+ text(b,'开物Praxis · 体验样板（演示数据）',50,495,650,24,12,'#64748B');text(b,`${i+1} / 6`,845,495,75,24,12,'#64748B');
  if(i===0){text(b,'让成果清楚可见',65,155,480,70,40,ink,true);text(b,'计划 10 项 · 完成 7 项 · 待完成 3 项',65,260,500,70,24);card(b,650,145,245,280,blue);text(b,'70%',675,215,210,110,66,'#FFFFFF',true);text(b,'今日完成率',675,335,210,40,22,'#FFFFFF');}
  if(i===1){for(const [j,num,label] of [[0,'10','计划功能'],[1,'7','完成交付'],[2,'70%','完成率']] as const){card(b,60+j*285,140,260,270,j===1?blue:'#EFF6FF');text(b,num,85+j*285,200,210,110,64,j===1?'#FFFFFF':blue,true);text(b,label,85+j*285,330,210,45,22,j===1?'#FFFFFF':ink);}}
  if(i===2){b.addChart('pie',{categories:['已完成','待完成'],series:[{name:'功能数量',values:[7,3]}],title:'计划功能完成情况',hasLegend:true},{x:70,y:115,width:500,height:330});text(b,'7 项已完成',635,170,270,60,30,blue,true);text(b,'3 项待完成',635,260,270,60,30);text(b,'演示数据：7 ÷ 10 = 70%',635,345,270,65,20,'#64748B');}
