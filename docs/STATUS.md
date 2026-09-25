@@ -1,3 +1,7 @@
+## 2026-09-25：仓库首页 README 重写
+
+`README.md` 与 `README.zh-CN.md` 已整页改写。页顶改用 `assets/brand/praxis-favicon.png`。正文不再出现旧产品名、旧仓库下载链接、旧截图和 Star 趋势。未在 GitHub 页面刷新验收。
+
 ## 2026-09-25：桌面安装包换用新 1024 logo
 
 用户提供 1024×1024 开关形渐变标（黑底）。已写入 `assets/brand/workdsh-logo-concept.png` 与 `praxis-desktop-icon-1024.png`，并用 10 档 iconset 重生成 `scripts/desktop/patches/upstream/apps/desktop/workdsh-icon.icns`（sha256 `77397ac2…`）。electron-builder `mac.icon` 仍指向该文件。未执行本轮桌面重打包；Web SVG 主标未改。
