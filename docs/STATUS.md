@@ -1,6 +1,6 @@
 ## 2026-09-26：Desktop 未签名 Alpha 三包 CI
 
-按用户「按这个做」：在官方 `apps/desktop` 流水线（tag `dsh-v0.1.5-rc.1` + WORKDSH TEST PATCH）上接 GitHub Actions，不采用社区 `dsh-plugin-desktop`。新增 `ci-bootstrap-snapshot.mjs`、`ci-pack-plugins.mjs`、`ci-build-installer.mjs`；`pack-desktop.mjs` 支持 `--target` / `--installer`；`.github/workflows/desktop.yml` 在 `windows-latest` + `macos-latest`（arm64/x64）打 NSIS/DMG，`desktop-v*` 标签发 prerelease；同事安装说明见 [DESKTOP-INSTALL.md](DESKTOP-INSTALL.md)。electron-builder 补丁允许 `WORKDSH_DESKTOP_UNSIGNED=1` 跳过 Win EV / Mac 公证。本机未跑完整三平台打包（需 CI Runner）；未打标签触发正式流水线。下一步：推送到 `mine` 后打 `desktop-v*` 或手动 Run workflow 冒烟。
+按用户「按这个做」：在官方 `apps/desktop` 流水线（tag `dsh-v0.1.5-rc.1` + WORKDSH TEST PATCH）上接 GitHub Actions，不采用社区 `dsh-plugin-desktop`。新增 `ci-bootstrap-snapshot.mjs`、`ci-pack-plugins.mjs`、`ci-build-installer.mjs`；`pack-desktop.mjs` 支持 `--target` / `--installer`；`.github/workflows/desktop.yml` 在 `windows-latest` + `macos-latest`（arm64/x64）打 NSIS/DMG，`desktop-v*` 标签发 prerelease；同事安装说明见 [DESKTOP-INSTALL.md](DESKTOP-INSTALL.md)。electron-builder 补丁允许 `WORKDSH_DESKTOP_UNSIGNED=1` 跳过 Win EV / Mac 公证。提交 `bb357d9453` 已推送 `mine/main`（viccao-yue/Praxis）。本机未跑完整三平台打包；`gh` token 失效未能代触发 Actions，需在 GitHub 手动 Run workflow 或打 `desktop-v*` 标签。
 
 ## 2026-09-25：文档去掉旧产品名和 W 标
 
