@@ -35,7 +35,8 @@ export function createElectronBuilderConfig(
   const workdshUnsigned = env.WORKDSH_DESKTOP_UNSIGNED === '1'
   const macOSSigning = packagesMacOS && !workdshUnsigned ? resolveMacOSSigningEnvironment(env) : undefined
   if (packagesMacOS && !workdshUnsigned) resolveMacOSNotarizationEnvironment(env)
-  const windowsSigner = packagesWindows
+  // WORKDSH TEST PATCH: unsigned Alpha builds skip Windows EV signing (CI preview only).
+  const windowsSigner = packagesWindows && !workdshUnsigned
     ? createWindowsTokenSigner({
         certificateFile: env.DSH_DESKTOP_WINDOWS_CER_FILE,
         signTool: env.DSH_DESKTOP_WINDOWS_SIGNTOOL,
@@ -94,11 +95,18 @@ export function createElectronBuilderConfig(
       )
     },
     win: {
-      forceCodeSigning: true,
-      signtoolOptions: {
-        sign: windowsSigner,
-        signingHashAlgorithms: ['sha256'],
-      },
+      // WORKDSH TEST PATCH: allow unsigned NSIS for Alpha CI (SmartScreen may warn).
+      forceCodeSigning: !workdshUnsigned,
+      ...(windowsSigner !== undefined
+        ? {
+            signtoolOptions: {
+              sign: windowsSigner,
+              signingHashAlgorithms: ['sha256'],
+            },
+          }
+        : {}),
+      // Prefer PNG source; electron-builder expands multi-size ICO for the installer.
+      icon: fileURLToPath(new URL('./build/icon.png', import.meta.url)),
       target: ['nsis'],
     },
     linux: {

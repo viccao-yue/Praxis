@@ -1,37 +1,49 @@
 # 开物Praxis 桌面打包（官方流水线）
 
 基于官方 `deepseek-ai/deepseek-harness` 仓库 `apps/desktop`（tag `dsh-v0.1.5-rc.1`）的隔离快照，
-经 `WORKDSH TEST PATCH` 补丁产出 **开物Praxis.app 未签名本地测试版**（macOS arm64）。
+经 `WORKDSH TEST PATCH` 补丁产出 **Praxis** 未签名桌面端。
 
-**完整指南见 [docs/DESKTOP-PACKAGING.md](../../docs/DESKTOP-PACKAGING.md)**：用法、补丁用途表、
-快照重建、Windows 说明与常见问题均以该文档为主体；本文件仅作脚本目录速查。
+- **同事安装**：见 [docs/DESKTOP-INSTALL.md](../../docs/DESKTOP-INSTALL.md)
+- **打包指南**：见 [docs/DESKTOP-PACKAGING.md](../../docs/DESKTOP-PACKAGING.md)
+- **CI 三包**：`.github/workflows/desktop.yml`（标签 `desktop-v*`）
 
-产物仅本机自用，**不可分发**；正式发布需停用未签名模式并具备 Apple Developer ID 与公证凭据。
+未签名 Alpha 仅供内测；正式分发需 Apple Developer ID / Windows 代码签名并停用 `WORKDSH_DESKTOP_UNSIGNED`。
 
-## 快速使用
+## 本地快速使用
 
 ```bash
-node scripts/desktop/pack-desktop.mjs                # 校验补丁 → build:desktop → electron-builder → 产物校验
-node scripts/desktop/pack-desktop.mjs --restart      # 打包校验通过后重启应用
-node scripts/desktop/pack-desktop.mjs --skip-build   # 只重跑 electron-builder（未改 apps/desktop 源码时）
-node scripts/desktop/pack-desktop.mjs --check-only   # 只做前置检查
-node scripts/desktop/pack-desktop.mjs --sync-patches # 快照补丁有改动时，同步到本目录存档
+# 本机已有快照与种子时：只重打 .app 目录
+node scripts/desktop/pack-desktop.mjs
+node scripts/desktop/pack-desktop.mjs --restart
+node scripts/desktop/pack-desktop.mjs --skip-build
+node scripts/desktop/pack-desktop.mjs --check-only
+node scripts/desktop/pack-desktop.mjs --sync-patches
+
+# 多目标 / 安装包（须对应 OS 宿主）
+node scripts/desktop/pack-desktop.mjs --target=mac-arm64 --installer
+node scripts/desktop/pack-desktop.mjs --target=mac-x64 --installer
+node scripts/desktop/pack-desktop.mjs --target=win-x64 --installer
 ```
 
-脚本自动处理：Node 22 自举、corepack 直调、`ELECTRON_MIRROR` 镜像、未签名环境变量、产物断言。
-退出码非 0 即失败。
+## CI / 完整准备序列
 
-产物：`.artifacts/desktop-pack-test/upstream/apps/desktop/.desktop-build/targets/mac-arm64/artifacts/mac-arm64/开物Praxis.app`
+```bash
+node scripts/desktop/ci-bootstrap-snapshot.mjs   # 拉官方 tag + 应用补丁 + Win PNG 图标
+corepack pnpm build
+node scripts/desktop/ci-build-installer.mjs --target=mac-arm64
+# → .artifacts/desktop-installers/<target>/
+```
 
-## 前置条件
+`ci-build-installer.mjs` 会：安装快照依赖 → 打种子 tarball → `build:desktop` → 官方 `package:<target>`（prepare + electron-builder）。
 
-- macOS arm64 主机（Apple Silicon）。
-- 快照存在：`.artifacts/desktop-pack-test/upstream/`（gitignored，重建见指南「快照重建」）。
-- 首次打包需联网（npm 产物已缓存在快照 node_modules；Electron 二进制走 npmmirror 镜像）。
-- 不要求 Apple 签名凭据（`WORKDSH_DESKTOP_UNSIGNED=1` 由脚本注入）。
+## 脚本清单
 
-## 补丁存档（patches/upstream/）
+| 文件 | 用途 |
+|------|------|
+| `pack-desktop.mjs` | 本地/校验入口；`--target` / `--installer` |
+| `ci-bootstrap-snapshot.mjs` | 下载官方快照并应用 `patches/upstream` |
+| `ci-pack-plugins.mjs` | 将开物 7 包 + `dsh-ui-appearance@0.1.10` 打入 `packed/workdsh` |
+| `ci-build-installer.mjs` | CI 用完整准备 + 安装包 |
+| `patches/upstream/` | WORKDSH TEST PATCH 存档（含 `workdsh-icon.icns`） |
 
-`patches/upstream/` 存档 9 个补丁文件，按快照相对路径存放；
-`pack-desktop.mjs` 每次运行逐文件 SHA-256 比对，不一致即报错（防漂移）。
-改动流程：改快照 → `--sync-patches` → 存档随代码提交。清单与用途见指南「补丁存档」。
+产物路径示例：`.artifacts/desktop-pack-test/upstream/apps/desktop/.desktop-build/targets/mac-arm64/artifacts/`

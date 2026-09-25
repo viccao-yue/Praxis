@@ -1,3 +1,7 @@
+## 2026-09-26：Desktop 未签名 Alpha 三包 CI
+
+按用户「按这个做」：在官方 `apps/desktop` 流水线（tag `dsh-v0.1.5-rc.1` + WORKDSH TEST PATCH）上接 GitHub Actions，不采用社区 `dsh-plugin-desktop`。新增 `ci-bootstrap-snapshot.mjs`、`ci-pack-plugins.mjs`、`ci-build-installer.mjs`；`pack-desktop.mjs` 支持 `--target` / `--installer`；`.github/workflows/desktop.yml` 在 `windows-latest` + `macos-latest`（arm64/x64）打 NSIS/DMG，`desktop-v*` 标签发 prerelease；同事安装说明见 [DESKTOP-INSTALL.md](DESKTOP-INSTALL.md)。electron-builder 补丁允许 `WORKDSH_DESKTOP_UNSIGNED=1` 跳过 Win EV / Mac 公证。本机未跑完整三平台打包（需 CI Runner）；未打标签触发正式流水线。下一步：推送到 `mine` 后打 `desktop-v*` 或手动 Run workflow 冒烟。
+
 ## 2026-09-25：文档去掉旧产品名和 W 标
 
 已删除品牌目录里的两枚旧 W 标。`docs/` 里旧产品名已改为 Praxis，模块 README 与更新记录改为 praxis 包名前缀，并去掉旧仓库链接。官网页去掉这些外链，页标改用萌芽图标。仓库首页改用 1024 透明背景标志。打包用的 macOS 图标文件名未改，文档里的对应路径因此和磁盘文件不一致。

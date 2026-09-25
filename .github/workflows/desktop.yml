@@ -1,0 +1,172 @@
+name: Desktop
+
+# Unsigned Alpha installers via the official apps/desktop pipeline
+# (deepseek-ai/deepseek-harness tag dsh-v0.1.5-rc.1 + WORKDSH TEST PATCH).
+# Not the community dsh-plugin-desktop / Yarn shell.
+
+on:
+  push:
+    tags:
+      - 'desktop-v*'
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Build one target only (empty = all three)'
+        required: false
+        default: ''
+        type: choice
+        options:
+          - ''
+          - mac-arm64
+          - mac-x64
+          - win-x64
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DSH_TELEMETRY_DISABLED: '1'
+  DSH_DESKTOP_TAG: dsh-v0.1.5-rc.1
+  WORKDSH_DESKTOP_UNSIGNED: '1'
+  DSH_DESKTOP_APP_ID: com.workdsh.app
+  DSH_DESKTOP_AUTO_UPDATE_ENV: production
+  ELECTRON_MIRROR: https://npmmirror.com/mirrors/electron/
+
+jobs:
+  desktop-windows:
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.target == '' || github.event.inputs.target == 'win-x64' }}
+    runs-on: windows-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.19'
+      - run: corepack enable
+      - name: Install workspace
+        run: corepack pnpm install --frozen-lockfile
+      - name: Build workspace packages
+        run: corepack pnpm build
+      - name: Bootstrap official desktop snapshot
+        run: node scripts/desktop/ci-bootstrap-snapshot.mjs
+      - name: Build Windows NSIS installer
+        run: node scripts/desktop/ci-build-installer.mjs --target=win-x64
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: praxis-desktop-windows-x64
+          path: .artifacts/desktop-installers/win-x64/*
+          if-no-files-found: error
+          retention-days: 14
+
+  desktop-macos:
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.target == '' || startsWith(github.event.inputs.target, 'mac-') }}
+    runs-on: macos-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [mac-arm64, mac-x64]
+    steps:
+      - name: Decide whether to build
+        id: gate
+        shell: bash
+        run: |
+          selected="${{ github.event.inputs.target }}"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "$selected" && "$selected" != "${{ matrix.target }}" ]]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.run == 'true'
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.run == 'true'
+        with:
+          node-version: '22.19'
+      - if: steps.gate.outputs.run == 'true'
+        run: corepack enable
+      - name: Install workspace
+        if: steps.gate.outputs.run == 'true'
+        run: corepack pnpm install --frozen-lockfile
+      - name: Build workspace packages
+        if: steps.gate.outputs.run == 'true'
+        run: corepack pnpm build
+      - name: Bootstrap official desktop snapshot
+        if: steps.gate.outputs.run == 'true'
+        run: node scripts/desktop/ci-bootstrap-snapshot.mjs
+      - name: Build macOS DMG
+        if: steps.gate.outputs.run == 'true'
+        run: node scripts/desktop/ci-build-installer.mjs --target=${{ matrix.target }}
+      - name: Upload macOS DMG
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: praxis-desktop-macos-${{ matrix.target }}
+          path: .artifacts/desktop-installers/${{ matrix.target }}/*
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-desktop-release:
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'desktop-v')
+    needs: [desktop-windows, desktop-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download installers
+        uses: actions/download-artifact@v4
+        with:
+          pattern: praxis-desktop-*
+          path: staging
+      - name: Prepare release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          while IFS= read -r -d '' file; do
+            artifact="$(basename "$(dirname "$file")")"
+            name="$(basename "$file")"
+            cp "$file" "release-assets/${artifact}--${name}"
+          done < <(find staging -type f \( -name '*.dmg' -o -name '*.exe' -o -name '*.blockmap' \) -print0)
+          count="$(find release-assets -type f ! -name SHA256SUMS | wc -l | tr -d ' ')"
+          if [[ "$count" -lt 1 ]]; then
+            echo "no installer assets found" >&2
+            find staging -type f -print >&2 || true
+            exit 1
+          fi
+          (cd release-assets && sha256sum -- * > SHA256SUMS)
+          ls -la release-assets
+      - name: Publish GitHub prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${TAG#desktop-v}"
+          cat > release-notes.md <<'EOF'
+          开物 Praxis Desktop（未签名 Alpha）
+
+          - Windows x64：NSIS Setup.exe（原生 Windows Runner 构建）
+          - macOS Apple Silicon：arm64 DMG
+          - macOS Intel：x64 DMG
+          - 基于官方 `apps/desktop` 流水线（`dsh-v0.1.5-rc.1`）+ 开物种子插件
+          - **未签名**：macOS 可能需「仍要打开」；Windows 可能触发 SmartScreen
+
+          安装说明见仓库 `docs/DESKTOP-INSTALL.md`。升级前请备份 `~/.dsh`（Windows：`%USERPROFILE%\.dsh`）。
+          各文件 SHA-256 见 `SHA256SUMS`。
+          EOF
+          gh release create "$TAG" release-assets/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Praxis Desktop ${VERSION}" \
+            --notes-file release-notes.md \
+            --prerelease

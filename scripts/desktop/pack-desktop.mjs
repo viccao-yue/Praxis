@@ -1,20 +1,16 @@
 #!/usr/bin/env node
 /**
- * 开物Praxis 桌面打包入口（macOS arm64，未签名本地测试版）。
+ * Multi-target pack entry for CI / local Alpha installers.
  *
- * 基于官方 apps/desktop 流水线（deepseek-ai/deepseek-harness，tag dsh-v0.1.5-rc.1）的
- * 隔离快照 + WORKDSH TEST PATCH 补丁（存档见 scripts/desktop/patches/，完整指南见 docs/DESKTOP-PACKAGING.md）。
+ *   node scripts/desktop/pack-desktop.mjs --target=mac-arm64 --installer
+ *   node scripts/desktop/pack-desktop.mjs --target=mac-x64 --installer
+ *   node scripts/desktop/pack-desktop.mjs --target=win-x64 --installer
  *
- * 用法:
- *   node scripts/desktop/pack-desktop.mjs                # 校验快照补丁 → build:desktop → electron-builder → 产物校验
- *   node scripts/desktop/pack-desktop.mjs --skip-build   # 跳过 build:desktop（只重跑 electron-builder）
- *   node scripts/desktop/pack-desktop.mjs --check-only   # 只做前置检查（不构建）
- *   node scripts/desktop/pack-desktop.mjs --sync-patches # 用快照当前文件同步补丁存档（补丁改动后）
- *   node scripts/desktop/pack-desktop.mjs --restart      # 打包并校验通过后重启应用
+ * Default remains local mac-arm64 directory build (`--dir`) for smoke testing.
  */
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, readdirSync, readFileSync, statSync, copyFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync, copyFileSync, mkdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { homedir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
@@ -25,13 +21,40 @@ const WORKSPACE_ROOT = resolve(SCRIPT_DIR, '..', '..');
 const SNAPSHOT = join(WORKSPACE_ROOT, '.artifacts', 'desktop-pack-test', 'upstream');
 const DESKTOP_APP = join(SNAPSHOT, 'apps', 'desktop');
 const PATCH_STORE = join(SCRIPT_DIR, 'patches', 'upstream');
-const TARGET_NAME = 'mac-arm64';
-const APP_BUNDLE = join(DESKTOP_APP, '.desktop-build', 'targets', TARGET_NAME, 'artifacts', TARGET_NAME, 'Praxis.app');
 const ELECTRON_MIRROR = 'https://npmmirror.com/mirrors/electron/';
 const REQUIRED_NODE = [22, 19];
 
-const args = new Set(process.argv.slice(2));
-const flag = (name) => args.has(name);
+const TARGETS = {
+  'mac-arm64': { platform: 'darwin', arch: 'arm64', electronArgs: ['--mac', '--arm64'] },
+  'mac-x64': { platform: 'darwin', arch: 'x64', electronArgs: ['--mac', '--x64'] },
+  'win-x64': { platform: 'win32', arch: 'x64', electronArgs: ['--win', '--x64'] },
+};
+
+const args = process.argv.slice(2);
+const flag = (name) => args.includes(name);
+const opt = (name, fallback) => {
+  const hit = args.find((a) => a.startsWith(`${name}=`));
+  return hit ? hit.slice(name.length + 1) : fallback;
+};
+
+const targetName = opt('--target', 'mac-arm64');
+const target = TARGETS[targetName];
+if (!target) {
+  console.error(`[pack-desktop] unknown --target=${targetName}; use ${Object.keys(TARGETS).join('|')}`);
+  process.exit(1);
+}
+
+const installer = flag('--installer');
+const APP_BUNDLE = join(
+  DESKTOP_APP,
+  '.desktop-build',
+  'targets',
+  targetName,
+  'artifacts',
+  targetName,
+  target.platform === 'darwin' ? 'Praxis.app' : 'Praxis',
+);
+const ARTIFACTS_DIR = join(DESKTOP_APP, '.desktop-build', 'targets', targetName, 'artifacts');
 
 function fail(message) {
   console.error(`\n[pack-desktop] ERROR: ${message}`);
@@ -51,7 +74,6 @@ function runCapture(command, commandArgs, options = {}) {
   return result.stdout.trim();
 }
 
-// --- Node 自举：shell 默认 Node 可能低于 22.19，脚本自动切换到 nvm 中的合格版本重跑 ---
 function needsNodeBootstrap() {
   const [major, minor] = process.versions.node.split('.').map(Number);
   return major < REQUIRED_NODE[0] || (major === REQUIRED_NODE[0] && minor < REQUIRED_NODE[1]);
@@ -77,13 +99,19 @@ function findNode22Bin() {
 
 if (needsNodeBootstrap()) {
   const node22 = findNode22Bin();
-  if (node22 === undefined) fail(`需要 Node >= ${REQUIRED_NODE.join('.')}，当前 ${process.versions.node}，且未在 ~/.nvm/versions/node 找到 v22.${REQUIRED_NODE[1]}+`);
-  console.log(`[pack-desktop] Node ${process.versions.node} 不满足要求，切换到 ${node22} 重跑`);
+  if (node22 === undefined) fail(`需要 Node >= ${REQUIRED_NODE.join('.')}，当前 ${process.versions.node}`);
+  console.log(`[pack-desktop] Node ${process.versions.node} → ${node22}`);
   run(node22, [fileURLToPath(import.meta.url), ...process.argv.slice(2)]);
   process.exit(0);
 }
 
-// --- 快照与 pnpm ---
+if (target.platform === 'win32' && process.platform !== 'win32') {
+  fail('win-x64 必须在 Windows 宿主上打包（GitHub windows-latest 或本机 Windows）');
+}
+if (target.platform === 'darwin' && process.platform !== 'darwin') {
+  fail('mac 目标必须在 macOS 宿主上打包');
+}
+
 function snapshotPnpmVersion() {
   const manifest = JSON.parse(readFileSync(join(SNAPSHOT, 'package.json'), 'utf8'));
   const declared = /^pnpm@(.+)$/.exec(manifest.packageManager ?? '');
@@ -95,7 +123,7 @@ function resolvePnpmEntry() {
   const declared = snapshotPnpmVersion();
   const candidates = existsSync(cacheRoot) ? readdirSync(cacheRoot) : [];
   const pick = declared !== undefined && candidates.includes(declared) ? declared : candidates.sort().at(-1);
-  if (pick === undefined) fail(`未找到 pnpm corepack 缓存（${cacheRoot}），请先安装 pnpm@${declared ?? '11.7.0'}`);
+  if (pick === undefined) fail(`未找到 pnpm corepack 缓存`);
   const entry = join(cacheRoot, pick, 'bin', 'pnpm.mjs');
   if (!existsSync(entry)) fail(`pnpm 入口不存在: ${entry}`);
   return entry;
@@ -104,9 +132,9 @@ function resolvePnpmEntry() {
 function snapshotEnv() {
   return {
     ...process.env,
-    PATH: `${dirname(process.execPath)}:${process.env.PATH ?? ''}`,
-    DSH_DESKTOP_TARGET_PLATFORM: 'darwin',
-    DSH_DESKTOP_TARGET_ARCH: 'arm64',
+    PATH: `${dirname(process.execPath)}${process.platform === 'win32' ? ';' : ':'}${process.env.PATH ?? ''}`,
+    DSH_DESKTOP_TARGET_PLATFORM: target.platform,
+    DSH_DESKTOP_TARGET_ARCH: target.arch,
     WORKDSH_DESKTOP_UNSIGNED: '1',
     DSH_DESKTOP_APP_ID: 'com.workdsh.app',
     DSH_DESKTOP_AUTO_UPDATE_ENV: 'production',
@@ -133,28 +161,27 @@ function listFiles(root) {
 
 function checkPrerequisites() {
   if (!existsSync(join(DESKTOP_APP, 'package.json'))) {
-    fail(`官方快照缺失: ${SNAPSHOT}\n  重建步骤见 docs/DESKTOP-PACKAGING.md「快照重建」`);
+    fail(`官方快照缺失: ${SNAPSHOT}\n  先运行: node scripts/desktop/ci-bootstrap-snapshot.mjs`);
   }
   const drift = [];
   for (const patchFile of listFiles(PATCH_STORE)) {
-    const target = join(SNAPSHOT, relative(PATCH_STORE, patchFile));
-    if (!existsSync(target)) drift.push(`${relative(PATCH_STORE, patchFile)} (快照缺失)`);
-    else if (sha256(patchFile) !== sha256(target)) drift.push(`${relative(PATCH_STORE, patchFile)} (内容不一致)`);
+    const dest = join(SNAPSHOT, relative(PATCH_STORE, patchFile));
+    if (!existsSync(dest)) drift.push(`${relative(PATCH_STORE, patchFile)} (快照缺失)`);
+    else if (sha256(patchFile) !== sha256(dest)) drift.push(`${relative(PATCH_STORE, patchFile)} (内容不一致)`);
   }
   if (drift.length > 0 && flag('--sync-patches')) {
     for (const patchFile of listFiles(PATCH_STORE)) {
-      const target = join(SNAPSHOT, relative(PATCH_STORE, patchFile));
-      if (existsSync(target)) copyFileSync(target, patchFile);
+      const dest = join(SNAPSHOT, relative(PATCH_STORE, patchFile));
+      if (existsSync(dest)) copyFileSync(dest, patchFile);
     }
-    console.log(`[pack-desktop] 已将快照差异同步到补丁存档（${drift.length} 处），注意随代码提交。`);
+    console.log(`[pack-desktop] 已同步补丁存档（${drift.length} 处）`);
   } else if (drift.length > 0) {
-    fail(`快照与补丁存档不一致（${drift.length} 处）:\n  ${drift.join('\n  ')}\n  若确认快照为最新补丁，运行 --sync-patches 同步存档；否则检查快照是否被改动。`);
+    fail(`快照与补丁存档不一致:\n  ${drift.join('\n  ')}`);
   } else {
-    console.log(`[pack-desktop] 快照与补丁存档一致（${listFiles(PATCH_STORE).length} 个补丁文件）`);
+    console.log(`[pack-desktop] 补丁一致（${listFiles(PATCH_STORE).length}）`);
   }
 }
 
-// --- 产物校验 ---
 function findAsarModule() {
   const pnpmRoot = join(SNAPSHOT, 'node_modules', '.pnpm');
   if (!existsSync(pnpmRoot)) return undefined;
@@ -169,7 +196,7 @@ function plistValue(key) {
   return runCapture('plutil', ['-extract', key, 'raw', join(APP_BUNDLE, 'Contents', 'Info.plist')]);
 }
 
-function verifyArtifact() {
+function verifyMacApp() {
   if (!existsSync(APP_BUNDLE)) fail(`产物不存在: ${APP_BUNDLE}`);
   const problems = [];
   const expect = (label, actual, wanted) => {
@@ -181,56 +208,85 @@ function verifyArtifact() {
   const iconSource = join(DESKTOP_APP, 'workdsh-icon.icns');
   const iconPacked = join(APP_BUNDLE, 'Contents', 'Resources', 'icon.icns');
   if (!existsSync(iconPacked) || sha256(iconSource) !== sha256(iconPacked)) problems.push('icon.icns 与品牌源不一致');
-
   const asarPath = join(APP_BUNDLE, 'Contents', 'Resources', 'app.asar');
   const asarMain = findAsarModule();
-  if (asarMain === undefined) {
-    problems.push('未找到 @electron/asar 模块，无法校验 app.asar');
-  } else {
+  if (asarMain === undefined) problems.push('未找到 @electron/asar');
+  else {
     const require = createRequire(import.meta.url);
     const asar = require(asarMain);
     const main = asar.extractFile(asarPath, 'lib/main.js').toString();
     const preload = asar.extractFile(asarPath, 'lib/preload-app.cjs').toString();
-    if (!main.includes('hiddenInset') || !main.includes('shellFrame')) problems.push('app.asar lib/main.js 缺少窗口壳补丁（hiddenInset/shellFrame）');
-    if (!preload.includes('workdshShell') || !preload.includes('_logoRow')) problems.push('app.asar lib/preload-app.cjs 缺少外壳适配样式补丁');
+    if (!main.includes('hiddenInset') || !main.includes('shellFrame')) problems.push('缺少窗口壳补丁');
+    if (!preload.includes('workdshShell') || !preload.includes('_logoRow') || !preload.includes('data-workdsh-shell')) {
+      problems.push('缺少外壳样式补丁');
+    }
   }
   if (problems.length > 0) fail(`产物校验失败:\n  ${problems.join('\n  ')}`);
-  console.log('[pack-desktop] 产物校验通过（Info.plist / 图标 / app.asar 补丁断言）');
+  console.log('[pack-desktop] mac .app 校验通过');
 }
 
-function appSize() {
-  const result = spawnSync('du', ['-sh', APP_BUNDLE], { encoding: 'utf8' });
-  return result.status === 0 ? result.stdout.split('\t')[0] : 'unknown';
+function collectInstallers() {
+  if (!existsSync(ARTIFACTS_DIR)) return [];
+  const out = [];
+  const walk = (dir) => {
+    for (const name of readdirSync(dir)) {
+      const path = join(dir, name);
+      if (statSync(path).isDirectory()) walk(path);
+      else if (/\.(dmg|exe|blockmap)$/i.test(name)) out.push(path);
+    }
+  };
+  walk(ARTIFACTS_DIR);
+  return out;
 }
 
-// --- 主流程 ---
-console.log(`[pack-desktop] 快照: ${SNAPSHOT}`);
+function verifyInstallers() {
+  const files = collectInstallers();
+  if (files.length === 0) fail(`未找到安装包产物（在 ${ARTIFACTS_DIR}）`);
+  for (const file of files) {
+    const size = statSync(file).size;
+    if (size < 1_000_000) fail(`安装包过小: ${file} (${size} bytes)`);
+    console.log(`[pack-desktop] installer ${relative(ARTIFACTS_DIR, file)} (${Math.round(size / 1e6)} MB)`);
+  }
+}
+
+console.log(`[pack-desktop] target=${targetName} installer=${installer}`);
 checkPrerequisites();
 if (flag('--check-only')) {
-  console.log('[pack-desktop] --check-only 完成，未执行构建。');
+  console.log('[pack-desktop] --check-only 完成');
   process.exit(0);
 }
 
 const pnpm = resolvePnpmEntry();
-if (spawnSync('pgrep', ['-f', 'Praxis.app/Contents/MacOS/Praxis']).status === 0) {
-  console.log('[pack-desktop] 停止运行中的 开物Praxis 实例（避免覆盖运行中的应用）');
+if (target.platform === 'darwin' && spawnSync('pgrep', ['-f', 'Praxis.app/Contents/MacOS/Praxis']).status === 0) {
   spawnSync('pkill', ['-f', 'Praxis.app/Contents/MacOS/Praxis']);
 }
+
 if (!flag('--skip-build')) {
-  console.log('[pack-desktop] 1/2 build:desktop（tsc + tsdown）');
+  console.log('[pack-desktop] 1/2 build:desktop');
   run(process.execPath, [pnpm, 'run', 'build:desktop'], { cwd: SNAPSHOT, env: snapshotEnv() });
 } else {
-  console.log('[pack-desktop] 1/2 跳过 build:desktop（--skip-build）');
+  console.log('[pack-desktop] 1/2 skip build:desktop');
 }
-console.log('[pack-desktop] 2/2 electron-builder --dir（未签名，--publish never）');
-run(process.execPath, [pnpm, 'exec', 'electron-builder', '--config', 'electron-builder.config.mjs', '--dir', '--publish', 'never'], {
-  cwd: DESKTOP_APP,
-  env: snapshotEnv(),
-});
-verifyArtifact();
 
-console.log(`\n[pack-desktop] 完成: ${APP_BUNDLE}（${appSize()}）`);
-if (flag('--restart')) {
-  console.log('[pack-desktop] 重新打开应用');
+const builderArgs = ['exec', 'electron-builder', '--config', 'electron-builder.config.mjs', '--publish', 'never', ...target.electronArgs];
+if (!installer) builderArgs.push('--dir');
+console.log(`[pack-desktop] 2/2 electron-builder ${installer ? 'installer' : '--dir'}`);
+run(process.execPath, [pnpm, ...builderArgs], { cwd: DESKTOP_APP, env: snapshotEnv() });
+
+if (installer) verifyInstallers();
+else if (target.platform === 'darwin') verifyMacApp();
+
+const staging = join(WORKSPACE_ROOT, '.artifacts', 'desktop-installers', targetName);
+mkdirSync(staging, { recursive: true });
+if (installer) {
+  for (const file of collectInstallers()) {
+    copyFileSync(file, join(staging, file.split(/[/\\]/).at(-1)));
+  }
+  console.log(`[pack-desktop] staged → ${staging}`);
+} else {
+  console.log(`[pack-desktop] 完成: ${APP_BUNDLE}`);
+}
+
+if (flag('--restart') && target.platform === 'darwin' && !installer) {
   spawnSync('open', [APP_BUNDLE], { stdio: 'inherit' });
 }

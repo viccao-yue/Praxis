@@ -107,15 +107,15 @@ electron-builder 经 `extraResources` 把快照内 `.desktop-build/targets/mac-a
 - 影响：`0.1.6-alpha.2` 的官方行为与插件面变化**不会**出现在桌面测试版；对比桌面与 Web 行为差异时先核对宿主版本；桌面冒烟结论不能替代 Web 基线验收。
 - 升级路径（**未实施**，应作为独立任务立项）：重新选择与基线对应的官方快照 → 逐个复核/重做 9 补丁（窗口壳补丁依赖官方 web UI 类名，升级后可能失效）→ 重打 7 包 tarball → 重跑准备序列 → 打包冒烟 → 记录版本对照证据。
 
-## Windows 平台说明
+## Windows / 多平台与 CI
 
-**macOS 不能直接产出 Windows 版**，三条官方硬门槛：
+**macOS 不能直接产出 Windows 版**（官方硬门槛）：
 
-1. `package-target.ts:136-137` 明确 `win-x64 requires a Windows x64 build host`（官方 README.zh.md 同）。
-2. `prepare:seed` 需用**目标平台 Node** 执行 pnpm 离线安装验证并按平台/CPU 过滤可选依赖（win 目标仅生成 `node.exe`，macOS 无法执行）。
-3. Windows 打包强制 EV 代码签名（`windows-sign.mjs` 缺 `DSH_DESKTOP_WINDOWS_*` 凭据直接抛错），无未签名降级路径。
+1. `package-target.ts`：`win-x64 requires a Windows x64 build host`。
+2. `prepare:seed` 需用**目标平台 Node** 做离线安装验证（win 目标只有 `node.exe`）。
+3. 正式 Windows 包仍依赖 EV 签名凭据；**未签名 Alpha** 由 `WORKDSH_DESKTOP_UNSIGNED=1` 跳过（见补丁 `electron-builder.config.mjs`）。SmartScreen 可能告警，见 [DESKTOP-INSTALL.md](DESKTOP-INSTALL.md)。
 
-如需 Windows 版：在 Windows x64 真机或虚拟机复刻本流程，并新增等价的 unsigned 测试补丁；作为独立任务规划，不虚构已通过。
+三平台安装包由 `.github/workflows/desktop.yml` 打出：`windows-latest` → NSIS；`macos-latest` → arm64/x64 DMG；标签 `desktop-v*` 发 prerelease。入口脚本：`ci-bootstrap-snapshot.mjs` → `ci-build-installer.mjs --target=…`。不使用社区 `dsh-plugin-desktop`。
 
 ## 常见问题
 

@@ -54,7 +54,10 @@
     "probe:subagent:activation-limit": "node scripts/probe-subagent-activation-limit.mjs",
     "test:library": "corepack pnpm --filter workdsh-plugin-library test",
     "probe:library": "node scripts/probe-library-release.mjs",
-    "test:projects": "corepack pnpm --filter workdsh-plugin-projects test"
+    "test:projects": "corepack pnpm --filter workdsh-plugin-projects test",
+    "desktop:bootstrap": "node scripts/desktop/ci-bootstrap-snapshot.mjs",
+    "desktop:pack": "node scripts/desktop/pack-desktop.mjs",
+    "desktop:installer": "node scripts/desktop/ci-build-installer.mjs"
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "4.0.3",
