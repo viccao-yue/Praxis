@@ -1,4 +1,6 @@
-## 2026-09-26：Desktop CI #1 失败与修复
+## 2026-09-26：Desktop CI #2 prepare:packages 失败
+
+mac-arm64 在 `prepare:packages` 退出 1（Windows 侧截图为绿）。根因：开物 `workdsh-bundle` 等依赖 `@deepseek-ai/dsh-browser-use` 等 **0.1.7** 包，官方桌面快照 `0.1.5-rc.1` 包集中不存在，闭包校验 `requires unpacked internal package`。已改 prepare-package-set 补丁：对 `workdsh-*` / appearance 层跳过缺失的 `@deepseek-ai/*`；`ci-pack-plugins` 额外 `npm pack` 五个快照缺失的硬依赖。请重新 Run workflow。
 
 手动 Run Desktop #1：`Build macOS DMG` 瞬间 exit 1（bootstrap/workspace 已过）。根因：官方快照锁定 `pnpm@11.7.0`，CI 仅有仓库 `pnpm@10.x` 的 corepack 缓存，`ci-build-installer` 未 prepare 快照版本。已改为 `corepack prepare pnpm@<snapshot>`；workflow 增加显式 prepare，并用 `plan` job 按 target 生成 matrix（避免未选中的 mac-x64 假绿）。请重新 Run workflow。未再次本地打满安装包。
 
