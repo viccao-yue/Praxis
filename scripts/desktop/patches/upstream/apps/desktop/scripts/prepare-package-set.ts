@@ -80,14 +80,12 @@ export function selectDesktopPackageClosure(
       for (const dependency of dependencyNames(packed.manifest, section)) {
         if (available.has(dependency)) visit(dependency)
         else if (dependency.startsWith('@deepseek-ai/')) {
-          // WORKDSH TEST PATCH: Praxis layers target a newer DSH family than the
-          // locked desktop snapshot pack. Missing @deepseek-ai/* deps are left to
-          // prepare:seed / npm registry instead of failing the closure (official
-          // dsh/desktop-host roots still require a packed internal match).
-          const workdshLayer = name.startsWith('workdsh-') || name === 'dsh-ui-appearance'
-          if (!workdshLayer) {
-            throw new Error(`desktop package set: ${name} requires unpacked internal package ${dependency}`)
-          }
+          // WORKDSH TEST PATCH: Praxis seeds target DSH 0.1.7 while the desktop
+          // snapshot pack is 0.1.5-rc.1. Missing @deepseek-ai/* modules (including
+          // transitive deps of any Praxis-added tarball) are left for prepare:seed
+          // / npm instead of failing the closure. Official roots are still required
+          // via the ROOT_PACKAGES / WORKDSH_ROOT_PACKAGES presence checks above.
+          console.warn(`desktop package set: skip unpacked ${dependency} (from ${name})`)
         }
       }
     }

@@ -53,22 +53,6 @@ for (const [dir, name] of PACKAGES) {
 console.log('[ci-pack-plugins] pack dsh-ui-appearance@0.1.10');
 run('npm', ['pack', 'dsh-ui-appearance@0.1.10', '--pack-destination', PACKED]);
 
-// Hard deps present on Praxis (0.1.7) but absent from the locked desktop snapshot
-// pack (0.1.5-rc.1). Putting them in packed/workdsh lets the closure select them.
-const EXTRA_NPM = [
-  '@deepseek-ai/dsh-browser-use@0.1.7-alpha.1',
-  '@deepseek-ai/dsh-computer-use@0.1.7-alpha.1',
-  '@deepseek-ai/dsh-experimental-auto-review@0.1.7-alpha.1',
-  '@deepseek-ai/dsh-experimental-browser-use-playwright-mcp@0.1.7-alpha.1',
-  '@deepseek-ai/dsh-experimental-computer-use-cua-driver-native@0.1.7-alpha.1',
-];
-for (const spec of EXTRA_NPM) {
-  console.log(`[ci-pack-plugins] pack ${spec}`);
-  run('npm', ['pack', spec, '--pack-destination', PACKED]);
-}
-
 const tgz = readdirSync(PACKED).filter((n) => n.endsWith('.tgz'));
-if (tgz.length < PACKAGES.length + 1 + EXTRA_NPM.length) {
-  fail(`expected >= ${PACKAGES.length + 1 + EXTRA_NPM.length} tarballs, got ${tgz.length}`);
-}
+if (tgz.length < PACKAGES.length + 1) fail(`expected >= ${PACKAGES.length + 1} tarballs, got ${tgz.length}`);
 console.log(`[ci-pack-plugins] done (${tgz.length} tarballs)`);

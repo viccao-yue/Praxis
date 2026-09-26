@@ -1,4 +1,6 @@
-## 2026-09-26：Desktop CI #2 prepare:packages 失败
+## 2026-09-26：Desktop CI #3 仍 prepare:packages
+
+#2 修复不够：把 0.1.7 的 browser-use 等打进 `packed/workdsh` 后，闭包访问这些包时其传递 `@deepseek-ai/*` 仍按「必须已打包」抛错。#3 改为对所有缺失的 `@deepseek-ai/*` 一律 skip（官方根包仍靠 ROOT 存在性检查），并撤销 EXTRA npm pack。请再 Run。
 
 mac-arm64 在 `prepare:packages` 退出 1（Windows 侧截图为绿）。根因：开物 `workdsh-bundle` 等依赖 `@deepseek-ai/dsh-browser-use` 等 **0.1.7** 包，官方桌面快照 `0.1.5-rc.1` 包集中不存在，闭包校验 `requires unpacked internal package`。已改 prepare-package-set 补丁：对 `workdsh-*` / appearance 层跳过缺失的 `@deepseek-ai/*`；`ci-pack-plugins` 额外 `npm pack` 五个快照缺失的硬依赖。请重新 Run workflow。
 
