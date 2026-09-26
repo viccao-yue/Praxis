@@ -115,18 +115,22 @@ if (target.platform === 'darwin' && process.platform !== 'darwin') {
 function snapshotPnpmVersion() {
   const manifest = JSON.parse(readFileSync(join(SNAPSHOT, 'package.json'), 'utf8'));
   const declared = /^pnpm@(.+)$/.exec(manifest.packageManager ?? '');
-  return declared?.[1];
+  return declared?.[1] ?? '11.7.0';
 }
 
 function resolvePnpmEntry() {
-  const cacheRoot = join(homedir(), '.cache', 'node', 'corepack', 'v1', 'pnpm');
   const declared = snapshotPnpmVersion();
+  console.log(`[pack-desktop] corepack prepare pnpm@${declared}`);
+  run('corepack', ['prepare', `pnpm@${declared}`, '--activate']);
+  const cacheRoot = join(homedir(), '.cache', 'node', 'corepack', 'v1', 'pnpm');
+  const entry = join(cacheRoot, declared, 'bin', 'pnpm.mjs');
+  if (existsSync(entry)) return entry;
   const candidates = existsSync(cacheRoot) ? readdirSync(cacheRoot) : [];
-  const pick = declared !== undefined && candidates.includes(declared) ? declared : candidates.sort().at(-1);
-  if (pick === undefined) fail(`未找到 pnpm corepack 缓存`);
-  const entry = join(cacheRoot, pick, 'bin', 'pnpm.mjs');
-  if (!existsSync(entry)) fail(`pnpm 入口不存在: ${entry}`);
-  return entry;
+  const pick = candidates.includes(declared) ? declared : candidates.sort().at(-1);
+  if (pick === undefined) fail(`未找到 pnpm corepack 缓存（需要 pnpm@${declared}）`);
+  const fallback = join(cacheRoot, pick, 'bin', 'pnpm.mjs');
+  if (!existsSync(fallback)) fail(`pnpm 入口不存在: ${fallback}`);
+  return fallback;
 }
 
 function snapshotEnv() {

@@ -37,8 +37,35 @@ env:
   ELECTRON_MIRROR: https://npmmirror.com/mirrors/electron/
 
 jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      mac_targets: ${{ steps.sel.outputs.mac_targets }}
+      build_win: ${{ steps.sel.outputs.build_win }}
+      build_mac: ${{ steps.sel.outputs.build_mac }}
+    steps:
+      - id: sel
+        shell: bash
+        run: |
+          set -euo pipefail
+          t="${{ github.event.inputs.target }}"
+          if [[ "${{ github.event_name }}" != "workflow_dispatch" || -z "$t" ]]; then
+            echo 'mac_targets=["mac-arm64","mac-x64"]' >> "$GITHUB_OUTPUT"
+            echo 'build_win=true' >> "$GITHUB_OUTPUT"
+            echo 'build_mac=true' >> "$GITHUB_OUTPUT"
+          elif [[ "$t" == "win-x64" ]]; then
+            echo 'mac_targets=[]' >> "$GITHUB_OUTPUT"
+            echo 'build_win=true' >> "$GITHUB_OUTPUT"
+            echo 'build_mac=false' >> "$GITHUB_OUTPUT"
+          else
+            echo "mac_targets=[\"$t\"]" >> "$GITHUB_OUTPUT"
+            echo 'build_win=false' >> "$GITHUB_OUTPUT"
+            echo 'build_mac=true' >> "$GITHUB_OUTPUT"
+          fi
+
   desktop-windows:
-    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.target == '' || github.event.inputs.target == 'win-x64' }}
+    needs: plan
+    if: needs.plan.outputs.build_win == 'true'
     runs-on: windows-latest
     timeout-minutes: 180
     steps:
@@ -55,6 +82,8 @@ jobs:
         run: corepack pnpm build
       - name: Bootstrap official desktop snapshot
         run: node scripts/desktop/ci-bootstrap-snapshot.mjs
+      - name: Prepare snapshot pnpm
+        run: corepack prepare pnpm@11.7.0 --activate
       - name: Build Windows NSIS installer
         run: node scripts/desktop/ci-build-installer.mjs --target=win-x64
       - name: Upload Windows installer
@@ -66,48 +95,33 @@ jobs:
           retention-days: 14
 
   desktop-macos:
-    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.target == '' || startsWith(github.event.inputs.target, 'mac-') }}
+    needs: plan
+    if: needs.plan.outputs.build_mac == 'true'
     runs-on: macos-latest
     timeout-minutes: 180
     strategy:
       fail-fast: false
       matrix:
-        target: [mac-arm64, mac-x64]
+        target: ${{ fromJSON(needs.plan.outputs.mac_targets) }}
     steps:
-      - name: Decide whether to build
-        id: gate
-        shell: bash
-        run: |
-          selected="${{ github.event.inputs.target }}"
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "$selected" && "$selected" != "${{ matrix.target }}" ]]; then
-            echo "run=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          fi
       - uses: actions/checkout@v4
-        if: steps.gate.outputs.run == 'true'
         with:
           persist-credentials: false
       - uses: actions/setup-node@v4
-        if: steps.gate.outputs.run == 'true'
         with:
           node-version: '22.19'
-      - if: steps.gate.outputs.run == 'true'
-        run: corepack enable
+      - run: corepack enable
       - name: Install workspace
-        if: steps.gate.outputs.run == 'true'
         run: corepack pnpm install --frozen-lockfile
       - name: Build workspace packages
-        if: steps.gate.outputs.run == 'true'
         run: corepack pnpm build
       - name: Bootstrap official desktop snapshot
-        if: steps.gate.outputs.run == 'true'
         run: node scripts/desktop/ci-bootstrap-snapshot.mjs
+      - name: Prepare snapshot pnpm
+        run: corepack prepare pnpm@11.7.0 --activate
       - name: Build macOS DMG
-        if: steps.gate.outputs.run == 'true'
         run: node scripts/desktop/ci-build-installer.mjs --target=${{ matrix.target }}
       - name: Upload macOS DMG
-        if: steps.gate.outputs.run == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: praxis-desktop-macos-${{ matrix.target }}

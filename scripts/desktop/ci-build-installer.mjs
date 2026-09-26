@@ -52,18 +52,35 @@ function run(command, args, options = {}) {
 function snapshotPnpmVersion() {
   const manifest = JSON.parse(readFileSync(join(SNAPSHOT, 'package.json'), 'utf8'));
   const declared = /^pnpm@(.+)$/.exec(manifest.packageManager ?? '');
-  return declared?.[1];
+  return declared?.[1] ?? '11.7.0';
 }
 
+/**
+ * Official desktop snapshot pins packageManager (pnpm@11.7.0). CI runners only
+ * have the workspace pnpm (10.x) until we explicitly prepare the snapshot pin.
+ */
 function resolvePnpmEntry() {
-  const cacheRoot = join(homedir(), '.cache', 'node', 'corepack', 'v1', 'pnpm');
   const declared = snapshotPnpmVersion();
+  console.log(`[ci-build-installer] corepack prepare pnpm@${declared}`);
+  run('corepack', ['prepare', `pnpm@${declared}`, '--activate'], { env: process.env });
+
+  const cacheRoot = join(homedir(), '.cache', 'node', 'corepack', 'v1', 'pnpm');
+  const entry = join(cacheRoot, declared, 'bin', 'pnpm.mjs');
+  if (existsSync(entry)) {
+    console.log(`[ci-build-installer] using pnpm@${declared} → ${entry}`);
+    return entry;
+  }
+
+  // Some corepack layouts nest differently; fall back to any matching version dir.
   const candidates = existsSync(cacheRoot) ? readdirSync(cacheRoot) : [];
-  const pick = declared !== undefined && candidates.includes(declared) ? declared : candidates.sort().at(-1);
-  if (pick === undefined) fail(`pnpm corepack cache missing (need pnpm@${declared ?? '11.7.0'})`);
-  const entry = join(cacheRoot, pick, 'bin', 'pnpm.mjs');
-  if (!existsSync(entry)) fail(`pnpm entry missing: ${entry}`);
-  return entry;
+  const pick = candidates.includes(declared) ? declared : candidates.sort().at(-1);
+  if (pick === undefined) fail(`pnpm corepack cache missing after prepare pnpm@${declared}`);
+  const fallback = join(cacheRoot, pick, 'bin', 'pnpm.mjs');
+  if (!existsSync(fallback)) fail(`pnpm entry missing: ${fallback}`);
+  if (pick !== declared) {
+    console.warn(`[ci-build-installer] warning: wanted pnpm@${declared}, using ${pick}`);
+  }
+  return fallback;
 }
 
 function targetEnv() {

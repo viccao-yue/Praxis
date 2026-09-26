@@ -1,3 +1,7 @@
+## 2026-09-26：Desktop CI #1 失败与修复
+
+手动 Run Desktop #1：`Build macOS DMG` 瞬间 exit 1（bootstrap/workspace 已过）。根因：官方快照锁定 `pnpm@11.7.0`，CI 仅有仓库 `pnpm@10.x` 的 corepack 缓存，`ci-build-installer` 未 prepare 快照版本。已改为 `corepack prepare pnpm@<snapshot>`；workflow 增加显式 prepare，并用 `plan` job 按 target 生成 matrix（避免未选中的 mac-x64 假绿）。请重新 Run workflow。未再次本地打满安装包。
+
 ## 2026-09-26：Desktop 未签名 Alpha 三包 CI
 
 按用户「按这个做」：在官方 `apps/desktop` 流水线（tag `dsh-v0.1.5-rc.1` + WORKDSH TEST PATCH）上接 GitHub Actions，不采用社区 `dsh-plugin-desktop`。新增 `ci-bootstrap-snapshot.mjs`、`ci-pack-plugins.mjs`、`ci-build-installer.mjs`；`pack-desktop.mjs` 支持 `--target` / `--installer`；`.github/workflows/desktop.yml` 在 `windows-latest` + `macos-latest`（arm64/x64）打 NSIS/DMG，`desktop-v*` 标签发 prerelease；同事安装说明见 [DESKTOP-INSTALL.md](DESKTOP-INSTALL.md)。electron-builder 补丁允许 `WORKDSH_DESKTOP_UNSIGNED=1` 跳过 Win EV / Mac 公证。提交 `bb357d9453` 已推送 `mine/main`（viccao-yue/Praxis）。本机未跑完整三平台打包；`gh` token 失效未能代触发 Actions，需在 GitHub 手动 Run workflow 或打 `desktop-v*` 标签。
