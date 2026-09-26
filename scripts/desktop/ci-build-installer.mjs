@@ -148,12 +148,14 @@ const walk = (dir) => {
   for (const name of readdirSync(dir)) {
     const path = join(dir, name);
     if (statSync(path).isDirectory()) walk(path);
-    else if (/\.(dmg|exe)$/i.test(name)) collected.push(path);
+    // Only electron-builder installers (artifactName workdsh-${version}-${os}-${arch}.${ext}).
+    // Nested tools like fastlist-*.exe must not be treated as the product installer.
+    else if (/^workdsh-.*\.(dmg|exe)$/i.test(name)) collected.push(path);
   }
 };
 walk(artifacts);
 
-if (collected.length === 0) fail(`no dmg/exe under ${artifacts}`);
+if (collected.length === 0) fail(`no workdsh-*.dmg/exe under ${artifacts}`);
 for (const file of collected) {
   const base = file.split(/[/\\]/).at(-1);
   const dest = join(staging, base);

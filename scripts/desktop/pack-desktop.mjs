@@ -236,7 +236,7 @@ function collectInstallers() {
     for (const name of readdirSync(dir)) {
       const path = join(dir, name);
       if (statSync(path).isDirectory()) walk(path);
-      else if (/\.(dmg|exe|blockmap)$/i.test(name)) out.push(path);
+      else if (/^workdsh-.*\.(dmg|exe|blockmap)$/i.test(name)) out.push(path);
     }
   };
   walk(ARTIFACTS_DIR);

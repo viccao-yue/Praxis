@@ -1,4 +1,6 @@
-## 2026-09-26：Desktop CI #3 仍 prepare:packages
+## 2026-09-26：Desktop CI mac DMG 已产出但校验误杀
+
+prepare 与 electron-builder 已成功：`workdsh-0.1.5-rc.1-mac-arm64.dmg` / `.zip`，未签名跳过正常。失败在 `ci-build-installer` 递归收集 `*.exe` 时把产物树里的 `fastlist-0.3.0-x64.exe`（约 266KB）当成安装包做 1MB 下限校验。已改为只收 `workdsh-*.dmg|exe`。请再 Run；Upload 步骤应能挂上 Artifact。
 
 #2 修复不够：把 0.1.7 的 browser-use 等打进 `packed/workdsh` 后，闭包访问这些包时其传递 `@deepseek-ai/*` 仍按「必须已打包」抛错。#3 改为对所有缺失的 `@deepseek-ai/*` 一律 skip（官方根包仍靠 ROOT 存在性检查），并撤销 EXTRA npm pack。请再 Run。
 
