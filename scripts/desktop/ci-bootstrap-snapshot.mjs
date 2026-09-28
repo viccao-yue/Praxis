@@ -111,7 +111,8 @@ if (entries.length !== 1) fail(`expected one top-level folder in tarball, got ${
 const unpacked = join(extractRoot, entries[0]);
 
 rmSync(SNAPSHOT, { recursive: true, force: true });
-mkdirSync(dirname(SNAPSHOT), { recursive: true });
+// On Windows, recursive mkdir of a drive root such as D:\ throws EPERM even though it exists.
+if (!existsSync(dirname(SNAPSHOT))) mkdirSync(dirname(SNAPSHOT), { recursive: true });
 console.log(`[ci-bootstrap-snapshot] copying snapshot into ${SNAPSHOT}`);
 cpSync(unpacked, SNAPSHOT, { recursive: true });
 console.log(`[ci-bootstrap-snapshot] snapshot ready: ${SNAPSHOT}`);

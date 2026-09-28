@@ -40,7 +40,7 @@ Finder 和程序坞按应用文件名显示，只改 `CFBundleDisplayName` 仍�
 
 ## 2026-09-28：Desktop CI Windows 打包后 Office 冒烟修复
 
-图标修复生效，Windows `electron-builder` 已成功（NSIS 已生成）；失败在官方 `smoke-packaged-runtime --unsigned`：打包后应用内 DOCX→PDF 报 `LibreOfficeKit initialization failed`，而打包前同一运行时的转换通过。实测 `@deepseek-ai/libreoffice-kit-win32-x64@0.0.1` 包内最深文件 84 字符；完整路径打包前 241、CI 打包后 301、典型用户安装位置约 215，只有 CI 打包后超过 Windows 260 字符上限。三个 CI 脚本支持 `PRAXIS_DESKTOP_SNAPSHOT` 覆盖快照根，Windows 任务设为工作区盘符下 `\dsk`（打包后约 251），失败日志上传路径随之改。本机验证覆盖路径下快照准备完成、默认路径不受影响。未执行：Windows Runner 实跑。
+图标修复生效，Windows `electron-builder` 已成功（NSIS 已生成）；失败在官方 `smoke-packaged-runtime --unsigned`：打包后应用内 DOCX→PDF 报 `LibreOfficeKit initialization failed`，而打包前同一运行时的转换通过。实测 `@deepseek-ai/libreoffice-kit-win32-x64@0.0.1` 包内最深文件 84 字符；完整路径打包前 241、CI 打包后 301、典型用户安装位置约 215，只有 CI 打包后超过 Windows 260 字符上限。三个 CI 脚本支持 `PRAXIS_DESKTOP_SNAPSHOT` 覆盖快照根，Windows 任务设为工作区盘符下 `\dsk`（打包后约 251），失败日志上传路径随之改。本机验证覆盖路径下快照准备完成、默认路径不受影响。首次实跑在 `mkdirSync('D:\', { recursive: true })` 报 EPERM（Windows 上 Node 对盘符根递归 mkdir 报错），已改为父目录不存在才创建。未执行：Windows Runner 再次实跑。
 
 ## 2026-09-28：Desktop CI Windows 图标转换修复
 
