@@ -149,6 +149,11 @@ export function createElectronBuilderConfig(
     extraResources: [
       { from: buildPaths.runtime, to: 'runtime' },
       { from: fileURLToPath(new URL('../resources/icon-windows.png', import.meta.url)), to: 'icon.png' },
+      // Finder and the Dock show the .app filename unless these localized names exist.
+      { from: fileURLToPath(new URL('../resources/Base.lproj', import.meta.url)), to: 'Base.lproj' },
+      { from: fileURLToPath(new URL('../resources/en.lproj', import.meta.url)), to: 'en.lproj' },
+      { from: fileURLToPath(new URL('../resources/zh_CN.lproj', import.meta.url)), to: 'zh_CN.lproj' },
+      { from: fileURLToPath(new URL('../resources/zh_Hans.lproj', import.meta.url)), to: 'zh_Hans.lproj' },
     ],
     mac: {
       // WORKDSH TEST PATCH: Praxis branded application icon.
@@ -157,7 +162,8 @@ export function createElectronBuilderConfig(
       // macOS matches the application locale against this bundle, not Electron Framework resources.
       extendInfo: {
         CFBundleDisplayName: '开物Praxis',
-        CFBundleLocalizations: ['en', 'zh_CN'],
+        CFBundleLocalizations: ['en', 'zh_CN', 'zh_Hans'],
+        LSHasLocalizedDisplayName: true,
         NSMicrophoneUsageDescription: '开物Praxis uses your microphone to transcribe speech into message drafts.',
       },
       identity: workdshUnsigned ? null : macOSSigning?.signingIdentity,

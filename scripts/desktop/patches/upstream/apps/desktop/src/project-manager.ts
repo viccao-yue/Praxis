@@ -43,9 +43,7 @@ const WORKDSH_PROFILE_BUNDLES = [
   'workdsh-plugin-office',
   'workdsh-plugin-projects',
   'workdsh-plugin-vision',
-  'workdsh-plugin-workbench',
   'workdsh-provider-identity-local',
-  'workdsh-ui',
   'dsh-ui-appearance',
 ] as const
 const WORKSPACE_SETTINGS = 'nodeLinker: hoisted\nautoInstallPeers: false\n'

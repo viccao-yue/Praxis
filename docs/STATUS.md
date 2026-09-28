@@ -1,6 +1,30 @@
+## 2026-09-28：图标下的名称改为开物Praxis
+
+Finder 和程序坞按应用文件名显示，只改 `CFBundleDisplayName` 仍会显示 Praxis。已把 `/Applications/Praxis.app` 改名为 `/Applications/开物Praxis.app`，包内 `CFBundleName` 仍是 Praxis，Helper 名称不变。已重新打开，进程在。安装包已按这个应用重打：`.artifacts/desktop-installers/mac-arm64/开物Praxis.dmg`。
+
+## 2026-09-28：数字员工搜索框只留一条焦点边
+
+上一版搜索框覆盖写在样式层里，压不过页面自己的焦点外轮廓，聚焦时仍是两层蓝边。现在输入框不再套这圈外轮廓，只保留官方输入框的一条边。已写入预览和桌面 Profile。未在浏览器重新聚焦核对。
+
+## 2026-09-28：数字员工搜索框和技能开关
+
+数字员工搜索框聚焦时不再叠两层蓝边，只保留官方输入框自己的一圈焦点边。技能卡片关闭状态的开关改为中性灰轨道和白色滑块，不再用近乎透明的悬停色；打开状态仍是绿色。已写入预览和桌面 Profile。未在浏览器重新点开核对。
+
+## 2026-09-28：资料库删除确认按钮
+
+删除确认不再使用主按钮蓝色，也不再用 `#b94242`。按钮改为官方错误色压深后的红色填充、浅色文字，取消保持官方描边按钮；新建、重命名、停用的确定仍是主按钮。已重建资料库客户端，并写入正在运行的预览 Profile 与 `~/.praxis` 桌面 Profile。未在浏览器重新打开对话框核对（本机无头浏览器未能启动）。刷新 8517 或桌面窗口后可见。
+
 ## 2026-09-28：Desktop CI 切到 0.1.7-alpha.1 并准备给同事分发
 
 审查工作区里的 0.1.7 桌面改动：补丁存档与本机快照逐文件一致，`js-yaml` 与快照 `pnpm@11.7.0` 均可用，移除了「跳过缺失 `@deepseek-ai/*`」的临时做法。另修两处：未签名 Windows 产物改写入 `unsigned-artifacts`，与官方 `smoke-packaged-runtime --unsigned` 读取目录一致（此前 Windows 冒烟必失败）；Release 附件改为 ASCII 名 `Praxis-<版本>-<target>.<ext>`，避免 GitHub 改写中文文件名。安装说明补充 `xattr -cr`。同批提交含另一窗口的 `src/main.ts` 补丁：桌面 `DSH_HOME` 默认改为 `~/.praxis`，并为宿主进程读取系统代理；安装说明与 Release 说明已随之改为 `~/.praxis`，旧 `~/.dsh/profiles/desktop` 数据不会自动迁移。未执行：CI 三平台构建、Windows 与 Intel Mac 实机安装。本机 Apple 芯片 DMG `.artifacts/desktop-installers/mac-arm64/开物Praxis.dmg` 可先直接分发。
+
+## 2026-09-28：桌面补上 Better Sidebar 和 dsh-im
+
+网页预览里已安装的 `dsh-better-sidebar@0.21.1` 与 `@xmanrui/dsh-im@4.28.0` 已写入 `~/.praxis/profiles/desktop` 并安装。桌面应用已重新打开，宿主使用该配置。未在插件页逐项点开验收。
+
+## 2026-09-28：桌面登录、图标名和初次工作区
+
+登录点了没反应，是因为桌面宿主的登录请求不走系统代理，`auth_init` 直接网络失败。现在会读取系统代理再发起登录，点击后出现「等待登录」并打开浏览器。Dock 图标下的名称改为「开物Praxis」（应用包名仍是 Praxis.app，否则找不到 Helper）。桌面数据改到 `~/.praxis`，不再带上 `~/.dsh` 里原有的公文办事员、情报采集员和已归档会话。已在本机打开核对：侧栏是开物页面，工作区只有「默认工作区」。安装包已重打：`.artifacts/desktop-installers/mac-arm64/开物Praxis.dmg`。
 
 ## 2026-09-28：桌面界面改成开物Praxis，并接回已有内容
 

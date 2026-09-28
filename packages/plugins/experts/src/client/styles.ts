@@ -14,8 +14,8 @@ export const expertsCss = `${modalCss}
 .wd-experts button:disabled{cursor:not-allowed}
 .wd-experts button:disabled{color:var(--dsw-alias-label-dimmed)}
 .wd-experts input,.wd-experts select,.wd-experts textarea{border:1px solid var(--dsw-alias-border-l2);border-radius:8px;background:var(--dsw-alias-bg-layer-1);min-height:36px;padding:6px 12px}
-.wd-experts :focus-visible{outline-offset:3px}
-.wd-experts :focus-visible{outline:2px solid var(--dsw-alias-brand-primary)}
+.wd-experts :focus-visible:not(input){outline-offset:3px}
+.wd-experts :focus-visible:not(input){outline:2px solid var(--dsw-alias-brand-primary)}
 .wd-experts .muted{color:var(--dsw-alias-label-tertiary)}
 .wd-experts .cap-header{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:24px}
 .wd-experts .cap-tab{display:flex;align-items:center;gap:7px;white-space:nowrap}
@@ -25,7 +25,7 @@ export const expertsCss = `${modalCss}
 .wd-experts .cap-tab:disabled{color:var(--dsw-alias-label-tertiary)}
 .wd-experts .cap-title{display:flex;align-items:center;gap:8px;margin:0;min-height:38px;padding:0 4px 0 2px;font-size:16px;font-weight:600;line-height:22px;color:var(--dsw-alias-label-primary)}
 .wd-experts .cap-title svg{flex:none}
-.wd-experts .search{margin-left:auto;width:250px;min-width:150px}
+.wd-experts .search{margin-left:auto;width:250px;min-width:150px;height:36px}
 .wd-experts .mine-toggle,.wd-experts .create-expert{white-space:nowrap}
 .wd-experts .mine-toggle.active{background:var(--dsw-alias-interactive-bg-hover);border-color:var(--dsw-alias-border-l2)}
 .wd-experts .create-expert,.wd-experts .create-expert:hover:not(:disabled){background:var(--dsw-alias-button-primary-fill);color:var(--dsw-alias-label-primary-inverted);border-color:var(--dsw-alias-border-l2);font-weight:600}
@@ -388,4 +388,6 @@ export const expertsCss = `${modalCss}
 
 }
 ${controlsCss}
+.wd-experts .search,.wd-experts .search:focus-within{outline:none}
+.wd-experts .search input,.wd-experts .search input:focus,.wd-experts .search input:focus-visible{border:0;outline:none;outline-offset:0;background:transparent;box-shadow:none;min-height:0;height:100%;padding:0;border-radius:0}
 `;
