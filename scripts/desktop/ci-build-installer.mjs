@@ -14,7 +14,7 @@
  * WORKDSH_DESKTOP_UNSIGNED=1 so Alpha builds skip Apple/Windows signing.
  */
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, copyFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, copyFileSync, rmSync, writeFileSync } from 'node:fs';
 import { rebuildMacInstallers, renamePackagedMacApps } from './mac-display-name.mjs';
 import { createHash } from 'node:crypto';
 import { homedir } from 'node:os';
@@ -25,6 +25,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const SNAPSHOT = join(ROOT, '.artifacts', 'desktop-pack-test', 'upstream');
 const DESKTOP_APP = join(SNAPSHOT, 'apps', 'desktop');
 const ELECTRON_MIRROR = 'https://npmmirror.com/mirrors/electron/';
+const ELECTRON_BUILDER_CACHE = join(ROOT, '.artifacts', 'desktop-pack-test', 'electron-builder-cache');
 
 const TARGETS = {
   'mac-arm64': { platform: 'darwin', arch: 'arm64', packageScript: 'package:mac:arm64' },
@@ -119,7 +120,7 @@ function targetEnv() {
     DSH_DESKTOP_AUTO_UPDATE_ENV: 'production',
     ELECTRON_MIRROR,
     ELECTRON_GET_USE_PROXY: '1',
-    ELECTRON_BUILDER_CACHE: join(ROOT, '.artifacts', 'desktop-pack-test', 'electron-builder-cache'),
+    ELECTRON_BUILDER_CACHE: ELECTRON_BUILDER_CACHE,
   };
 }
 
@@ -135,6 +136,11 @@ if (target.platform === 'darwin' && process.platform !== 'darwin') {
 if (targetName === 'mac-arm64' && process.arch !== 'arm64') {
   fail('mac-arm64 requires Apple Silicon host');
 }
+
+// The cache sits under the repository's "type": "module" package.json, but electron-builder
+// runs CommonJS .js tools from it (icons-bundle icon-tool.js for the Windows .ico).
+mkdirSync(ELECTRON_BUILDER_CACHE, { recursive: true });
+writeFileSync(join(ELECTRON_BUILDER_CACHE, 'package.json'), '{ "type": "commonjs" }\n');
 
 const pnpm = resolvePnpmEntry();
 const env = targetEnv();

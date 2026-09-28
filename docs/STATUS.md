@@ -38,6 +38,10 @@ Finder 和程序坞按应用文件名显示，只改 `CFBundleDisplayName` 仍�
 
 删除确认不再使用主按钮蓝色，也不再用 `#b94242`。按钮改为官方错误色压深后的红色填充、浅色文字，取消保持官方描边按钮；新建、重命名、停用的确定仍是主按钮。已重建资料库客户端，并写入正在运行的预览 Profile 与 `~/.praxis` 桌面 Profile。未在浏览器重新打开对话框核对（本机无头浏览器未能启动）。刷新 8517 或桌面窗口后可见。
 
+## 2026-09-28：Desktop CI Windows 图标转换修复
+
+Windows 官方打包已过运行时与 Office→PDF 自检、Electron 打包，失败在 electron-builder 把 `icon-windows.png` 转 `.ico`：`ELECTRON_BUILDER_CACHE` 位于仓库 `.artifacts` 下，受根 `package.json` 的 `"type": "module"` 影响，缓存里 CommonJS 的 `icons-bundle/icon-tool.js` 被当 ESM 执行而报 `require is not defined`（macOS 用现成 icns，不走该转换）。`ci-build-installer` 现在在缓存目录写 `{"type":"commonjs"}`。本机复现并验证：无该文件时 CJS 工具报错，有时正常执行。工作流另加失败时上传官方 `packaging-runs` 日志（Artifact 名 `desktop-logs-*`，不进 Release）。未执行：Windows Runner 实跑。
+
 ## 2026-09-28：Desktop CI Windows 打包配置补齐
 
 corepack 修复后 Windows 依赖安装、插件打包与准备步骤通过，官方 `package-target.ts` 报缺 `apps/desktop/.env.windows`（官方只从该文件读发布设置）。`ci-bootstrap-snapshot` 现与 `.env.macos` 同样生成 `.env.windows`：应用 ID、`production`、更新来源 `https://github.com`、签名缓存并发 4，不含签名凭据。已用官方 `loadDesktopPackageEnvironment` + `validateDesktopPackageEnvironment(unsigned)` 校验生成文件通过。未执行：Windows Runner 实跑。
