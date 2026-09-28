@@ -38,6 +38,10 @@ Finder 和程序坞按应用文件名显示，只改 `CFBundleDisplayName` 仍�
 
 删除确认不再使用主按钮蓝色，也不再用 `#b94242`。按钮改为官方错误色压深后的红色填充、浅色文字，取消保持官方描边按钮；新建、重命名、停用的确定仍是主按钮。已重建资料库客户端，并写入正在运行的预览 Profile 与 `~/.praxis` 桌面 Profile。未在浏览器重新打开对话框核对（本机无头浏览器未能启动）。刷新 8517 或桌面窗口后可见。
 
+## 2026-09-28：Desktop CI Windows corepack 启动修复
+
+Windows 快照解压已通过，`ci-build-installer` 随后报 `spawnSync corepack ENOENT`：Windows 的 `corepack` 是 `.cmd` 包装，spawnSync 不经 shell 无法启动；且 pnpm 缓存在 `%LOCALAPPDATA%\node\corepack` 而非 `~/.cache/node/corepack`。改为用当前 Node 运行 corepack 自带 `dist/corepack.js`，缓存目录按 `COREPACK_HOME`、Windows `LOCALAPPDATA`、其他平台 `XDG_CACHE_HOME`/`~/.cache` 解析。本机 macOS 验证入口解析与 `11.7.0` 缓存路径不变。未执行：Windows Runner 实跑。
+
 ## 2026-09-28：Desktop CI Windows 快照解压修复
 
 Windows 任务在 curl 下载完成（27099696 字节）后，`ci-bootstrap-snapshot` 无输出退出 1。官方源码包含 15 个符号链接（`CLAUDE.md` 别名与测试快照），均不参与桌面构建；Windows 改用 `System32\tar.exe`，先列清单再用 `--exclude` 跳过这些链接。外部命令输出改为捕获后写 stdout，未捕获异常同时写 stdout/stderr，避免 Runner 丢失错误原因。本机用同为 bsdtar 的 macOS tar 模拟：识别 15 个链接、解压成功、无符号链接落地。未执行：Windows Runner 实跑。

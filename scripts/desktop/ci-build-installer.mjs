@@ -57,15 +57,38 @@ function snapshotPnpmVersion() {
 }
 
 /**
+ * On Windows `corepack` is a .cmd shim that spawnSync cannot start without a shell,
+ * so corepack's own JS entry beside the running Node is used on every platform.
+ */
+function corepackEntry() {
+  const nodeDir = dirname(process.execPath);
+  const candidates = [
+    join(nodeDir, 'node_modules', 'corepack', 'dist', 'corepack.js'),
+    join(nodeDir, '..', 'lib', 'node_modules', 'corepack', 'dist', 'corepack.js'),
+  ];
+  const entry = candidates.find((path) => existsSync(path));
+  if (entry === undefined) fail(`corepack entry not found beside ${process.execPath}`);
+  return entry;
+}
+
+function corepackHome() {
+  if (process.env.COREPACK_HOME) return process.env.COREPACK_HOME;
+  if (process.platform === 'win32') {
+    return join(process.env.LOCALAPPDATA ?? join(homedir(), 'AppData', 'Local'), 'node', 'corepack');
+  }
+  return join(process.env.XDG_CACHE_HOME ?? join(homedir(), '.cache'), 'node', 'corepack');
+}
+
+/**
  * Official desktop snapshot pins packageManager (pnpm@11.7.0). CI runners only
  * have the workspace pnpm (10.x) until we explicitly prepare the snapshot pin.
  */
 function resolvePnpmEntry() {
   const declared = snapshotPnpmVersion();
   console.log(`[ci-build-installer] corepack prepare pnpm@${declared}`);
-  run('corepack', ['prepare', `pnpm@${declared}`, '--activate'], { env: process.env });
+  run(process.execPath, [corepackEntry(), 'prepare', `pnpm@${declared}`, '--activate'], { env: process.env });
 
-  const cacheRoot = join(homedir(), '.cache', 'node', 'corepack', 'v1', 'pnpm');
+  const cacheRoot = join(corepackHome(), 'v1', 'pnpm');
   const entry = join(cacheRoot, declared, 'bin', 'pnpm.mjs');
   if (existsSync(entry)) {
     console.log(`[ci-build-installer] using pnpm@${declared} → ${entry}`);
