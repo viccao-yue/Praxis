@@ -111,7 +111,9 @@ jobs:
   desktop-macos:
     needs: plan
     if: needs.plan.outputs.build_mac == 'true'
-    runs-on: macos-latest
+    # mac-x64 needs an Intel host: under Rosetta the x64 LibreOffice smoke times out.
+    # macos-15-intel is GitHub's last Intel macOS image (supported until August 2027).
+    runs-on: ${{ matrix.target == 'mac-x64' && 'macos-15-intel' || 'macos-latest' }}
     timeout-minutes: 180
     strategy:
       fail-fast: false

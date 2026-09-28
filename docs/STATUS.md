@@ -38,6 +38,10 @@ Finder 和程序坞按应用文件名显示，只改 `CFBundleDisplayName` 仍�
 
 删除确认不再使用主按钮蓝色，也不再用 `#b94242`。按钮改为官方错误色压深后的红色填充、浅色文字，取消保持官方描边按钮；新建、重命名、停用的确定仍是主按钮。已重建资料库客户端，并写入正在运行的预览 Profile 与 `~/.praxis` 桌面 Profile。未在浏览器重新打开对话框核对（本机无头浏览器未能启动）。刷新 8517 或桌面窗口后可见。
 
+## 2026-09-28：Desktop CI Windows 出包成功，mac-x64 改用 Intel 机器
+
+Windows 任务成功：Artifact `praxis-desktop-windows-x64` 内为 `开物Praxis.exe`（417364662 字节），已通过官方打包后冒烟。mac-x64 在 `macos-latest`（arm64）上失败于 `prepare:dsh` 的运行时冒烟：x64 LibreOffice 经 Rosetta 执行 DOCX→PDF 报 `LibreOffice conversion timed out`，未到 electron-builder。`desktop-macos` 改为 mac-x64 使用 `macos-15-intel`（GitHub 最后的 Intel macOS 镜像，支持到 2027-08），mac-arm64 仍用 `macos-latest`。未执行：mac-x64 在 Intel 机器上实跑；Windows 安装包实机安装。
+
 ## 2026-09-28：Desktop CI Windows 打包后 Office 冒烟修复
 
 图标修复生效，Windows `electron-builder` 已成功（NSIS 已生成）；失败在官方 `smoke-packaged-runtime --unsigned`：打包后应用内 DOCX→PDF 报 `LibreOfficeKit initialization failed`，而打包前同一运行时的转换通过。实测 `@deepseek-ai/libreoffice-kit-win32-x64@0.0.1` 包内最深文件 84 字符；完整路径打包前 241、CI 打包后 301、典型用户安装位置约 215，只有 CI 打包后超过 Windows 260 字符上限。三个 CI 脚本支持 `PRAXIS_DESKTOP_SNAPSHOT` 覆盖快照根，Windows 任务设为工作区盘符下 `\dsk`（打包后约 251），失败日志上传路径随之改。本机验证覆盖路径下快照准备完成、默认路径不受影响。首次实跑在 `mkdirSync('D:\', { recursive: true })` 报 EPERM（Windows 上 Node 对盘符根递归 mkdir 报错），已改为父目录不存在才创建。再跑时官方 `readDesktopBuildCommit` 在 `D:\dsk` 执行 `git rev-parse HEAD` 失败（快照移出仓库后不再是 git 目录）；`ci-build-installer` 在快照位于仓库外时给子进程设 `GIT_DIR`/`GIT_WORK_TREE` 指回 Praxis 检出，与快照在仓库内时一样记录 Praxis 提交号。本机模拟：无变量失败，有变量读到当前 HEAD。快照 `postinstall` 的 lefthook 在 CI 下直接跳过，不改仓库 git 配置。未执行：Windows Runner 再次实跑。

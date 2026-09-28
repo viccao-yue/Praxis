@@ -116,7 +116,7 @@ electron-builder 经 `extraResources` 把快照内 `.desktop-build/targets/mac-a
 2. `prepare:seed` 需用**目标平台 Node** 做离线安装验证（win 目标只有 `node.exe`）。
 3. 正式 Windows 包仍依赖 EV 签名凭据；**未签名 Alpha** 由 `WORKDSH_DESKTOP_UNSIGNED=1` 跳过（见补丁 `electron-builder.config.mjs`）。SmartScreen 可能告警，见 [DESKTOP-INSTALL.md](DESKTOP-INSTALL.md)。
 
-三平台安装包由 `.github/workflows/desktop.yml` 打出：`windows-latest` → NSIS；`macos-latest` → arm64/x64 DMG；标签 `desktop-v*` 发 prerelease。入口脚本：`ci-bootstrap-snapshot.mjs` → `ci-build-installer.mjs --target=…`。不使用社区 `dsh-plugin-desktop`。
+三平台安装包由 `.github/workflows/desktop.yml` 打出：`windows-latest` → NSIS（快照放在盘符根 `\dsk`，避免 LibreOffice 超过 260 字符路径）；`macos-latest` → arm64 DMG；`macos-15-intel` → x64 DMG（Rosetta 下 x64 LibreOffice 冒烟会超时，须 Intel 机器）；标签 `desktop-v*` 发 prerelease。入口脚本：`ci-bootstrap-snapshot.mjs` → `ci-build-installer.mjs --target=…`。不使用社区 `dsh-plugin-desktop`。
 
 ## 常见问题
 
