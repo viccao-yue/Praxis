@@ -38,6 +38,10 @@ Finder 和程序坞按应用文件名显示，只改 `CFBundleDisplayName` 仍�
 
 删除确认不再使用主按钮蓝色，也不再用 `#b94242`。按钮改为官方错误色压深后的红色填充、浅色文字，取消保持官方描边按钮；新建、重命名、停用的确定仍是主按钮。已重建资料库客户端，并写入正在运行的预览 Profile 与 `~/.praxis` 桌面 Profile。未在浏览器重新打开对话框核对（本机无头浏览器未能启动）。刷新 8517 或桌面窗口后可见。
 
+## 2026-09-28：Desktop CI Windows 打包配置补齐
+
+corepack 修复后 Windows 依赖安装、插件打包与准备步骤通过，官方 `package-target.ts` 报缺 `apps/desktop/.env.windows`（官方只从该文件读发布设置）。`ci-bootstrap-snapshot` 现与 `.env.macos` 同样生成 `.env.windows`：应用 ID、`production`、更新来源 `https://github.com`、签名缓存并发 4，不含签名凭据。已用官方 `loadDesktopPackageEnvironment` + `validateDesktopPackageEnvironment(unsigned)` 校验生成文件通过。未执行：Windows Runner 实跑。
+
 ## 2026-09-28：Desktop CI Windows corepack 启动修复
 
 Windows 快照解压已通过，`ci-build-installer` 随后报 `spawnSync corepack ENOENT`：Windows 的 `corepack` 是 `.cmd` 包装，spawnSync 不经 shell 无法启动；且 pnpm 缓存在 `%LOCALAPPDATA%\node\corepack` 而非 `~/.cache/node/corepack`。改为用当前 Node 运行 corepack 自带 `dist/corepack.js`，缓存目录按 `COREPACK_HOME`、Windows `LOCALAPPDATA`、其他平台 `XDG_CACHE_HOME`/`~/.cache` 解析。本机 macOS 验证入口解析与 `11.7.0` 缓存路径不变。未执行：Windows Runner 实跑。

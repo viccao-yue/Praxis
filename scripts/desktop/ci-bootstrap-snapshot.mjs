@@ -136,16 +136,22 @@ if (existsSync(brandPng)) {
   console.log('[ci-bootstrap-snapshot] installed Praxis icon PNG');
 }
 
-const macosEnv = join(SNAPSHOT, 'apps', 'desktop', '.env.macos');
-if (!existsSync(macosEnv)) {
-  writeFileSync(macosEnv, [
-    'DSH_DESKTOP_APP_ID=com.workdsh.app',
-    'DSH_DESKTOP_AUTO_UPDATE_ENV=production',
-    'DSH_DESKTOP_MACOS_PACK_CONCURRENCY=4',
-    'DSH_DESKTOP_MANDATORY_UPDATE_PROD_ORIGIN=https://github.com',
-    '',
-  ].join('\n'));
-  console.log('[ci-bootstrap-snapshot] wrote unsigned macOS packaging env');
+// The official package script reads release settings only from these dotenv files.
+// Unsigned Alpha builds need the shared settings; signing credentials stay unset.
+const sharedEnv = [
+  'DSH_DESKTOP_APP_ID=com.workdsh.app',
+  'DSH_DESKTOP_AUTO_UPDATE_ENV=production',
+  'DSH_DESKTOP_MANDATORY_UPDATE_PROD_ORIGIN=https://github.com',
+];
+const platformEnvs = [
+  ['.env.macos', 'macOS', ['DSH_DESKTOP_MACOS_PACK_CONCURRENCY=4']],
+  ['.env.windows', 'Windows', ['DSH_DESKTOP_WINDOWS_SIGNATURE_CACHE_CONCURRENCY=4']],
+];
+for (const [file, label, extra] of platformEnvs) {
+  const path = join(SNAPSHOT, 'apps', 'desktop', file);
+  if (existsSync(path)) continue;
+  writeFileSync(path, [...sharedEnv, ...extra, ''].join('\n'));
+  console.log(`[ci-bootstrap-snapshot] wrote unsigned ${label} packaging env`);
 }
 
 console.log('[ci-bootstrap-snapshot] done');
