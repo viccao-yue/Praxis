@@ -11,7 +11,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, rmSync, cpSync, readdirSync, readFileSync, statSync, writeFileSync, writeSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const TAG = process.env.DSH_DESKTOP_TAG ?? 'dsh-v0.1.7-alpha.1';
@@ -21,9 +21,41 @@ const CACHE = join(ROOT, '.artifacts', 'desktop-pack-test', 'cache');
 const TARBALL = join(CACHE, `${TAG}.tar.gz`);
 const URL = `https://codeload.github.com/deepseek-ai/deepseek-harness/tar.gz/refs/tags/${TAG}`;
 
+// The Windows runner has dropped stderr before exit, so failures go to stdout too.
 function fail(message) {
-  writeSync(2, `[ci-bootstrap-snapshot] ERROR: ${message}\n`);
+  const line = `[ci-bootstrap-snapshot] ERROR: ${message}\n`;
+  writeSync(1, line);
+  writeSync(2, line);
   process.exit(1);
+}
+
+process.on('uncaughtException', (error) => fail(error?.stack ?? String(error)));
+
+/** Run a tool with captured output so its messages reach the job log before any exit. */
+function runCaptured(command, args, what) {
+  const result = spawnSync(command, args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  if (result.stdout) writeSync(1, result.stdout);
+  if (result.stderr) writeSync(1, result.stderr);
+  if (result.error) fail(`${what}: ${result.error.message}`);
+  if (result.status !== 0) fail(`${what}: ${command} exited with ${result.status ?? result.signal}`);
+  return result.stdout ?? '';
+}
+
+// Windows tar cannot create the snapshot's symlinks (CLAUDE.md aliases, test fixtures);
+// none of them are used by the desktop build, so they are skipped there.
+function extractTarball(tarball, dest) {
+  if (process.platform !== 'win32') {
+    runCaptured('tar', ['-xzf', tarball, '-C', dest], 'extract snapshot');
+    return;
+  }
+  const tar = join(process.env.SystemRoot ?? 'C:\\Windows', 'System32', 'tar.exe');
+  const listing = runCaptured(tar, ['-tvzf', tarball], 'list snapshot');
+  const links = listing.split(/\r?\n/)
+    .filter((line) => line.startsWith('l'))
+    .map((line) => line.replace(/ -> .*$/, '').split(/\s+/).pop())
+    .filter(Boolean);
+  console.log(`[ci-bootstrap-snapshot] skipping ${links.length} symlinks on Windows`);
+  runCaptured(tar, ['-xzf', tarball, '-C', dest, ...links.flatMap((link) => ['--exclude', link])], 'extract snapshot');
 }
 
 function downloadTarball(url, dest) {
@@ -69,13 +101,15 @@ if (!existsSync(TARBALL) || process.env.DSH_DESKTOP_FORCE_DOWNLOAD === '1') {
 const extractRoot = join(CACHE, 'extract');
 rmSync(extractRoot, { recursive: true, force: true });
 mkdirSync(extractRoot, { recursive: true });
-execFileSync('tar', ['-xzf', TARBALL, '-C', extractRoot], { stdio: 'inherit' });
+console.log(`[ci-bootstrap-snapshot] extracting ${TARBALL}`);
+extractTarball(TARBALL, extractRoot);
 const entries = readdirSync(extractRoot);
 if (entries.length !== 1) fail(`expected one top-level folder in tarball, got ${entries.join(', ')}`);
 const unpacked = join(extractRoot, entries[0]);
 
 rmSync(SNAPSHOT, { recursive: true, force: true });
 mkdirSync(dirname(SNAPSHOT), { recursive: true });
+console.log(`[ci-bootstrap-snapshot] copying snapshot into ${SNAPSHOT}`);
 cpSync(unpacked, SNAPSHOT, { recursive: true });
 console.log(`[ci-bootstrap-snapshot] snapshot ready: ${SNAPSHOT}`);
 
