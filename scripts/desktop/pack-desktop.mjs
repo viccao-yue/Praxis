@@ -11,6 +11,7 @@
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, statSync, copyFileSync, mkdirSync } from 'node:fs';
+import { rebuildMacInstallers, renamePackagedMacApps } from './mac-display-name.mjs';
 import { createRequire } from 'node:module';
 import { homedir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
@@ -45,7 +46,7 @@ if (!target) {
 }
 
 const installer = flag('--installer');
-const APP_BUNDLE = join(
+let appBundle = join(
   DESKTOP_APP,
   '.desktop-build',
   'targets',
@@ -197,11 +198,11 @@ function findAsarModule() {
 }
 
 function plistValue(key) {
-  return runCapture('plutil', ['-extract', key, 'raw', join(APP_BUNDLE, 'Contents', 'Info.plist')]);
+  return runCapture('plutil', ['-extract', key, 'raw', join(appBundle, 'Contents', 'Info.plist')]);
 }
 
 function verifyMacApp() {
-  if (!existsSync(APP_BUNDLE)) fail(`产物不存在: ${APP_BUNDLE}`);
+  if (!existsSync(appBundle)) fail(`产物不存在: ${appBundle}`);
   const problems = [];
   const expect = (label, actual, wanted) => {
     if (actual !== wanted) problems.push(`${label}: 期望 ${wanted}，实际 ${actual}`);
@@ -210,9 +211,9 @@ function verifyMacApp() {
   expect('CFBundleDisplayName', plistValue('CFBundleDisplayName'), '开物Praxis');
   expect('CFBundleIconFile', plistValue('CFBundleIconFile'), 'icon.icns');
   const iconSource = join(DESKTOP_APP, 'workdsh-icon.icns');
-  const iconPacked = join(APP_BUNDLE, 'Contents', 'Resources', 'icon.icns');
+  const iconPacked = join(appBundle, 'Contents', 'Resources', 'icon.icns');
   if (!existsSync(iconPacked) || sha256(iconSource) !== sha256(iconPacked)) problems.push('icon.icns 与品牌源不一致');
-  const asarPath = join(APP_BUNDLE, 'Contents', 'Resources', 'app.asar');
+  const asarPath = join(appBundle, 'Contents', 'Resources', 'app.asar');
   const asarMain = findAsarModule();
   if (asarMain === undefined) problems.push('未找到 @electron/asar');
   else {
@@ -236,7 +237,7 @@ function collectInstallers() {
     for (const name of readdirSync(dir)) {
       const path = join(dir, name);
       if (statSync(path).isDirectory()) walk(path);
-      else if (/^workdsh-.*\.(dmg|exe|blockmap)$/i.test(name)) out.push(path);
+      else if (/^(?:workdsh-|开物Praxis).*\.(dmg|exe|blockmap)$/i.test(name)) out.push(path);
     }
   };
   walk(ARTIFACTS_DIR);
@@ -277,6 +278,17 @@ if (!installer) builderArgs.push('--dir');
 console.log(`[pack-desktop] 2/2 electron-builder ${installer ? 'installer' : '--dir'}`);
 run(process.execPath, [pnpm, ...builderArgs], { cwd: DESKTOP_APP, env: snapshotEnv() });
 
+if (target.platform === 'darwin') {
+  const renamed = renamePackagedMacApps(ARTIFACTS_DIR);
+  if (renamed.length !== 1) fail(`expected one Praxis.app to rename, found ${renamed.length}`);
+  appBundle = renamed[0];
+  if (installer) {
+    const dmgs = rebuildMacInstallers(ARTIFACTS_DIR, appBundle);
+    if (dmgs.length === 0) fail(`no DMG to reseal under ${ARTIFACTS_DIR}`);
+  }
+  console.log(`[pack-desktop] Finder name → ${appBundle}`);
+}
+
 if (installer) verifyInstallers();
 else if (target.platform === 'darwin') verifyMacApp();
 
@@ -288,9 +300,9 @@ if (installer) {
   }
   console.log(`[pack-desktop] staged → ${staging}`);
 } else {
-  console.log(`[pack-desktop] 完成: ${APP_BUNDLE}`);
+  console.log(`[pack-desktop] 完成: ${appBundle}`);
 }
 
 if (flag('--restart') && target.platform === 'darwin' && !installer) {
-  spawnSync('open', [APP_BUNDLE], { stdio: 'inherit' });
+  spawnSync('open', [appBundle], { stdio: 'inherit' });
 }

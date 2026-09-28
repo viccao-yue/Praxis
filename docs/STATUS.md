@@ -1,3 +1,11 @@
+## 2026-09-28：图标下的名称改回开物Praxis
+
+Finder 用应用文件名做图标下的文字。安装包里的文件仍是 `Praxis.app`，所以显示 Praxis。`CFBundleName` 继续是 Praxis，Helper 仍叫 `Praxis Helper.app`。打包结束后把外层包改名为 `开物Praxis.app` 并重做 DMG。本机 `/Applications/Praxis.app` 已改名为 `/Applications/开物Praxis.app`。未重跑 GitHub Actions。
+
+## 2026-09-28：未公证的安装包下载后仍要清隔离标记
+
+新的 macOS 包能启动，但从浏览器下载后仍要执行 `xattr -cr /Applications/Praxis.app`。包内只有链接器留下的临时签名，`Info.plist` 未封入，系统因此显示「已损坏」。给本机安装包补了临时签名后，签名本身可以通过校验，但没有 Apple 公证票据，带隔离标记时仍会被拒绝。在配置 Developer ID 并公证之前，网页下载的包都需要先去掉隔离标记。未改打包脚本。
+
 ## 2026-09-28：桌面主进程改为在官方库编译之后再打包
 
 下载的 Praxis.app 启动时报找不到 `@deepseek-ai/dsh-home-paths`。这些包的 `lib/index.js` 被 gitignore，要等 `build:official` 才生成。CI 先跑了 `build:desktop`，tsdown 找不到文件就把 import 留在 `app.asar/lib/main.js` 外面，而安装包只把它们放在 `dsh/node_modules`。现在 `package-target` 在 `build:official` 之后再打包壳，并拒绝仍带这三条外部 import 的产物。本机已安装的 `/Applications/Praxis.app` 旁补了缺失的包，进程已起来。未重跑 GitHub Actions。

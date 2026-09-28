@@ -15,6 +15,7 @@
  */
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, copyFileSync, rmSync } from 'node:fs';
+import { rebuildMacInstallers, renamePackagedMacApps } from './mac-display-name.mjs';
 import { createHash } from 'node:crypto';
 import { homedir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
@@ -146,6 +147,22 @@ run(process.execPath, [pnpm, '--filter', '@deepseek-ai/dsh-desktop', 'run', targ
 
 const artifacts = join(DESKTOP_APP, '.desktop-build', 'targets', targetName, 'artifacts');
 const unsignedArtifacts = join(DESKTOP_APP, '.desktop-build', 'targets', targetName, 'unsigned-artifacts');
+if (target.platform === 'darwin') {
+  // electron-builder names the bundle Praxis.app so helpers stay "Praxis Helper.app".
+  // Finder labels the icon with that filename, so the shipped disk image uses 开物Praxis.app.
+  const renamed = [
+    ...renamePackagedMacApps(artifacts),
+    ...renamePackagedMacApps(unsignedArtifacts),
+  ];
+  if (renamed.length !== 1) fail(`expected one Praxis.app to rename, found ${renamed.length}`);
+  console.log(`[ci-build-installer] Finder name → ${renamed[0]}`);
+  const dmgs = [
+    ...rebuildMacInstallers(artifacts, renamed[0]),
+    ...rebuildMacInstallers(unsignedArtifacts, renamed[0]),
+  ];
+  if (dmgs.length === 0) fail(`no DMG to reseal under ${artifacts}`);
+  console.log(`[ci-build-installer] resealed ${dmgs.length} dmg`);
+}
 const staging = join(ROOT, '.artifacts', 'desktop-installers', targetName);
 rmSync(staging, { recursive: true, force: true });
 mkdirSync(staging, { recursive: true });
