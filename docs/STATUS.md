@@ -38,6 +38,10 @@ Finder 和程序坞按应用文件名显示，只改 `CFBundleDisplayName` 仍�
 
 删除确认不再使用主按钮蓝色，也不再用 `#b94242`。按钮改为官方错误色压深后的红色填充、浅色文字，取消保持官方描边按钮；新建、重命名、停用的确定仍是主按钮。已重建资料库客户端，并写入正在运行的预览 Profile 与 `~/.praxis` 桌面 Profile。未在浏览器重新打开对话框核对（本机无头浏览器未能启动）。刷新 8517 或桌面窗口后可见。
 
+## 2026-09-28：Desktop CI mac DMG 重封失败修复
+
+CI mac-arm64 在 `mac-display-name.mjs` 的 `renameSync` 报 ENOENT：`hdiutil create` 会给不以 `.dmg` 结尾的输出路径自动补 `.dmg`，脚本却按 `开物Praxis.dmg.renaming` 去找文件。临时文件改为 `*.renaming.dmg`；DMG 根目录改为 `开物Praxis.app` 加 `Applications` 链接（app 临时移入、结束后移回）。本机用假 app 实测：生成、挂载可见 app 与链接、原 app 已移回。未执行：CI 重跑与真实 1.6GB app 重封。
+
 ## 2026-09-28：Desktop CI 切到 0.1.7-alpha.1 并准备给同事分发
 
 审查工作区里的 0.1.7 桌面改动：补丁存档与本机快照逐文件一致，`js-yaml` 与快照 `pnpm@11.7.0` 均可用，移除了「跳过缺失 `@deepseek-ai/*`」的临时做法。另修两处：未签名 Windows 产物改写入 `unsigned-artifacts`，与官方 `smoke-packaged-runtime --unsigned` 读取目录一致（此前 Windows 冒烟必失败）；Release 附件改为 ASCII 名 `Praxis-<版本>-<target>.<ext>`，避免 GitHub 改写中文文件名。安装说明补充 `xattr -cr`。同批提交含另一窗口的 `src/main.ts` 补丁：桌面 `DSH_HOME` 默认改为 `~/.praxis`，并为宿主进程读取系统代理；安装说明与 Release 说明已随之改为 `~/.praxis`，旧 `~/.dsh/profiles/desktop` 数据不会自动迁移。未执行：CI 三平台构建、Windows 与 Intel Mac 实机安装。本机 Apple 芯片 DMG `.artifacts/desktop-installers/mac-arm64/开物Praxis.dmg` 可先直接分发。
