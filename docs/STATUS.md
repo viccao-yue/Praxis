@@ -1,3 +1,7 @@
+## 2026-09-28：桌面主进程改为在官方库编译之后再打包
+
+下载的 Praxis.app 启动时报找不到 `@deepseek-ai/dsh-home-paths`。这些包的 `lib/index.js` 被 gitignore，要等 `build:official` 才生成。CI 先跑了 `build:desktop`，tsdown 找不到文件就把 import 留在 `app.asar/lib/main.js` 外面，而安装包只把它们放在 `dsh/node_modules`。现在 `package-target` 在 `build:official` 之后再打包壳，并拒绝仍带这三条外部 import 的产物。本机已安装的 `/Applications/Praxis.app` 旁补了缺失的包，进程已起来。未重跑 GitHub Actions。
+
 ## 2026-09-28：桌面冒烟不再因空 .gitkeep 失败
 
 macOS DMG 已经打出，随后 `smoke-packaged-runtime` 报 ASAR 完整性失败。对照本机安装包：清单 40617 个文件，包内 40614 个，只少 3 个 0 字节 `.gitkeep`（undici、experts、skills 的空占位）。electron-builder 不会把空文件放进 ASAR。校验现在只放过这种占位缺失，其他缺文件或哈希变化仍失败。未重跑 GitHub Actions。

@@ -129,17 +129,16 @@ run(process.execPath, [join(ROOT, 'scripts/desktop/ci-pack-plugins.mjs'), `--tar
   env,
 });
 
-console.log('[ci-build-installer] 3/6 build:desktop');
-run(process.execPath, [pnpm, 'run', 'build:desktop'], { cwd: SNAPSHOT, env });
-
 // package-target.ts imports the notarization proxy at load time, and that proxy
 // imports @deepseek-ai/node-addon-system/flock. The tag archive gitignores
 // native/system/packages/*/lib, and the official script only compiles it later
 // inside main(). Compile the JS entry first so tsx can resolve flock.js.
-console.log('[ci-build-installer] 4/6 build node-addon-system JS');
+// The shell bundle itself runs inside package-target, after build:official emits
+// the gitignored package entries that main.js must inline.
+console.log('[ci-build-installer] 3/5 build node-addon-system JS');
 run(process.execPath, [pnpm, '--dir', join(SNAPSHOT, 'native/system'), 'run', 'build:ts'], { cwd: SNAPSHOT, env });
 
-console.log(`[ci-build-installer] 5/6 official ${target.packageScript} (prepare + installer)`);
+console.log(`[ci-build-installer] 4/5 official ${target.packageScript} (prepare + installer)`);
 run(process.execPath, [pnpm, '--filter', '@deepseek-ai/dsh-desktop', 'run', target.packageScript], {
   cwd: SNAPSHOT,
   env,
@@ -176,4 +175,4 @@ for (const file of collected) {
   console.log(`[ci-build-installer] ${base} ${Math.round(size / 1e6)}MB sha256=${hash.slice(0, 12)}…`);
 }
 
-console.log(`[ci-build-installer] 6/6 staged → ${staging}`);
+console.log(`[ci-build-installer] 5/5 staged → ${staging}`);

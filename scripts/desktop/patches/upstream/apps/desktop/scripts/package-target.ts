@@ -453,6 +453,16 @@ export async function packageTarget(
     })
   }
   await execute(['run', 'build:official'], buildEnv, REPOSITORY_ROOT)
+  // WORKDSH TEST PATCH: package lib/ entries are gitignored. Bundling the shell before
+  // build:official makes tsdown keep those imports external, and the packaged app then
+  // cannot resolve them from app.asar/lib/main.js.
+  await execute(['run', 'build:desktop'], buildEnv, REPOSITORY_ROOT)
+  const bundledMain = readFileSync(join(APP_ROOT, 'lib/main.js'), 'utf8')
+  for (const name of ['@deepseek-ai/dsh-home-paths', '@deepseek-ai/dsh-app-boot', '@deepseek-ai/dsh-deepseek-account']) {
+    if (bundledMain.includes(`from "${name}"`) || bundledMain.includes(`from '${name}'`)) {
+      throw new Error(`desktop package: shell bundle left ${name} external`)
+    }
+  }
   await execute(['run', 'release:pack', '--family', 'dsh', '--out', buildPaths.packedDsh, ...packArguments], buildEnv, REPOSITORY_ROOT)
   await execute([
     '--dir',
