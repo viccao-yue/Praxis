@@ -8,11 +8,9 @@
  *   DSH_DESKTOP_TAG=dsh-v0.1.7-alpha.1 node scripts/desktop/ci-bootstrap-snapshot.mjs
  */
 import { createHash } from 'node:crypto';
-import { createWriteStream, existsSync, mkdirSync, rmSync, cpSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, rmSync, cpSync, readdirSync, readFileSync, statSync, writeFileSync, writeSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
-import { pipeline } from 'node:stream/promises';
 import { fileURLToPath } from 'node:url';
-import { createGunzip } from 'node:zlib';
 import { execFileSync } from 'node:child_process';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -24,8 +22,23 @@ const TARBALL = join(CACHE, `${TAG}.tar.gz`);
 const URL = `https://codeload.github.com/deepseek-ai/deepseek-harness/tar.gz/refs/tags/${TAG}`;
 
 function fail(message) {
-  console.error(`[ci-bootstrap-snapshot] ERROR: ${message}`);
+  writeSync(2, `[ci-bootstrap-snapshot] ERROR: ${message}\n`);
   process.exit(1);
+}
+
+function downloadTarball(url, dest) {
+  const curl = process.platform === 'win32' ? 'curl.exe' : 'curl';
+  execFileSync(curl, [
+    '-fL',
+    '--retry', '5',
+    '--retry-delay', '2',
+    '--retry-all-errors',
+    '-o', dest,
+    url,
+  ], { stdio: 'inherit' });
+  const size = statSync(dest).size;
+  if (size < 1_000_000) fail(`tarball too small (${size} bytes): ${dest}`);
+  console.log(`[ci-bootstrap-snapshot] downloaded ${size} bytes`);
 }
 
 function listFiles(root) {
@@ -48,9 +61,7 @@ function sha256(file) {
 mkdirSync(CACHE, { recursive: true });
 if (!existsSync(TARBALL) || process.env.DSH_DESKTOP_FORCE_DOWNLOAD === '1') {
   console.log(`[ci-bootstrap-snapshot] downloading ${URL}`);
-  const response = await fetch(URL);
-  if (!response.ok) fail(`download failed: HTTP ${response.status}`);
-  await pipeline(response.body, createWriteStream(TARBALL));
+  downloadTarball(URL, TARBALL);
 } else {
   console.log(`[ci-bootstrap-snapshot] using cached ${TARBALL}`);
 }

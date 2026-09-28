@@ -1,3 +1,7 @@
+## 2026-09-28：Windows 引导改为 curl 下载官方源码包
+
+Windows 桌面任务在 `ci-bootstrap-snapshot` 下载 `dsh-v0.1.7-alpha.1` 时约 9 秒退出，日志没有错误正文。Node `fetch` 写文件在 Windows runner 上失败，且 `process.exit` 会把错误说明冲掉。下载改为 `curl.exe` 并重试 5 次，过小的包直接失败。未重跑 GitHub Actions。
+
 ## 2026-09-28：图标下的名称改回开物Praxis
 
 Finder 用应用文件名做图标下的文字。安装包里的文件仍是 `Praxis.app`，所以显示 Praxis。`CFBundleName` 继续是 Praxis，Helper 仍叫 `Praxis Helper.app`。打包结束后把外层包改名为 `开物Praxis.app` 并重做 DMG。本机 `/Applications/Praxis.app` 已改名为 `/Applications/开物Praxis.app`。未重跑 GitHub Actions。
