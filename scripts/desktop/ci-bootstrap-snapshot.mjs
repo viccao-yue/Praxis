@@ -15,7 +15,10 @@ import { execFileSync, spawnSync } from 'node:child_process';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const TAG = process.env.DSH_DESKTOP_TAG ?? 'dsh-v0.1.7-alpha.1';
-const SNAPSHOT = join(ROOT, '.artifacts', 'desktop-pack-test', 'upstream');
+// Windows CI sets a short snapshot root: LibreOffice cannot open files past 260 characters.
+const SNAPSHOT = process.env.PRAXIS_DESKTOP_SNAPSHOT
+  ? resolve(process.env.PRAXIS_DESKTOP_SNAPSHOT)
+  : join(ROOT, '.artifacts', 'desktop-pack-test', 'upstream');
 const PATCH_STORE = join(ROOT, 'scripts', 'desktop', 'patches', 'upstream');
 const CACHE = join(ROOT, '.artifacts', 'desktop-pack-test', 'cache');
 const TARBALL = join(CACHE, `${TAG}.tar.gz`);

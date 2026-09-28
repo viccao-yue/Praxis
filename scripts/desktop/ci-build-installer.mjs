@@ -22,7 +22,10 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const SNAPSHOT = join(ROOT, '.artifacts', 'desktop-pack-test', 'upstream');
+// Windows CI sets a short snapshot root: LibreOffice cannot open files past 260 characters.
+const SNAPSHOT = process.env.PRAXIS_DESKTOP_SNAPSHOT
+  ? resolve(process.env.PRAXIS_DESKTOP_SNAPSHOT)
+  : join(ROOT, '.artifacts', 'desktop-pack-test', 'upstream');
 const DESKTOP_APP = join(SNAPSHOT, 'apps', 'desktop');
 const ELECTRON_MIRROR = 'https://npmmirror.com/mirrors/electron/';
 const ELECTRON_BUILDER_CACHE = join(ROOT, '.artifacts', 'desktop-pack-test', 'electron-builder-cache');

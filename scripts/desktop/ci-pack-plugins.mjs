@@ -9,7 +9,10 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const SNAPSHOT = join(ROOT, '.artifacts', 'desktop-pack-test', 'upstream');
+// Windows CI sets a short snapshot root: LibreOffice cannot open files past 260 characters.
+const SNAPSHOT = process.env.PRAXIS_DESKTOP_SNAPSHOT
+  ? resolve(process.env.PRAXIS_DESKTOP_SNAPSHOT)
+  : join(ROOT, '.artifacts', 'desktop-pack-test', 'upstream');
 const TARGET = process.env.DSH_DESKTOP_PACK_TARGET ?? process.argv.find((a) => a.startsWith('--target='))?.slice(9) ?? 'mac-arm64';
 const PACKED = join(SNAPSHOT, 'apps', 'desktop', '.desktop-build', 'targets', TARGET, 'packed', 'workdsh');
 

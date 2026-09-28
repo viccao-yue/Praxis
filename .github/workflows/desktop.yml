@@ -76,6 +76,12 @@ jobs:
         with:
           node-version: '22.19'
       - run: corepack enable
+      # LibreOffice fails once packaged paths pass 260 characters; the workspace path is too deep.
+      - name: Use a short snapshot root
+        shell: pwsh
+        run: |
+          $drive = Split-Path -Qualifier $env:GITHUB_WORKSPACE
+          "PRAXIS_DESKTOP_SNAPSHOT=$drive\dsk" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Install workspace
         run: corepack pnpm install --frozen-lockfile
       - name: Build workspace packages
@@ -91,7 +97,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: desktop-logs-windows-x64
-          path: .artifacts/desktop-pack-test/upstream/apps/desktop/.desktop-build/packaging-runs/
+          path: ${{ env.PRAXIS_DESKTOP_SNAPSHOT }}/apps/desktop/.desktop-build/packaging-runs/
           if-no-files-found: ignore
           retention-days: 7
       - name: Upload Windows installer
