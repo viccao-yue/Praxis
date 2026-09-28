@@ -1,3 +1,7 @@
+## 2026-09-28：桌面冒烟不再因空 .gitkeep 失败
+
+macOS DMG 已经打出，随后 `smoke-packaged-runtime` 报 ASAR 完整性失败。对照本机安装包：清单 40617 个文件，包内 40614 个，只少 3 个 0 字节 `.gitkeep`（undici、experts、skills 的空占位）。electron-builder 不会把空文件放进 ASAR。校验现在只放过这种占位缺失，其他缺文件或哈希变化仍失败。未重跑 GitHub Actions。
+
 ## 2026-09-28：桌面 CI 先编译 flock.js
 
 macOS DMG 在 `package:mac:arm64` 启动时失败：`@deepseek-ai/node-addon-system/lib/flock.js` 不存在。标签包忽略了 `native/system/packages/*/lib`，官方脚本要等进入 main 才 `build:ts`，但公证代理在文件顶层就 import 了 flock。安装包脚本现在会先编译这份 JS。未重跑 GitHub Actions。
