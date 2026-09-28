@@ -116,23 +116,30 @@ const pnpm = resolvePnpmEntry();
 const env = targetEnv();
 const marker = join(SNAPSHOT, 'node_modules', '.modules.yaml');
 
-console.log(`[ci-build-installer] 1/5 install snapshot deps (if needed)`);
+console.log(`[ci-build-installer] 1/6 install snapshot deps (if needed)`);
 if (!existsSync(marker) || process.env.DSH_DESKTOP_FORCE_INSTALL === '1') {
   run(process.execPath, [pnpm, 'install', '--frozen-lockfile'], { cwd: SNAPSHOT, env });
 } else {
   console.log('[ci-build-installer] node_modules present, skip install');
 }
 
-console.log(`[ci-build-installer] 2/5 pack Praxis seed plugins → packed/workdsh`);
+console.log(`[ci-build-installer] 2/6 pack Praxis seed plugins → packed/workdsh`);
 run(process.execPath, [join(ROOT, 'scripts/desktop/ci-pack-plugins.mjs'), `--target=${targetName}`], {
   cwd: ROOT,
   env,
 });
 
-console.log('[ci-build-installer] 3/5 build:desktop');
+console.log('[ci-build-installer] 3/6 build:desktop');
 run(process.execPath, [pnpm, 'run', 'build:desktop'], { cwd: SNAPSHOT, env });
 
-console.log(`[ci-build-installer] 4/5 official ${target.packageScript} (prepare + installer)`);
+// package-target.ts imports the notarization proxy at load time, and that proxy
+// imports @deepseek-ai/node-addon-system/flock. The tag archive gitignores
+// native/system/packages/*/lib, and the official script only compiles it later
+// inside main(). Compile the JS entry first so tsx can resolve flock.js.
+console.log('[ci-build-installer] 4/6 build node-addon-system JS');
+run(process.execPath, [pnpm, '--dir', join(SNAPSHOT, 'native/system'), 'run', 'build:ts'], { cwd: SNAPSHOT, env });
+
+console.log(`[ci-build-installer] 5/6 official ${target.packageScript} (prepare + installer)`);
 run(process.execPath, [pnpm, '--filter', '@deepseek-ai/dsh-desktop', 'run', target.packageScript], {
   cwd: SNAPSHOT,
   env,
@@ -169,4 +176,4 @@ for (const file of collected) {
   console.log(`[ci-build-installer] ${base} ${Math.round(size / 1e6)}MB sha256=${hash.slice(0, 12)}…`);
 }
 
-console.log(`[ci-build-installer] 5/5 staged → ${staging}`);
+console.log(`[ci-build-installer] 6/6 staged → ${staging}`);

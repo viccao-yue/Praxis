@@ -1,3 +1,7 @@
+## 2026-09-28：桌面 CI 先编译 flock.js
+
+macOS DMG 在 `package:mac:arm64` 启动时失败：`@deepseek-ai/node-addon-system/lib/flock.js` 不存在。标签包忽略了 `native/system/packages/*/lib`，官方脚本要等进入 main 才 `build:ts`，但公证代理在文件顶层就 import 了 flock。安装包脚本现在会先编译这份 JS。未重跑 GitHub Actions。
+
 ## 2026-09-28：图标下的名称改为开物Praxis
 
 Finder 和程序坞按应用文件名显示，只改 `CFBundleDisplayName` 仍会显示 Praxis。已把 `/Applications/Praxis.app` 改名为 `/Applications/开物Praxis.app`，包内 `CFBundleName` 仍是 Praxis，Helper 名称不变。已重新打开，进程在。安装包已按这个应用重打：`.artifacts/desktop-installers/mac-arm64/开物Praxis.dmg`。
