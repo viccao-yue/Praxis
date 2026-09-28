@@ -18,7 +18,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, copyFileSyn
 import { rebuildMacInstallers, renamePackagedMacApps } from './mac-display-name.mjs';
 import { createHash } from 'node:crypto';
 import { homedir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -111,9 +111,18 @@ function resolvePnpmEntry() {
   return fallback;
 }
 
+// The official package script records `git rev-parse HEAD` from the snapshot root. A snapshot
+// outside this checkout is not a repository, so git is pointed back at the Praxis checkout.
+function gitEnv() {
+  const rel = relative(ROOT, SNAPSHOT);
+  if (rel !== '' && !rel.startsWith('..') && !isAbsolute(rel)) return {};
+  return { GIT_DIR: join(ROOT, '.git'), GIT_WORK_TREE: ROOT };
+}
+
 function targetEnv() {
   return {
     ...process.env,
+    ...gitEnv(),
     PATH: `${dirname(process.execPath)}${process.platform === 'win32' ? ';' : ':'}${process.env.PATH ?? ''}`,
     DSH_DESKTOP_TARGET_PLATFORM: target.platform,
     DSH_DESKTOP_TARGET_ARCH: target.arch,
