@@ -1,7 +1,7 @@
 name: Desktop
 
 # Unsigned Alpha installers via the official apps/desktop pipeline
-# (deepseek-ai/deepseek-harness tag dsh-v0.1.5-rc.1 + WORKDSH TEST PATCH).
+# (deepseek-ai/deepseek-harness tag dsh-v0.1.7-alpha.1 + WORKDSH TEST PATCH).
 # Not the community dsh-plugin-desktop / Yarn shell.
 
 on:
@@ -30,7 +30,7 @@ concurrency:
 
 env:
   DSH_TELEMETRY_DISABLED: '1'
-  DSH_DESKTOP_TAG: dsh-v0.1.5-rc.1
+  DSH_DESKTOP_TAG: dsh-v0.1.7-alpha.1
   WORKDSH_DESKTOP_UNSIGNED: '1'
   DSH_DESKTOP_APP_ID: com.workdsh.app
   DSH_DESKTOP_AUTO_UPDATE_ENV: production
@@ -142,14 +142,26 @@ jobs:
           pattern: praxis-desktop-*
           path: staging
       - name: Prepare release assets
+        env:
+          TAG: ${{ github.ref_name }}
         shell: bash
         run: |
           set -euo pipefail
+          VERSION="${TAG#desktop-v}"
           mkdir -p release-assets
+          # GitHub rewrites non-ASCII asset names, so 开物Praxis.dmg is renamed to an ASCII name per target.
           while IFS= read -r -d '' file; do
             artifact="$(basename "$(dirname "$file")")"
+            target="${artifact#praxis-desktop-}"
             name="$(basename "$file")"
-            cp "$file" "release-assets/${artifact}--${name}"
+            case "$name" in
+              *.exe.blockmap) ext='exe.blockmap' ;;
+              *.dmg.blockmap) ext='dmg.blockmap' ;;
+              *.dmg) ext='dmg' ;;
+              *.exe) ext='exe' ;;
+              *) continue ;;
+            esac
+            cp "$file" "release-assets/Praxis-${VERSION}-${target}.${ext}"
           done < <(find staging -type f \( -name '*.dmg' -o -name '*.exe' -o -name '*.blockmap' \) -print0)
           count="$(find release-assets -type f ! -name SHA256SUMS | wc -l | tr -d ' ')"
           if [[ "$count" -lt 1 ]]; then
@@ -173,10 +185,10 @@ jobs:
           - Windows x64：NSIS Setup.exe（原生 Windows Runner 构建）
           - macOS Apple Silicon：arm64 DMG
           - macOS Intel：x64 DMG
-          - 基于官方 `apps/desktop` 流水线（`dsh-v0.1.5-rc.1`）+ 开物种子插件
+          - 基于官方 `apps/desktop` 流水线（`dsh-v0.1.7-alpha.1`）+ 开物种子插件
           - **未签名**：macOS 可能需「仍要打开」；Windows 可能触发 SmartScreen
 
-          安装说明见仓库 `docs/DESKTOP-INSTALL.md`。升级前请备份 `~/.dsh`（Windows：`%USERPROFILE%\.dsh`）。
+          安装说明见仓库 `docs/DESKTOP-INSTALL.md`。桌面数据在 `~/.praxis`（Windows：`%USERPROFILE%\.praxis`），升级前请备份。
           各文件 SHA-256 见 `SHA256SUMS`。
           EOF
           gh release create "$TAG" release-assets/* \

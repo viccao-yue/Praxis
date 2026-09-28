@@ -1,6 +1,6 @@
 # 开物Praxis 桌面打包（官方流水线）
 
-基于官方 `deepseek-ai/deepseek-harness` 仓库 `apps/desktop`（tag `dsh-v0.1.5-rc.1`）的隔离快照，
+基于官方 `deepseek-ai/deepseek-harness` 仓库 `apps/desktop`（tag `dsh-v0.1.7-alpha.1`）的隔离快照，
 经 `WORKDSH TEST PATCH` 补丁产出 **Praxis** 未签名桌面端。
 
 - **同事安装**：见 [docs/DESKTOP-INSTALL.md](../../docs/DESKTOP-INSTALL.md)

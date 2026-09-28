@@ -1,3 +1,25 @@
+## 2026-09-28：Desktop CI 切到 0.1.7-alpha.1 并准备给同事分发
+
+审查工作区里的 0.1.7 桌面改动：补丁存档与本机快照逐文件一致，`js-yaml` 与快照 `pnpm@11.7.0` 均可用，移除了「跳过缺失 `@deepseek-ai/*`」的临时做法。另修两处：未签名 Windows 产物改写入 `unsigned-artifacts`，与官方 `smoke-packaged-runtime --unsigned` 读取目录一致（此前 Windows 冒烟必失败）；Release 附件改为 ASCII 名 `Praxis-<版本>-<target>.<ext>`，避免 GitHub 改写中文文件名。安装说明补充 `xattr -cr`。同批提交含另一窗口的 `src/main.ts` 补丁：桌面 `DSH_HOME` 默认改为 `~/.praxis`，并为宿主进程读取系统代理；安装说明与 Release 说明已随之改为 `~/.praxis`，旧 `~/.dsh/profiles/desktop` 数据不会自动迁移。未执行：CI 三平台构建、Windows 与 Intel Mac 实机安装。本机 Apple 芯片 DMG `.artifacts/desktop-installers/mac-arm64/开物Praxis.dmg` 可先直接分发。
+
+## 2026-09-28：桌面界面改成开物Praxis，并接回已有内容
+
+新开关图标已写入 `assets/brand/praxis-mac-icon-1024.png`，并重打未签名安装包 `.artifacts/desktop-installers/mac-arm64/开物Praxis.dmg`。`/Applications/Praxis.app` 已替换并重新打开（进程在）。打包进应用的界面里，侧栏名称、首页标题和窗口标题都是「开物Praxis」。未用辅助功能逐屏点验。
+
+桌面配置 `~/.dsh/profiles/desktop` 原先只有包名、没有依赖，所以打开后是官方空壳。已装上开物插件，并把预览目录里的专家、项目、资料库等存储接到 `~/.dsh/storages`。127 条会话此前都在归档列表里，现已移回可见列表；原文件留有 `workspace.json.bak-20260928`。
+
+## 2026-09-28：桌面宿主换到 0.1.7-alpha.1
+
+官方快照改为 `dsh-v0.1.7-alpha.1`。未签名 macOS arm64 安装包已打出：`.artifacts/desktop-installers/mac-arm64/workdsh-0.1.7-alpha.1-mac-arm64.dmg`（526MB，`CFBundleShortVersionString` 为 `0.1.7-alpha.1`，显示名 Praxis）。官方收尾冒烟失败：ASAR 清单比准备清单少 3 个空的 `.gitkeep`，其余 40614 个文件一致。未在本机打开应用验收。Intel 与 Windows 包未打。补丁和默认 tag 还在工作区，未提交。
+
+## 2026-09-28：本机桌面端可用性核对
+
+`/Applications/Praxis.app` 已安装（`com.workdsh.app`，`0.1.7-alpha.1`，未签名，由 09:39 本地 electron-builder 产物安装）；`~/.dsh/profiles/desktop` 已含全部 workdsh 插件与 `dsh-ui-appearance`。之后的「换品牌」重打包失败于官方 `verifyDesktopRuntime` 完整性校验（此前手动往 `.desktop-build/.../dsh/node_modules` 补 Cordis 导致运行时树与清单不符），未覆盖已装应用。带 `--remote-debugging-port` 重启后 CDP 核验：标题「开物Praxis」，侧栏插件/协同空间/数字员工/技能·连接器/资料库与工作区、会话输入框、模型选择均渲染；随后已按普通方式重启并关闭调试端口。未做真实模型对话验收；本地重打包流程仍需修复（完整性校验与手动补包冲突）。
+
+## 2026-09-28：本地 Web 预览重新部署
+
+`corepack pnpm build` 通过；`preview:install` 首次失败 `ERR_PNPM_UNEXPECTED_STORE`（预览 Profile 依赖此前由 pnpm 11 链到 store v11，官方插件管理器现用 pnpm 10 / store v10）。已把 `.test-runtime/preview/profiles/preview/node_modules` 改名为 `node_modules.store-v11-backup-202609280831`（未删，会话数据未动）后重装成功。`corepack pnpm preview` 已在 127.0.0.1:8517 启动，`[workdsh:probe] activated`，无 token 请求返回 401。未在浏览器里逐页验收。
+
 ## 2026-09-26：Desktop CI mac DMG 已产出但校验误杀
 
 prepare 与 electron-builder 已成功：`workdsh-0.1.5-rc.1-mac-arm64.dmg` / `.zip`，未签名跳过正常。失败在 `ci-build-installer` 递归收集 `*.exe` 时把产物树里的 `fastlist-0.3.0-x64.exe`（约 266KB）当成安装包做 1MB 下限校验。已改为只收 `workdsh-*.dmg|exe`。请再 Run；Upload 步骤应能挂上 Artifact。

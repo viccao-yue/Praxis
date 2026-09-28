@@ -5,10 +5,10 @@
  *
  * Usage:
  *   node scripts/desktop/ci-bootstrap-snapshot.mjs
- *   DSH_DESKTOP_TAG=dsh-v0.1.5-rc.1 node scripts/desktop/ci-bootstrap-snapshot.mjs
+ *   DSH_DESKTOP_TAG=dsh-v0.1.7-alpha.1 node scripts/desktop/ci-bootstrap-snapshot.mjs
  */
 import { createHash } from 'node:crypto';
-import { createWriteStream, existsSync, mkdirSync, rmSync, cpSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { createWriteStream, existsSync, mkdirSync, rmSync, cpSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { pipeline } from 'node:stream/promises';
 import { fileURLToPath } from 'node:url';
@@ -16,7 +16,7 @@ import { createGunzip } from 'node:zlib';
 import { execFileSync } from 'node:child_process';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const TAG = process.env.DSH_DESKTOP_TAG ?? 'dsh-v0.1.5-rc.1';
+const TAG = process.env.DSH_DESKTOP_TAG ?? 'dsh-v0.1.7-alpha.1';
 const SNAPSHOT = join(ROOT, '.artifacts', 'desktop-pack-test', 'upstream');
 const PATCH_STORE = join(ROOT, 'scripts', 'desktop', 'patches', 'upstream');
 const CACHE = join(ROOT, '.artifacts', 'desktop-pack-test', 'cache');
@@ -76,13 +76,31 @@ for (const patchFile of listFiles(PATCH_STORE)) {
   console.log(`[ci-bootstrap-snapshot] applied patch ${rel} (${sha256(patchFile).slice(0, 12)}…)`);
 }
 
-// Provide a PNG icon for Windows electron-builder (from brand 1024 source).
-const brandPng = join(ROOT, 'assets', 'brand', 'praxis-desktop-icon-1024.png');
-const winIcon = join(SNAPSHOT, 'apps', 'desktop', 'build', 'icon.png');
+// Provide a PNG icon for electron-builder (from the transparent 1024 logo).
+const brandPng = join(ROOT, 'assets', 'brand', 'praxis-logo.png');
+const iconTargets = [
+  join(SNAPSHOT, 'apps', 'desktop', 'build', 'icon.png'),
+  join(SNAPSHOT, 'apps', 'desktop', 'resources', 'icon-macos.png'),
+  join(SNAPSHOT, 'apps', 'desktop', 'resources', 'icon-windows.png'),
+];
 if (existsSync(brandPng)) {
-  mkdirSync(dirname(winIcon), { recursive: true });
-  cpSync(brandPng, winIcon);
-  console.log('[ci-bootstrap-snapshot] installed Windows icon PNG from brand asset');
+  for (const icon of iconTargets) {
+    mkdirSync(dirname(icon), { recursive: true });
+    cpSync(brandPng, icon);
+  }
+  console.log('[ci-bootstrap-snapshot] installed Praxis icon PNG');
+}
+
+const macosEnv = join(SNAPSHOT, 'apps', 'desktop', '.env.macos');
+if (!existsSync(macosEnv)) {
+  writeFileSync(macosEnv, [
+    'DSH_DESKTOP_APP_ID=com.workdsh.app',
+    'DSH_DESKTOP_AUTO_UPDATE_ENV=production',
+    'DSH_DESKTOP_MACOS_PACK_CONCURRENCY=4',
+    'DSH_DESKTOP_MANDATORY_UPDATE_PROD_ORIGIN=https://github.com',
+    '',
+  ].join('\n'));
+  console.log('[ci-bootstrap-snapshot] wrote unsigned macOS packaging env');
 }
 
 console.log('[ci-bootstrap-snapshot] done');

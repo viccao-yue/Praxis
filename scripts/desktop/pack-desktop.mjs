@@ -207,7 +207,7 @@ function verifyMacApp() {
     if (actual !== wanted) problems.push(`${label}: 期望 ${wanted}，实际 ${actual}`);
   };
   expect('CFBundleIdentifier', plistValue('CFBundleIdentifier'), 'com.workdsh.app');
-  expect('CFBundleDisplayName', plistValue('CFBundleDisplayName'), 'Praxis');
+  expect('CFBundleDisplayName', plistValue('CFBundleDisplayName'), '开物Praxis');
   expect('CFBundleIconFile', plistValue('CFBundleIconFile'), 'icon.icns');
   const iconSource = join(DESKTOP_APP, 'workdsh-icon.icns');
   const iconPacked = join(APP_BUNDLE, 'Contents', 'Resources', 'icon.icns');

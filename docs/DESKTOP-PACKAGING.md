@@ -3,7 +3,7 @@
 本文是 开物Praxis 桌面测试版打包的指南主体：用法、补丁用途表、快照重建、快照与仓库基线版本对照、Windows 说明与常见问题。
 脚本目录速查见 [scripts/desktop/README.md](../scripts/desktop/README.md)；决策背景见 [ADR-0025](adr/0025-desktop-packaging-via-official-pipeline.md)；历次执行证据见 [desktop-pack-test](evidence/desktop-pack-test.md)。
 
-**定位与边界**：基于官方 `deepseek-ai/deepseek-harness` 仓库 `apps/desktop` 的隔离快照（tag `dsh-v0.1.5-rc.1`），经 `Praxis TEST PATCH` 最小补丁产出 **开物Praxis.app 未签名本地测试版**（macOS arm64）。快照位于 `.artifacts/desktop-pack-test/upstream`（gitignored），**不作为 开物Praxis 的开发或运行依赖**，不参与 workspace、CI 与 Web 预览；不引入自建 Electron 壳与第二套插件加载器。产物仅本机自用、**不可分发**；正式发布需具备 Apple Developer ID 与公证凭据并停用未签名模式。
+**定位与边界**：基于官方 `deepseek-ai/deepseek-harness` 仓库 `apps/desktop` 的隔离快照（tag `dsh-v0.1.7-alpha.1`），经 `Praxis TEST PATCH` 最小补丁产出 **开物Praxis.app 未签名本地测试版**（macOS arm64）。快照位于 `.artifacts/desktop-pack-test/upstream`（gitignored），**不作为 开物Praxis 的开发或运行依赖**，不参与 workspace、CI 与 Web 预览；不引入自建 Electron 壳与第二套插件加载器。产物仅本机自用、**不可分发**；正式发布需具备 Apple Developer ID 与公证凭据并停用未签名模式。
 
 ## 快速使用
 
@@ -71,7 +71,7 @@ electron-builder 经 `extraResources` 把快照内 `.desktop-build/targets/mac-a
 
 快照随时可能丢失或需要升级；完整重建步骤如下（2026-09-12 首建流程，供复刻）：
 
-1. **获取官方快照**：下载官方 tag tarball（当前 `dsh-v0.1.5-rc.1`，commit `183f08e9…`）解包至 `.artifacts/desktop-pack-test/upstream/`。快照自持 `pnpm@11.7.0`（`packageManager`）、Node 要求 `^22.19.0 || >=24`。
+1. **获取官方快照**：下载官方 tag tarball（当前 `dsh-v0.1.7-alpha.1`）解包至 `.artifacts/desktop-pack-test/upstream/`。快照自持 `pnpm@11.7.0`（`packageManager`）、Node 要求 `^22.19.0 || >=24`。
 2. **安装依赖**：在快照根执行 `pnpm install --frozen-lockfile`。本机 corepack shim 可能损坏（`ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING`），直接调用缓存中的固定版本：`node ~/.cache/node/corepack/v1/pnpm/11.7.0/bin/pnpm.mjs`（`pack-desktop.mjs` 已内建该逻辑）。
 3. **应用补丁存档**：将 `scripts/desktop/patches/upstream/` 按相对路径覆盖到快照对应位置；然后 `--check-only` 验证（不一致文件会列出）。
 4. **打包 开物Praxis 本地包与预置第三方包 tarball**：对下表各包在仓库根执行 `pnpm --dir <包路径> pack --pack-destination "<快照>/apps/desktop/.desktop-build/targets/mac-arm64/packed/Praxis"`（第三方包用 `npm pack`），tarball 文件名须为 `<name>-<version>.tgz`。
@@ -95,17 +95,18 @@ electron-builder 经 `extraResources` 把快照内 `.desktop-build/targets/mac-a
 
 ## 快照与仓库基线的版本对照
 
-**快照（桌面测试版内嵌宿主）与仓库发布基线不是同一版本族，属于已知差异，不是事故**：
+2026-09-28 起桌面快照与仓库基线对齐为同一版本族：
 
 | | 桌面快照 | 仓库基线 |
 | - | -------- | -------- |
-| 来源 | 官方源码 tag `dsh-v0.1.5-rc.1`（快照 `package.json` 版本 `0.1.5-rc.1`） | npm 发布包 `@deepseek-ai/dsh@0.1.6-alpha.2`（根 `pnpm.overrides` 全族锁定） |
-| 用途 | 仅桌面测试版打包（隔离、gitignored，不入依赖图/CI） | Web 运行、开发、测试与发布 |
-| 工具链 | electron `^44.0.0`、快照自带 `pnpm@11.7.0` | 仓库 `pnpm@10.34.5`、Node 22 LTS |
+| 来源 | 官方源码 tag `dsh-v0.1.7-alpha.1`（快照 `package.json` 版本 `0.1.7-alpha.1`） | npm 发布包 `@deepseek-ai/dsh@0.1.7-alpha.1` |
+| 用途 | 仅桌面安装包打包（隔离、gitignored，不入依赖图） | Web 运行、开发、测试与发布 |
+| 工具链 | electron、快照自带 `pnpm@11.7.0` | 仓库 `pnpm@10.34.5`、Node 22 LTS |
 
-- 2026-09-12 选快照时其与当时 开物Praxis 基线一致；此后全仓基线升级至 `0.1.6-alpha.2`（证据见 [dsh-0.1.6-alpha.2-upgrade](evidence/dsh-0.1.6-alpha.2-upgrade.md)），快照未随之刷新，桌面测试版因此落后一个版本族。
-- 影响：`0.1.6-alpha.2` 的官方行为与插件面变化**不会**出现在桌面测试版；对比桌面与 Web 行为差异时先核对宿主版本；桌面冒烟结论不能替代 Web 基线验收。
-- 升级路径（**未实施**，应作为独立任务立项）：重新选择与基线对应的官方快照 → 逐个复核/重做 9 补丁（窗口壳补丁依赖官方 web UI 类名，升级后可能失效）→ 重打 7 包 tarball → 重跑准备序列 → 打包冒烟 → 记录版本对照证据。
+- 历史：此前快照为 `dsh-v0.1.5-rc.1`，落后基线；CI 曾靠跳过缺失的 `@deepseek-ai/*` 依赖通过，该做法已移除。`prepare-package-set` 现在只对上游 workspace 内未打包的依赖报错，外部依赖由 npm 解析。
+- 补丁存档 `scripts/desktop/patches/upstream` 按 0.1.7 目录结构重做（`scripts/electron-builder-config.mjs`、`prepare-dsh.ts`、`package-target.ts` 等），旧 0.1.5 的 `src/main.ts`、`preload-app.ts`、`prepare-seed.ts` 补丁已删除。
+- Cordis 通过 electron-builder `files` 从 `dsh/node_modules` 复制到应用 `node_modules`，不得手工改运行时目录，否则 `verifyDesktopRuntime` 完整性校验失败。
+- 桌面冒烟结论仍不能替代 Web 基线验收。
 
 ## Windows / 多平台与 CI
 

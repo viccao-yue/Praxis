@@ -94,6 +94,7 @@ function targetEnv() {
     DSH_DESKTOP_APP_ID: 'com.workdsh.app',
     DSH_DESKTOP_AUTO_UPDATE_ENV: 'production',
     ELECTRON_MIRROR,
+    ELECTRON_GET_USE_PROXY: '1',
     ELECTRON_BUILDER_CACHE: join(ROOT, '.artifacts', 'desktop-pack-test', 'electron-builder-cache'),
   };
 }
@@ -138,6 +139,7 @@ run(process.execPath, [pnpm, '--filter', '@deepseek-ai/dsh-desktop', 'run', targ
 });
 
 const artifacts = join(DESKTOP_APP, '.desktop-build', 'targets', targetName, 'artifacts');
+const unsignedArtifacts = join(DESKTOP_APP, '.desktop-build', 'targets', targetName, 'unsigned-artifacts');
 const staging = join(ROOT, '.artifacts', 'desktop-installers', targetName);
 rmSync(staging, { recursive: true, force: true });
 mkdirSync(staging, { recursive: true });
@@ -150,10 +152,11 @@ const walk = (dir) => {
     if (statSync(path).isDirectory()) walk(path);
     // Only electron-builder installers (artifactName workdsh-${version}-${os}-${arch}.${ext}).
     // Nested tools like fastlist-*.exe must not be treated as the product installer.
-    else if (/^workdsh-.*\.(dmg|exe)$/i.test(name)) collected.push(path);
+    else if (/^(?:workdsh-|开物Praxis).*\.(dmg|exe)$/i.test(name)) collected.push(path);
   }
 };
 walk(artifacts);
+walk(unsignedArtifacts);
 
 if (collected.length === 0) fail(`no workdsh-*.dmg/exe under ${artifacts}`);
 for (const file of collected) {
