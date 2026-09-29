@@ -30,14 +30,21 @@ import { resolveDesktopTargetBuildPaths } from './desktop-build-paths.mjs'
 const DSH_PACKAGE = '@deepseek-ai/dsh'
 const ROOT_PACKAGES = [DSH_PACKAGE, DESKTOP_HOST_PACKAGE] as const
 // WORKDSH TEST PATCH: preseed the Praxis profile layers beside the official roots.
+// Must list every Praxis entry in project-manager.ts WORKDSH_PROFILE_BUNDLES; a profile bundle
+// missing here is seeded into the profile but never installed, and shows as abnormal.
 const WORKDSH_ROOT_PACKAGES = [
   'workdsh-bundle',
   'workdsh-plugin-skills',
   'workdsh-plugin-access',
+  'workdsh-plugin-activity',
   'workdsh-plugin-audit',
+  'workdsh-plugin-connectors',
   'workdsh-plugin-experts',
-  'workdsh-provider-identity-local',
+  'workdsh-plugin-library',
   'workdsh-plugin-office',
+  'workdsh-plugin-projects',
+  'workdsh-plugin-vision',
+  'workdsh-provider-identity-local',
   'dsh-ui-appearance',
 ] as const
 const APP_ROOT = resolve(import.meta.dirname, '..')

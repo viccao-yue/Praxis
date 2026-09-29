@@ -20,10 +20,17 @@ const PACKAGES = [
   ['packages/bundle', 'workdsh-bundle'],
   ['packages/plugins/skills', 'workdsh-plugin-skills'],
   ['packages/plugins/access', 'workdsh-plugin-access'],
+  ['packages/plugins/activity', 'workdsh-plugin-activity'],
   ['packages/plugins/audit', 'workdsh-plugin-audit'],
+  ['packages/plugins/connectors', 'workdsh-plugin-connectors'],
   ['packages/plugins/experts', 'workdsh-plugin-experts'],
+  ['packages/plugins/library', 'workdsh-plugin-library'],
   ['packages/plugins/office', 'workdsh-plugin-office'],
+  ['packages/plugins/projects', 'workdsh-plugin-projects'],
+  ['packages/plugins/vision', 'workdsh-plugin-vision'],
   ['packages/providers/identity-local', 'workdsh-provider-identity-local'],
+  // Not a profile bundle: projects imports it at runtime through a peer dependency.
+  ['packages/ui', 'workdsh-ui'],
 ];
 
 function fail(message) {

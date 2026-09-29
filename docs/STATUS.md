@@ -38,6 +38,10 @@ Finder 和程序坞按应用文件名显示，只改 `CFBundleDisplayName` 仍�
 
 删除确认不再使用主按钮蓝色，也不再用 `#b94242`。按钮改为官方错误色压深后的红色填充、浅色文字，取消保持官方描边按钮；新建、重命名、停用的确定仍是主按钮。已重建资料库客户端，并写入正在运行的预览 Profile 与 `~/.praxis` 桌面 Profile。未在浏览器重新打开对话框核对（本机无头浏览器未能启动）。刷新 8517 或桌面窗口后可见。
 
+## 2026-09-28：Desktop 安装包补齐开物插件种子
+
+Windows 安装后，全局插件页的 activity、connectors、library、projects、vision 显示「异常」。原因：`project-manager.ts` 的 Profile bundle 清单有 12 个开物 bundle，但 `prepare-package-set.ts` 的根包和 `ci-pack-plugins.mjs` 的 tarball 清单只有 7 个，这 5 个插件被登记进 Profile，却没有进入安装包运行时。现两份清单已补齐。`ci-pack-plugins.mjs` 另外打入 `workdsh-ui`：它不是 bundle，是 projects 的 peer 依赖，由包集合闭包自动带入。本机 mac-arm64 证据：14 个 tarball 已打出；官方 `prepare:packages` 生成的包集合含全部 13 个开物包和 `workdsh-ui`；未签名模式下官方 `prepare:dsh` 已通过（运行时依赖安装、Office DOCX/XLSX/PPTX→PDF、dsh web 启动），`dsh/node_modules` 顶层 14 个开物包齐全。设置页 `experimental-computer-use-cua-driver-native` 启动失败来自官方实验插件，与本修复无关，未调查。未执行：重新出包后在 Windows、mac 上实机确认插件状态和开物品牌；完整 electron-builder 出包。
+
 ## 2026-09-28：Desktop CI Windows 出包成功，mac-x64 改用 Intel 机器
 
 Windows 任务成功：Artifact `praxis-desktop-windows-x64` 内为 `开物Praxis.exe`（417364662 字节），已通过官方打包后冒烟。mac-x64 在 `macos-latest`（arm64）上失败于 `prepare:dsh` 的运行时冒烟：x64 LibreOffice 经 Rosetta 执行 DOCX→PDF 报 `LibreOffice conversion timed out`，未到 electron-builder。`desktop-macos` 改为 mac-x64 使用 `macos-15-intel`（GitHub 最后的 Intel macOS 镜像，支持到 2027-08），mac-arm64 仍用 `macos-latest`。未执行：mac-x64 在 Intel 机器上实跑；Windows 安装包实机安装。
