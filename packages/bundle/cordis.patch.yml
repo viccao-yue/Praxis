@@ -3,8 +3,11 @@
       name: workdsh-bundle
     - id: computer-use
       name: '@deepseek-ai/dsh-computer-use'
+    # Cua Driver dlopens its platform library from a path inside app.asar, which the OS
+    # cannot open, so the packaged Desktop Host (Electron as Node) skips it.
     - id: computer-use-cua-driver-native
       name: '@deepseek-ai/dsh-experimental-computer-use-cua-driver-native'
+      disabled: !!js process.versions.electron !== undefined
     - id: browser-use
       name: '@deepseek-ai/dsh-browser-use'
     - id: browser-use-playwright-mcp
