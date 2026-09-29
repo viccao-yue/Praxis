@@ -45,6 +45,8 @@ const WORKDSH_PROFILE_BUNDLES = [
   'workdsh-plugin-vision',
   'workdsh-provider-identity-local',
   'dsh-ui-appearance',
+  'dsh-better-sidebar',
+  '@xmanrui/dsh-im',
 ] as const
 const WORKSPACE_SETTINGS = 'nodeLinker: hoisted\nautoInstallPeers: false\n'
 function writeJson(path: string, value: unknown): void {

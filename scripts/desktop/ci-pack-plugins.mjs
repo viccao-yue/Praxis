@@ -33,6 +33,13 @@ const PACKAGES = [
   ['packages/ui', 'workdsh-ui'],
 ];
 
+// Third-party npm plugins seeded as built-in bundles; keep exact versions.
+const NPM_PACKAGES = [
+  'dsh-ui-appearance@0.1.10',
+  'dsh-better-sidebar@0.21.1',
+  '@xmanrui/dsh-im@4.28.0',
+];
+
 function fail(message) {
   console.error(`[ci-pack-plugins] ERROR: ${message}`);
   process.exit(1);
@@ -71,9 +78,12 @@ for (const [dir, name] of PACKAGES) {
   run('corepack', ['pnpm', '--dir', abs, 'pack', '--pack-destination', PACKED]);
 }
 
-console.log('[ci-pack-plugins] pack dsh-ui-appearance@0.1.10');
-run('npm', ['pack', 'dsh-ui-appearance@0.1.10', '--pack-destination', PACKED]);
+for (const spec of NPM_PACKAGES) {
+  console.log(`[ci-pack-plugins] pack ${spec}`);
+  run('npm', ['pack', spec, '--pack-destination', PACKED]);
+}
 
 const tgz = readdirSync(PACKED).filter((n) => n.endsWith('.tgz'));
-if (tgz.length < PACKAGES.length + 1) fail(`expected >= ${PACKAGES.length + 1} tarballs, got ${tgz.length}`);
+const expected = PACKAGES.length + NPM_PACKAGES.length;
+if (tgz.length < expected) fail(`expected >= ${expected} tarballs, got ${tgz.length}`);
 console.log(`[ci-pack-plugins] done (${tgz.length} tarballs)`);
