@@ -38,6 +38,10 @@ Finder 和程序坞按应用文件名显示，只改 `CFBundleDisplayName` 仍�
 
 删除确认不再使用主按钮蓝色，也不再用 `#b94242`。按钮改为官方错误色压深后的红色填充、浅色文字，取消保持官方描边按钮；新建、重命名、停用的确定仍是主按钮。已重建资料库客户端，并写入正在运行的预览 Profile 与 `~/.praxis` 桌面 Profile。未在浏览器重新打开对话框核对（本机无头浏览器未能启动）。刷新 8517 或桌面窗口后可见。
 
+## 2026-09-29：全新安装的桌面端加载不到开物插件
+
+核对 run 36520754461（`a947bef00c`，只产出 mac-arm64）的 DMG：`workdsh-bundle` 的补丁已带 Cua `disabled` 行；在隔离 `DSH_HOME` 下按 `main.ts` 参数启动打包后的 Host，Cua 原生库没有被映射，确认修复生效。但同一次启动中 14 个开物条目全部 `failed to import`。挂 cordis Logger 取到原始错误：`ERR_MODULE_NOT_FOUND: Cannot find package 'workdsh-bundle' imported from …/profiles/desktop/`。原因是官方 `apps/desktop-host/src/index.ts` 以 `@deepseek-ai/dsh/package.json` 为 `installAnchor`，运行时解析只覆盖 dsh 自身的依赖闭包，开物包虽在 `app.asar/dsh` 且在 `desktop-runtime.json` 的 sharedPackages 中，全新 profile 仍解析不到。这也解释了早先 Windows 截图仍是 deepseek HARNESS 品牌。本机正常，是因为 `~/.praxis/profiles/desktop` 曾由预览脚本装入依赖。修复：新增补丁 `scripts/desktop/patches/upstream/apps/desktop-host/src/index.ts`，改为以运行时项目 `package.json` 为 anchor。插件管理器从同一清单读取 `dependencies`，开物包因此被视为内置、不可卸载。证据：本地运行时下官方入口 14 个失败，改后入口 0 个失败，`[workdsh:probe] activated`；快照 `build:lib:host`（含 tsc）通过，产物已含新 anchor；DMG 原 asar 运行时配合改后入口，只剩 vision 失败。vision 失败的原因：根 `pnpm build` 未构建 `workdsh-plugin-vision`，CI 打出的包没有 `dist`。已把它加进根 build；`ci-pack-plugins.mjs` 打包前检查 `exports` 目标文件，已验证缺 dist 时失败、恢复后 14 个 tarball 正常。未执行：重新出包后的完整安装包启动、Windows 包、设置页实机截图。
+
 ## 2026-09-29：桌面端跳过 Cua Driver 原生电脑操作插件
 
 Windows 与两台 mac 安装后，设置页的 `experimental-computer-use-cua-driver-native` 都显示「启动失败」。已在本机已安装的 `开物Praxis.app` 中复现：`@trycua/cua-driver` 的 `.node` 被 Electron 重定向到 `app.asar.unpacked`，但它随后用 `dlopen` 打开 `app.asar/.../libcua_driver_sdk.dylib`，报 errno=20；`@ubjs/node` 的 `resolveLibPath` 没有路径覆盖开关。该插件由 `workdsh-bundle` 引入，官方桌面默认组合不含它。修复：`packages/bundle/cordis.patch.yml` 的该条目加 `disabled: !!js process.versions.electron !== undefined`（0.1.7 官方文档与 `cordis-plugin-loader@1.0.4` 的 `disabledOf` 支持在挂载决策时求值）。证据：用锁定版本的 Include 解析器读取补丁并按 Loader 同样方式求值，系统 Node 22 下为 false（Web 照常挂载），在已安装应用的 Electron 下为 true（跳过）。未执行：重新出包后实机确认该插件在设置页显示为已停用；Web 预览重启后确认它仍能挂载。桌面端要用原生电脑操作，需要上游解决 asar 路径问题，或改用官方 `computer-use-cua-driver-mcp`。

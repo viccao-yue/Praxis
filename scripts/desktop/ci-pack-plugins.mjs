@@ -4,7 +4,7 @@
  * Package list must match WORKDSH_ROOT_PACKAGES / WORKDSH_PROFILE_BUNDLES.
  */
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -52,10 +52,21 @@ for (const name of readdirSync(PACKED)) {
   if (name.endsWith('.tgz')) rmSync(join(PACKED, name), { force: true });
 }
 
+function exportTargets(value) {
+  if (typeof value === 'string') return [value];
+  if (value === null || typeof value !== 'object') return [];
+  return Object.values(value).flatMap(exportTargets);
+}
+
 console.log(`[ci-pack-plugins] target=${TARGET} → ${PACKED}`);
 for (const [dir, name] of PACKAGES) {
   const abs = join(ROOT, dir);
   if (!existsSync(join(abs, 'package.json'))) fail(`missing package ${name} at ${dir}`);
+  // An unbuilt package still packs, then only fails to import on a colleague's machine.
+  const manifest = JSON.parse(readFileSync(join(abs, 'package.json'), 'utf8'));
+  const missing = exportTargets(manifest.exports ?? manifest.main)
+    .filter((target) => !target.includes('*') && !existsSync(join(abs, target)));
+  if (missing.length > 0) fail(`${name} is not built; missing ${missing.join(', ')} (add it to the root build script)`);
   console.log(`[ci-pack-plugins] pack ${name}`);
   run('corepack', ['pnpm', '--dir', abs, 'pack', '--pack-destination', PACKED]);
 }
