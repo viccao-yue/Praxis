@@ -20,6 +20,8 @@ export const ENTERPRISE_PACKAGES = Object.freeze([
 export const CATALOG_PACKAGES = Object.freeze({
   '@cocofhu/skillhub': '0.2.16',
   dshmarket: '1.66.8',
+  // Praxis: living memory plugin seeded beside community catalog packages.
+  'dsh-living-memory': '0.2.10',
 })
 
 export const RELEASE_PACKAGES = Object.freeze([
