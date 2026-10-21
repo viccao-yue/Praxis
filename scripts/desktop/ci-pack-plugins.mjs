@@ -38,6 +38,7 @@ const NPM_PACKAGES = [
   'dsh-ui-appearance@0.1.10',
   'dsh-better-sidebar@0.21.1',
   '@xmanrui/dsh-im@4.28.0',
+  'dsh-living-memory@0.2.10',
 ];
 
 function fail(message) {

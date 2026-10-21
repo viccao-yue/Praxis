@@ -48,6 +48,7 @@ const WORKDSH_ROOT_PACKAGES = [
   'dsh-ui-appearance',
   'dsh-better-sidebar',
   '@xmanrui/dsh-im',
+  'dsh-living-memory',
 ] as const
 const APP_ROOT = resolve(import.meta.dirname, '..')
 const REPOSITORY_ROOT = resolve(APP_ROOT, '..', '..')
