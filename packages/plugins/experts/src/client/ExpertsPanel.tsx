@@ -59,8 +59,8 @@ function cardSubtitle(summary: ExpertSummary, mine: boolean, state: string): str
   return mine ? `${base} · ${state}` : base;
 }
 
-/** This release ships single digital employees only; team UI stays hidden (Host/API retained). */
-const TEAMS_UI_ENABLED = false;
+/** Team (数字员工团) UI is enabled; Host/API team paths stay available either way. */
+const TEAMS_UI_ENABLED = true;
 
 export function ExpertsPanel({ toggleNavigation, management, summon, createExpertTask, editExpertTask }: ExpertsPanelProps) {
   const [view, setView] = useState<View>(() => expertDraftId(window.location.search) || new URLSearchParams(window.location.search).get('expert-library') === 'mine' ? 'mine' : 'center');
