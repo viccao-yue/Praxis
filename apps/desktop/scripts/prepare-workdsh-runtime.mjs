@@ -9,6 +9,7 @@ import { DSH_VERSION, OFFICIAL_PNPM_VERSION } from './runtime-version.mjs'
 import { CATALOG_PACKAGES, ENTERPRISE_PACKAGES, PRODUCT_PACKAGES, RELEASE_PACKAGES } from './workdsh-package-boundary.mjs'
 import { composeProfilePatches, verifyDefaultComposition, verifyDefaultProfile, verifyInstalledDshVersions, verifyOfficialWebPackages, verifyPackageDshReferences, verifyProfileRelease, verifyReleaseArchives } from './verify-profile-release.mjs'
 import { runtimeArchitecture, runtimeArchitectureYaml } from './runtime-architecture.mjs'
+import { patchAccountMenuAt } from '../../../scripts/praxis/patch-account-menu.mjs'
 const architecture = runtimeArchitecture()
 const desktopRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const output = join(desktopRoot, 'build/workdsh-runtime')
@@ -72,6 +73,8 @@ function verifyInstalled() {
   for (const id of ['skillhub', 'dsh-market']) {
     if (!config.stdout.includes('id: ' + id)) throw new Error('Missing community catalog integration: ' + id)
   }
+  // Praxis: hide contact/signin; unsigned click opens settings.
+  patchAccountMenuAt(profile)
   for (const id of ['workdsh-installation-probe', 'workdsh-identity-local', 'workdsh-access', 'workdsh-audit', 'workdsh-workbenches']) {
     if (!config.stdout.includes('id: ' + id)) throw new Error('Missing required infrastructure: ' + id)
   }

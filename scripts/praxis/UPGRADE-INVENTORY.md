@@ -20,8 +20,12 @@
 - [x] Seed `dsh-living-memory@0.2.10` via `CATALOG_PACKAGES`
 - [x] 专家团: upstream already enables team UI (no TEAMS_UI gate)
 
+## Applied (continued)
+- [x] AccountMenu: `scripts/praxis/patch-account-menu.mjs` runs from `prepare-workdsh-runtime.mjs` after Profile install (drop 联系我们/登录; unsigned label=设置; click→openSettings). Reference TSX kept at `scripts/praxis/AccountMenu.tsx`.
+- [x] Branch pushed: `mine/upgrade/workdsh-3.0.0-alpha.3` (@ `f9b7e1a38d` base + follow-up commits)
+
 ## Deferred (next commits on this branch)
-- [ ] AccountMenu (联系我们/登录隐藏 + 设置直达) against DSH 0.2.1 AccountMenu source
 - [ ] Desktop shell rename WorkDSH → 开物Praxis (app.setName / productName / DMG artifact) — touches many release tests
 - [ ] 专家 → 数字员工 copy rename (optional product wording)
 - [ ] dsh-better-sidebar / @xmanrui/dsh-im: re-evaluate under 3.0 (sidebar/workbench already different)
+- [ ] Full `dist:mac-smoke` after `pack-workdsh-profile` + prepare (needs yarn/corepack + built apps/web)
