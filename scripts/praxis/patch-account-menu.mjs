@@ -22,25 +22,33 @@ export function patchAccountMenuSource(source) {
   let next = source
   const steps = []
 
-  const signedOut = 'signedIn ? label : t("signedOut")'
-  if (!next.includes(signedOut)) throw new Error('AccountMenu patch: signedOut label pattern missing')
-  next = next.replaceAll(signedOut, 'signedIn ? label : t("settings")')
-  steps.push('label→settings')
+  // 0.1.x used signedOut; 0.2.1 AccountMenu uses "more" for the unsigned label.
+  const labelPatterns = [
+    'signedIn ? label : t("signedOut")',
+    'signedIn ? label : t("more")',
+  ]
+  const labelHit = labelPatterns.find(pattern => next.includes(pattern))
+  if (!labelHit) throw new Error('AccountMenu patch: unsigned label pattern missing (signedOut|more)')
+  next = next.replaceAll(labelHit, 'signedIn ? label : t("settings")')
+  steps.push(`label(${labelHit.includes('more') ? 'more' : 'signedOut'})→settings`)
 
-  const toggle = 'onClick: () => {\n\t\t\t\t\t\t\t\tsetOpen((value) => !value);\n\t\t\t\t\t\t\t}'
-  const openSettingsClick = 'onClick: () => {\n\t\t\t\t\t\t\t\tif (signedIn) setOpen((value) => !value);\n\t\t\t\t\t\t\t\telse openSettings();\n\t\t\t\t\t\t\t}'
-  if (next.includes(toggle)) {
-    next = next.replace(toggle, openSettingsClick)
-    steps.push('click→openSettings')
-  } else if (next.includes('setOpen((value) => !value)')) {
-    next = next.replace(
-      /onClick:\s*\(\)\s*=>\s*\{\s*setOpen\(\(value\)\s*=>\s*!value\);\s*\}/,
-      'onClick: () => { if (signedIn) setOpen((value) => !value); else openSettings(); }',
-    )
-    steps.push('click→openSettings(loose)')
-  } else {
-    throw new Error('AccountMenu patch: toggle onClick pattern missing')
-  }
+  // Only rewrite the AccountMenu trigger toggle (first setOpen toggle inside AccountMenu).
+  const menuStart = next.indexOf('function AccountMenu(')
+  if (menuStart < 0) throw new Error('AccountMenu patch: function AccountMenu missing')
+  const menuEndMarker = next.indexOf('//#endregion', menuStart)
+  const menuEnd = menuEndMarker > menuStart ? menuEndMarker : next.length
+  const before = next.slice(0, menuStart)
+  let menu = next.slice(menuStart, menuEnd)
+  const after = next.slice(menuEnd)
+
+  const toggleRe = /onClick:\s*\(\)\s*=>\s*\{\s*setOpen\(\(value\)\s*=>\s*!value\);\s*\}/
+  if (!toggleRe.test(menu)) throw new Error('AccountMenu patch: toggle onClick pattern missing in AccountMenu')
+  menu = menu.replace(
+    toggleRe,
+    'onClick: () => { if (signedIn) setOpen((value) => !value); else openSettings(); }',
+  )
+  steps.push('click→openSettings')
+  next = before + menu + after
 
   const contactBlock = /\{\s*id:\s*"contact",\s*label:\s*t\("contactUs"\),[\s\S]*?\},/
   if (!contactBlock.test(next)) throw new Error('AccountMenu patch: contact menu item missing')
@@ -58,13 +66,16 @@ export function patchAccountMenuSource(source) {
   next = next.replace(/const beginSignIn = \(\) => \{[\s\S]*?\};\n/, '')
 
   // Assert only inside AccountMenu — AccountSection may still show signedOut.
-  const menuStart = next.indexOf('function AccountMenu(')
-  const menuEnd = next.indexOf('//#endregion', menuStart)
-  const menu = menuStart >= 0 && menuEnd > menuStart ? next.slice(menuStart, menuEnd) : next
-  if (menu.includes('id: "contact"') || menu.includes('id: "signin"') || menu.includes('t("signedOut")')) {
-    throw new Error('AccountMenu patch: residual contact/signin/signedOut markers remain in AccountMenu')
+  const assertStart = next.indexOf('function AccountMenu(')
+  const assertEnd = next.indexOf('//#endregion', assertStart)
+  const menuBody = assertStart >= 0 && assertEnd > assertStart ? next.slice(assertStart, assertEnd) : next
+  if (menuBody.includes('id: "contact"') || menuBody.includes('id: "signin"')) {
+    throw new Error('AccountMenu patch: residual contact/signin markers remain in AccountMenu')
   }
-  if (!menu.includes('else openSettings()') && !menu.includes('else openSettings();')) {
+  if (menuBody.includes('t("signedOut")') || /signedIn \? label : t\("more"\)/.test(menuBody)) {
+    throw new Error('AccountMenu patch: residual unsigned label remain in AccountMenu')
+  }
+  if (!menuBody.includes('else openSettings()') && !menuBody.includes('else openSettings();')) {
     throw new Error('AccountMenu patch: openSettings click missing after transform')
   }
 
@@ -115,7 +126,7 @@ function selfTest() {
 								setOpen((value) => !value);
 							},
 							children: [wide && (0, react_jsx_runtime.jsx)("span", {
-								children: signedIn ? label : t("signedOut")
+								children: signedIn ? label : t("more")
 							})]
 						}),
 						items: [
@@ -149,15 +160,14 @@ function selfTest() {
 				]
 			});
 		}
+		//#endregion
 `
   const once = patchAccountMenuSource(sample)
   if (!once.changed) throw new Error('self-test: expected change')
   const twice = patchAccountMenuSource(once.source)
   if (!twice.already) throw new Error('self-test: expected idempotent skip')
   if (once.source.includes('id: "contact"')) throw new Error('self-test: contact row still present')
-  if (!once.source.includes('t("settings")') || once.source.includes('t("signedOut")')) {
-    throw new Error('self-test: settings label missing')
-  }
+  if (!once.source.includes('signedIn ? label : t("settings")')) throw new Error('self-test: settings label missing')
   if (!once.source.includes('else openSettings()')) throw new Error('self-test: openSettings click missing')
   console.log('patch-account-menu self-test ok:', once.steps.join(', '))
 }

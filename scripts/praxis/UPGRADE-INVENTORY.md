@@ -28,4 +28,4 @@
 - [ ] Desktop shell rename WorkDSH → 开物Praxis (app.setName / productName / DMG artifact) — touches many release tests
 - [ ] 专家 → 数字员工 copy rename (optional product wording)
 - [ ] dsh-better-sidebar / @xmanrui/dsh-im: re-evaluate under 3.0 (sidebar/workbench already different)
-- [ ] Full `dist:mac-smoke` after `pack-workdsh-profile` + prepare (needs yarn/corepack + built apps/web)
+- [x] Smoke: `pack-workdsh-profile` + `prepare-workdsh-runtime` OK (DSH 0.2.1-rc.2; living-memory seeded; AccountMenu patched). Full Electron `dist:mac-smoke` still optional.
