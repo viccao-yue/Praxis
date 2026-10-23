@@ -43,9 +43,9 @@ export function ProjectLineageChip({ sessionId, management, focusProject }: Proj
   if (!context) return null;
   return <>
     <style>{chipCss}</style>
-    <button type="button" className="wd-pl-chip" title={`打开项目：${context.project.name}`} aria-label={`打开项目 ${context.project.name}`} onClick={() => focusProject(context.project.id)}>
+    <button type="button" className="wd-pl-chip" title={`打开协同空间：${context.project.name}`} aria-label={`打开协同空间 ${context.project.name}`} onClick={() => focusProject(context.project.id)}>
       <Icon name="folder" size={14} />
-      <span className="wd-pl-chip-text">项目 / {context.project.name}</span>
+      <span className="wd-pl-chip-text">协同空间 / {context.project.name}</span>
     </button>
   </>;
 }

@@ -6,7 +6,7 @@ import type { ExpertTeamDefinition } from '../shared.js';
 export function TeamContent({ team, onChange }: { team?: ExpertTeamDefinition; onChange?: (team: ExpertTeamDefinition) => void }) {
   if (!team) return null;
   const fields = { role: '专业职责', methodology: '专业方法', boundaries: '协作边界', deliverables: '交付标准' } as const;
-  return <section className="team-content" aria-label="专家团内容">
+  return <section className="team-content" aria-label="数字员工团内容">
     <h3>团队成员 · {team.members.length}</h3>
     <p>主理人负责理解需求与整合交付；以下成员承担独立专业工作。整套内容统一保存、发布。</p>
     {team.members.map((member, index) => <details key={member.key} className="preview-settings">

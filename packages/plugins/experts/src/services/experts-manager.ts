@@ -6,7 +6,9 @@ import type { ConnectorManagementService } from 'workdsh-contracts';
 import { Context, Service } from '@deepseek-ai/cordis';
 import type { KvTable } from '@deepseek-ai/dsh-storage-domain';
 import type { SessionCreateRequest, SessionCreateValue } from '@deepseek-ai/dsh-api-session-controller';
-import { expertPresetDir, readExpertPreset, registerExpertPreset, resolveAgentsHome } from '../runtime/preset-compiler.js';
+import { expertPresetDir, readExpertPreset, registerExpertPreset, releaseExpertPresets, resolveAgentsHome, retainExpertPresetLifetime } from '../runtime/preset-compiler.js';
+import { withDefaultAvatar } from '../domain/default-avatars.js';
+import { LEAD_EXPERT_ID } from '../domain/templates.js';
 import {
   EXPERT_LIMITS,
   ExpertsError,
@@ -215,6 +217,7 @@ export class ExpertsManager extends Service implements ExpertsService {
   private operations?: KvTable<string, Operation>;
   private mutationTail: Promise<void> = Promise.resolve();
   private seeding?: Promise<void>;
+  private defaultRepairDone = false;
 
   private readonly confirmations = new ConfirmationStore();
   private readonly executionPlans = new TtlStore<ExecutionPlan>(PLAN_TTL_MS);
@@ -254,6 +257,13 @@ export class ExpertsManager extends Service implements ExpertsService {
     this.bindings = domain.table('bindings');
     this.preferences = domain.table('preferences');
     this.operations = domain.table('operations');
+    retainExpertPresetLifetime(this.ctx);
+    const liveExperts = new Set<string>();
+    for (const [, expert] of this.experts.entries()) liveExperts.add(expert.id);
+    for (const [key, revision] of [...this.revisions.entries()]) {
+      if (liveExperts.has(revision.expertId)) continue;
+      await this.revisions.delete(key);
+    }
     for (const [, revision] of this.revisions.entries()) {
       if (revision.compilerVersion !== COMPILER_VERSION) continue;
       try {
@@ -332,7 +342,7 @@ export class ExpertsManager extends Service implements ExpertsService {
       throw new ExpertsError('experts/forbidden', '没有权限对该专家执行此操作。', { reason: decision.code });
     }
     if (expert.teamParentId) {
-      if (['experts.update-draft', 'experts.publish', 'experts.set-availability'].includes(action)) throw new ExpertsError('experts/forbidden', '请通过专家团整体修改或发布成员。');
+      if (['experts.update-draft', 'experts.publish', 'experts.set-availability', 'experts.delete'].includes(action)) throw new ExpertsError('experts/forbidden', '请通过数字员工团整体修改或发布成员。');
       const parent = this.loadExpert(expert.teamParentId);
       if (!this.isVisible(actor, parent) || parent.availability !== 'enabled' || !parent.publishedRevisionRef) throw new ExpertsError('experts/disabled', '成员所属专家团未发布、已停用或不可访问。');
       const attached = [...this.revisionsTable().entries()].some(([, revision]) => revision.expertId === parent.id && Object.values(revision.teamMembers ?? {}).some(ref => ref.expertId === expert.id));
@@ -383,41 +393,176 @@ export class ExpertsManager extends Service implements ExpertsService {
   // ── default seeding ───────────────────────────────────────────────────────
 
   /**
-   * Seed the three shipped default experts once, the first time the catalog is
-   * read in a deployment. They become ordinary personal-owned experts (copyable,
-   * disable-able), never a hidden second source of truth. A compilation failure
-   * (e.g. no writable preset root) skips that template rather than breaking reads.
+   * Seed shipped defaults that are still missing, then freeze their Skill
+   * snapshots and portraits. Retry while a declared Skill is not yet installed.
    */
   private async ensureSeeded(actor: ActorContext, signal?: AbortSignal): Promise<void> {
-    if (this.expertsTable().size > 0) return;
+    const missing = DEFAULT_TEMPLATES.some((template) => !this.expertsTable().get(keys.expert(template.id)));
+    if (!missing && this.defaultRepairDone) return;
     if (!this.seeding) {
       this.seeding = this.enqueue(async () => {
-        if (this.expertsTable().size > 0) return;
         for (const template of DEFAULT_TEMPLATES) {
+          if (this.expertsTable().get(keys.expert(template.id))) continue;
           try {
             await this.seedTemplate(actor, template.id, template.definition, signal);
           } catch (error) {
             await this.audit(actor, 'experts.create-draft', template.id, 'failed', errorCode(error, 'experts/seed-failed'));
           }
         }
+        let healthy = true;
+        for (const template of DEFAULT_TEMPLATES) {
+          if (!this.expertsTable().get(keys.expert(template.id))) { healthy = false; continue; }
+          try {
+            await this.repairDefaultSkillLock(actor, template.id, template.definition, signal);
+            const expert = this.expertsTable().get(keys.expert(template.id));
+            const ref = expert?.publishedRevisionRef;
+            const revision = ref ? this.revisionsTable().get(keys.revision(ref.expertId, ref.revisionId)) : undefined;
+            const desired = withDefaultAvatar(template.id, template.definition);
+            const incomplete = (desired.skillRequirements.length > 0) && (revision?.dependencyLock.length !== desired.skillRequirements.length);
+            if (!revision || incomplete || (desired.avatarRef && revision.definition.avatarRef !== desired.avatarRef)) healthy = false;
+          } catch (error) {
+            healthy = false;
+            await this.audit(actor, 'experts.publish', template.id, 'failed', errorCode(error, 'experts/seed-skill-repair-failed'));
+          }
+        }
+        await this.refreshDefaultAvatars();
+        if (healthy) this.defaultRepairDone = true;
       }).then(() => undefined, () => undefined).finally(() => { this.seeding = undefined; });
     }
     await this.seeding;
   }
 
+  /** Resolve and retain declared Skills for a default expert. Empty when a Skill is not installed yet. */
+  private async freezeDefaultSkills(
+    expertId: string,
+    definition: ExpertDefinition,
+    signal?: AbortSignal,
+  ): Promise<{ dependencyLock: ExpertRevision['dependencyLock']; lockDigest: string; snapshotDirs: string[] }> {
+    if (definition.skillRequirements.length === 0) {
+      return { dependencyLock: [], lockDigest: digestOf([]), snapshotDirs: [] };
+    }
+    const draftRevision = shortDigest({ seed: expertId, freeze: definitionDigest(definition) });
+    const validation = await this.computeValidation(
+      { expertId, revision: draftRevision, definition, validationIssues: [] },
+      signal,
+    );
+    if (validation.dependencyLock.length !== definition.skillRequirements.length
+      || validation.issues.some((issue) => issue.code === 'experts/dependency-missing' || issue.code.startsWith('skills/'))) {
+      return { dependencyLock: [], lockDigest: digestOf([]), snapshotDirs: [] };
+    }
+    const consumer = { domain: EXPERT_DOMAIN, id: expertId };
+    const snapshotDirs: string[] = [];
+    for (const ref of validation.dependencyLock) {
+      signal?.throwIfAborted();
+      snapshotDirs.push((await this.ctx.workdshSkills.retainRevision(ref, consumer, signal)).snapshotDir);
+    }
+    return { dependencyLock: validation.dependencyLock, lockDigest: validation.dependencyLockDigest, snapshotDirs };
+  }
+
+  /** Re-publish a default when its Skill lock is incomplete or its portrait is missing. */
+  private async repairDefaultSkillLock(
+    actor: ActorContext,
+    expertId: string,
+    definition: ExpertDefinition,
+    signal?: AbortSignal,
+  ): Promise<void> {
+    const expert = this.expertsTable().get(keys.expert(expertId));
+    if (!expert || expert.origin !== 'default' || !expert.publishedRevisionRef) return;
+    const current = this.loadRevision(expert.publishedRevisionRef.expertId, expert.publishedRevisionRef.revisionId);
+    const desired = normalizeDefinition(withDefaultAvatar(expertId, definition));
+    const readiness = await this.computeReadiness(current, actor, signal);
+    const incomplete = desired.skillRequirements.length > 0 && current.dependencyLock.length !== desired.skillRequirements.length;
+    const avatarStale = Boolean(desired.avatarRef) && current.definition.avatarRef !== desired.avatarRef;
+    if (readiness === 'ready' && !incomplete && !avatarStale) return;
+    const frozen = await this.freezeDefaultSkills(expertId, desired, signal);
+    if (desired.skillRequirements.length > 0 && frozen.dependencyLock.length === 0 && !avatarStale) return;
+    const effectiveLock = frozen.dependencyLock.length ? frozen.dependencyLock : current.dependencyLock;
+    const effectiveLockDigest = frozen.dependencyLock.length ? frozen.lockDigest : current.dependencyLockDigest;
+    const basePresetId = await this.resolveBasePreset(signal);
+    const compiled = await this.compilePreset({
+      expertId,
+      definition: desired,
+      snapshotDirs: effectiveLock.length ? frozen.snapshotDirs : [],
+      basePresetId,
+    });
+    const defDigest = definitionDigest(desired);
+    const revisionId = revisionIdFor(defDigest, effectiveLockDigest, compiled.presetId);
+    if (revisionId === current.revisionId && readiness === 'ready' && !avatarStale) return;
+    const now = new Date().toISOString();
+    const draftRevision = shortDigest({ seed: expertId, repair: defDigest });
+    const revision: ExpertRevision = {
+      expertId, revisionId, definition: desired, definitionDigest: defDigest,
+      dependencyLock: effectiveLock, dependencyLockDigest: effectiveLockDigest,
+      presetRevisionRef: compiled.presetId, compilerVersion: COMPILER_VERSION,
+      compositionDigest: compiled.compositionDigest,
+      publishedAt: now, publishedBy: actor.principalId,
+    };
+    await this.revisionsTable().put(keys.revision(expertId, revisionId), revision);
+    await this.draftsTable().put(keys.draft(expertId), {
+      expertId, revision: draftRevision, definition: desired, validationIssues: [],
+    });
+    await this.expertsTable().update(keys.expert(expertId), (row) => ({
+      ...row,
+      publishedRevisionRef: { expertId, revisionId },
+      draftRevision,
+      revision: `r-${randomUUID()}`,
+      updatedAt: now,
+    }));
+    await this.audit(actor, 'experts.publish', expertId, 'succeeded', 'experts/default-skill-repair-succeeded', {
+      revisionId,
+      skills: String(effectiveLock.length),
+      avatar: desired.avatarRef ? '1' : '0',
+    });
+  }
+
+  /** Write the shipped portrait onto an already seeded default without changing its preset id. */
+  private async refreshDefaultAvatars(): Promise<void> {
+    for (const template of DEFAULT_TEMPLATES) {
+      const expert = this.expertsTable().get(keys.expert(template.id));
+      if (!expert || expert.origin !== 'default') continue;
+      const desired = withDefaultAvatar(template.id, template.definition);
+      if (!desired.avatarRef) continue;
+      const draft = this.draftsTable().get(keys.draft(template.id));
+      if (draft && draft.definition.avatarRef !== desired.avatarRef) {
+        await this.draftsTable().put(keys.draft(template.id), {
+          ...draft,
+          definition: {
+            ...draft.definition,
+            avatarRef: desired.avatarRef,
+            packageAssets: { ...draft.definition.packageAssets, ...desired.packageAssets },
+          },
+        });
+      }
+      const published = expert.publishedRevisionRef;
+      if (!published) continue;
+      const revision = this.revisionsTable().get(keys.revision(published.expertId, published.revisionId));
+      if (!revision || revision.definition.avatarRef === desired.avatarRef) continue;
+      await this.revisionsTable().put(keys.revision(published.expertId, published.revisionId), {
+        ...revision,
+        definition: {
+          ...revision.definition,
+          avatarRef: desired.avatarRef,
+          packageAssets: { ...revision.definition.packageAssets, ...desired.packageAssets },
+        },
+      });
+    }
+  }
+
   private async seedTemplate(actor: ActorContext, expertId: string, definition: ExpertDefinition, signal?: AbortSignal): Promise<void> {
     signal?.throwIfAborted();
     const now = new Date().toISOString();
-    const normalized = normalizeDefinition(definition);
+    const normalized = normalizeDefinition(withDefaultAvatar(expertId, definition));
     const defDigest = definitionDigest(normalized);
-    const lockDigest = digestOf([]);
+    const frozen = await this.freezeDefaultSkills(expertId, normalized, signal);
     const draftRevision = shortDigest({ seed: expertId, defDigest });
     const basePresetId = await this.resolveBasePreset(signal);
-    const compiled = await this.compilePreset({ expertId, definition: normalized, snapshotDirs: [], basePresetId });
-    const revisionId = revisionIdFor(defDigest, lockDigest, compiled.presetId);
+    const compiled = await this.compilePreset({
+      expertId, definition: normalized, snapshotDirs: frozen.snapshotDirs, basePresetId,
+    });
+    const revisionId = revisionIdFor(defDigest, frozen.lockDigest, compiled.presetId);
     const revision: ExpertRevision = {
       expertId, revisionId, definition: normalized, definitionDigest: defDigest,
-      dependencyLock: [], dependencyLockDigest: lockDigest,
+      dependencyLock: frozen.dependencyLock, dependencyLockDigest: frozen.lockDigest,
       presetRevisionRef: compiled.presetId, compilerVersion: COMPILER_VERSION,
       compositionDigest: compiled.compositionDigest,
       publishedAt: now, publishedBy: actor.principalId,
@@ -450,7 +595,7 @@ export class ExpertsManager extends Service implements ExpertsService {
    * Recompile an older published team for the current runtime without mutating its
    * immutable revision. Existing Sessions keep their old binding; only future
    * executions move to the derived revision. This is intentionally done on use so
-   * installations upgraded from an earlier WorkDSH release need no manual republish.
+   * installations upgraded from an earlier 开物Praxis release need no manual republish.
    */
   private async ensureCurrentExecutionRevision(actor: ActorContext, revision: ExpertRevision, signal?: AbortSignal): Promise<ExpertRevision> {
     if (!revision.definition.team || revision.compilerVersion === COMPILER_VERSION) return revision;
@@ -695,6 +840,9 @@ export class ExpertsManager extends Service implements ExpertsService {
 
   private sortRows(rows: { expert: Expert; preference?: ExpertPreference }[]): void {
     rows.sort((left, right) => {
+      const leftLead = left.expert.id === LEAD_EXPERT_ID ? 0 : 1;
+      const rightLead = right.expert.id === LEAD_EXPERT_ID ? 0 : 1;
+      if (leftLead !== rightLead) return leftLead - rightLead;
       const leftPin = left.preference?.pinned ? 1 : 0;
       const rightPin = right.preference?.pinned ? 1 : 0;
       if (leftPin !== rightPin) return rightPin - leftPin;
@@ -1268,6 +1416,85 @@ export class ExpertsManager extends Service implements ExpertsService {
       return receipt;
     } catch (error) {
       await this.audit(actor, 'experts.set-availability', expertId, 'failed', errorCode(error, 'experts/internal'));
+      throw error;
+    }
+  }
+
+  private presetIdsOf(expertId: string): string[] {
+    const presets = new Set<string>();
+    for (const [, revision] of this.revisionsTable().entries()) {
+      if (revision.expertId === expertId) presets.add(revision.presetRevisionRef);
+    }
+    return [...presets];
+  }
+
+  private rosterPresetIds(expertId: string): string[] {
+    const expertIds = new Set([expertId]);
+    for (const [, row] of this.expertsTable().entries()) {
+      if (row.teamParentId === expertId) expertIds.add(row.id);
+    }
+    const presets = new Set(this.presetIdsOf(expertId));
+    for (const id of expertIds) {
+      if (id === expertId) continue;
+      for (const presetId of this.presetIdsOf(id)) presets.add(presetId);
+    }
+    return [...presets];
+  }
+
+  /** Permanently remove an archived personal expert and its Agent presets. Built-in defaults stay. */
+  async deleteArchived(
+    actor: ActorContext,
+    expertId: string,
+    context: MutationContext,
+    signal?: AbortSignal,
+  ): Promise<{ expertId: string; operationId: string }> {
+    signal?.throwIfAborted();
+    assertActorContext(actor);
+    await this.ensureSeeded(actor, signal);
+    const expert = this.loadExpert(expertId);
+    if (!this.isVisible(actor, expert)) throw new ExpertsError('experts/not-found', '未找到该数字员工。');
+    if (expert.origin === 'default') throw new ExpertsError('experts/forbidden', '内置数字员工不可删除。', { reason: 'default-immutable' });
+    if (expert.availability !== 'archived') throw new ExpertsError('experts/invalid-request', '只能删除已归档的数字员工；请先归档后再删除。');
+    await this.authorize(actor, 'experts.delete', expert, signal);
+    const presetIds = this.rosterPresetIds(expertId);
+    const payloadDigest = digestOf({ action: 'experts.delete', expertId });
+    try {
+      const receipt = await this.withOperation(actor, 'experts.delete', context, payloadDigest, signal,
+        async (record) => {
+          const current = this.loadExpert(expertId);
+          if (current.availability !== 'archived') throw new ExpertsError('experts/invalid-request', '只能删除已归档的数字员工；请先归档后再删除。');
+          if (context.expectedRevision !== undefined && current.revision !== context.expectedRevision) {
+            throw new ExpertsError('experts/conflict', '数字员工已被修改，请刷新后重试。', { expectedRevision: context.expectedRevision, currentRevision: current.revision });
+          }
+          const memberIds = [...this.expertsTable().entries()]
+            .filter(([, row]) => row.teamParentId === expertId)
+            .map(([, row]) => row.id);
+          for (const memberId of memberIds) {
+            await this.draftsTable().delete(keys.draft(memberId));
+            await this.preferencesTable().delete(keys.preference(actor.principalId, memberId));
+            await this.expertsTable().delete(keys.expert(memberId));
+          }
+          await this.draftsTable().delete(keys.draft(expertId));
+          await this.preferencesTable().delete(keys.preference(actor.principalId, expertId));
+          await this.expertsTable().delete(keys.expert(expertId));
+          const removedIds = new Set([expertId, ...memberIds]);
+          for (const [key, revision] of [...this.revisionsTable().entries()]) {
+            if (removedIds.has(revision.expertId)) await this.revisionsTable().delete(key);
+          }
+          const result = { expertId, operationId: context.operationId };
+          record({ resultRef: expertId, resultDetail: JSON.stringify(result) });
+          return result;
+        },
+        (operation) => {
+          if (!operation.resultDetail) throw new ExpertsError('experts/outcome-unknown', '无法恢复删除结果，请查询操作状态。');
+          return JSON.parse(operation.resultDetail) as { expertId: string; operationId: string };
+        },
+      );
+      await this.audit(actor, 'experts.delete', expertId, 'succeeded', 'experts/delete-succeeded', {});
+      await releaseExpertPresets(this.ctx, presetIds);
+      return receipt;
+    } catch (error) {
+      await this.audit(actor, 'experts.delete', expertId, 'failed', errorCode(error, 'experts/internal'));
       throw error;
     }
   }

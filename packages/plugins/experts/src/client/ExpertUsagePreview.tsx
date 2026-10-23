@@ -10,7 +10,7 @@ export type ExpertUsagePreviewProps = {
 
 /** Read-only review of the exact saved definition; does not prepare or run a task. */
 export function ExpertUsagePreview({ definition, dependencyLock }: ExpertUsagePreviewProps) {
-  return <section className="usage-preview" aria-label="专家使用预览">
+  return <section className="usage-preview" aria-label="数字员工使用预览">
     <header><span className="preview-avatar" aria-hidden>{definition.avatarRef?.startsWith('data:image/') ? <img src={definition.avatarRef} alt="" /> : definition.name.trim().charAt(0) || '专'}</span><div><h3>{definition.name}</h3><p>{definition.description}</p></div></header>
     {definition.agentDocument ? <div className="prose-block" style={{ whiteSpace: 'pre-wrap' }}>{definition.agentDocument}</div> : <ExpertWorkSummary definition={definition} />}
     <TeamContent team={definition.team} />

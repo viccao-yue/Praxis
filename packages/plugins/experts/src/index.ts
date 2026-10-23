@@ -17,7 +17,7 @@ export * from './tools/management-tools.js';
 export * from './runtime/execution-guard.js';
 
 /**
- * Host plugin entry for WorkDSH experts (D04 / P1-02, expert module 0.1).
+ * Host plugin entry for 开物Praxis experts (D04 / P1-02, expert module 0.1).
  *
  * This is an independent, Loader-recognised entry: `cordis.patch.yml` inserts
  * `workdsh-plugin-experts`, and the official Loader calls `apply(ctx)` after the

@@ -1,5 +1,5 @@
 import {composeInstalledEnterprisePlugins,installedEnterprisePlugins} from './enterprise-plugins.ts'
-/** Minimal Electron carrier for the bundled WorkDSH release profile. */
+/** Minimal Electron carrier for the bundled 开物Praxis release profile. */
 
 import { app, BrowserWindow, dialog, ipcMain, Menu, shell } from 'electron'
 import { spawn, type ChildProcess } from 'node:child_process'
@@ -10,6 +10,7 @@ import {
   rmSync,
   writeFileSync,
 } from 'node:fs'
+import { homedir } from 'node:os'
 import { isAbsolute, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { connectionEntryHtml, enterpriseLoginHtml, connectionLoadingHtml } from './connection-entry.ts'
@@ -80,7 +81,7 @@ function browserWorkerRequest(): { port: number, profile: string } | undefined {
   const profile = process.argv.find(arg => arg.startsWith('--workdsh-browser-worker-profile='))
     ?.slice('--workdsh-browser-worker-profile='.length)
   if (!Number.isInteger(port) || port < 1024 || port > 65535 || !profile || !isAbsolute(profile) || !existsSync(profile)) {
-    throw new Error('Invalid WorkDSH browser worker arguments')
+    throw new Error('Invalid 开物Praxis browser worker arguments')
   }
   return { port, profile }
 }
@@ -111,7 +112,7 @@ function startBrowserWorker(request: { port: number, profile: string }): void {
     await page.loadURL('about:blank')
     process.stdout.write('WORKDSH_BROWSER_WORKER_READY\n')
   }).catch(error => {
-    process.stderr.write(`WorkDSH browser worker failed: ${String(error)}\n`)
+    process.stderr.write(`开物Praxis browser worker failed: ${String(error)}\n`)
     app.exit(1)
   })
 }
@@ -126,7 +127,7 @@ function openWindow(url: string, connection: DesktopConnection = { mode: 'person
     ...(previous && typeof previous.getBounds === 'function' ? previous.getBounds() : {}),
     minWidth: 960,
     minHeight: 640,
-    title: 'WorkDSH',
+    title: '开物Praxis',
     icon,
     backgroundColor: '#111113',
     show: false,
@@ -140,9 +141,10 @@ function openWindow(url: string, connection: DesktopConnection = { mode: 'person
   })
   const page = window
   entrySurface = carrier
-  window.on('page-title-updated', event => {
+  window.on('page-title-updated', (event, title) => {
     event.preventDefault()
-    page.setTitle('WorkDSH')
+    const next = title.includes('WorkDSH') ? title.replaceAll('WorkDSH', '开物Praxis') : title
+    page.setTitle(next.length > 0 ? next : '开物Praxis')
   })
   if (connection.mode === 'enterprise') enterpriseWindows.add(page)
   window.webContents.setWindowOpenHandler(({ url: target }) => {
@@ -198,7 +200,7 @@ async function officialCommand(home: string, args: string[], timeoutMs = 240_000
 
 async function prepareProfile(home: string): Promise<{ profile: string, existingHome: boolean }> {
   // Capture this before materialization creates the new Home's Profile files.
-  const existingHome = [join(home, 'profiles', PROFILE_NAME, 'package.json'), join(home, 'profiles', PROFILE_NAME, 'cordis.yml'), join(home, 'cordis.yml'), join(home, '.workdsh-host.mjs')].some(existsSync)
+  const existingHome = [join(home, 'profiles', PROFILE_NAME, 'package.json'), join(home, 'profiles', PROFILE_NAME, 'cordis.yml'), join(home, 'cordis.yml'), join(home, '.workdsh-host.mjs'), join(home, '.workdsh-host', 'bin.js')].some(existsSync)
   const source = bundledProfileDirectory()
   const result = materializeRuntimeProfile(source, home)
   if (result.changed) {
@@ -479,7 +481,14 @@ if (desktopUserData) {
   if (!isAbsolute(desktopUserData)) throw new Error('Desktop user data override must be absolute')
   app.setPath('userData', desktopUserData)
 }
-app.setName('WorkDSH')
+// Keep the existing user-data directory, then show 开物Praxis in menus.
+// CFBundleName stays WorkDSH so Electron can still find WorkDSH Helper.
+if (!desktopUserData) {
+  app.setPath('userData', process.platform === 'win32'
+    ? join(process.env.APPDATA ?? '', '开物Praxis')
+    : join(homedir(), 'Library/Application Support/WorkDSH'))
+}
+app.setName('开物Praxis')
 if (!app.requestSingleInstanceLock()) {
   app.quit()
 } else {
@@ -531,7 +540,7 @@ if (!app.requestSingleInstanceLock()) {
     installLoginHandlers()
     showConnectionEntry()
   }).catch(cause => {
-    process.stderr.write(`WorkDSH failed to start: ${cause instanceof Error ? cause.stack ?? cause.message : String(cause)}\n`)
+    process.stderr.write(`开物Praxis failed to start: ${cause instanceof Error ? cause.stack ?? cause.message : String(cause)}\n`)
     app.quit()
   })
 }

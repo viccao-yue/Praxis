@@ -133,7 +133,12 @@ export function enterpriseSpace(userData: string, backend: string, actor: Enterp
   const deviceId = (parsed as { deviceId?: unknown }).deviceId
   if (typeof deviceId !== 'string' || !/^[0-9a-f-]{36}$/u.test(deviceId)) throw new Error('企业本机设备记录无效')
   for (const name of ['home', 'dsh', 'agents', 'workspace', 'tmp', 'appdata', 'localappdata']) mkdirSync(join(root, name), { recursive: true, mode: 0o700 })
-  return { root, home: join(root, 'dsh'), deviceId }
+  const home = join(root, 'dsh')
+  // Settings already contains IM机器人. Enterprise login does not add a second sidebar entry.
+  const sidebar = join(home, 'integrations', 'dsh-im')
+  mkdirSync(sidebar, { recursive: true, mode: 0o700 })
+  writeJson(join(sidebar, 'sidebar-settings.json'), { version: 1, mode: 'hide' })
+  return { root, home, deviceId }
 }
 
 export function enterpriseEnvironment(root: string, executable: string, parent: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
@@ -158,14 +163,21 @@ export function officialLauncher(source: string, home: string, executable: strin
 
 /** The official application-owned Profile API supplies the full installation dependency graph. */
 export function officialHostLauncher(source: string, home: string, executable: string, packageManager: string, patches: string[]): string {
+  const cli = join(source, 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'bin.js')
   const boot = join(source, 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'profile-boot.js')
   const appBoot = join(source, 'node_modules', '@deepseek-ai', 'dsh-app-boot', 'lib', 'index.js')
-  if (!existsSync(boot) || !existsSync(appBoot) || !existsSync(packageManager)) throw new Error('安装包缺少官方 Profile 启动接口')
+  if (!existsSync(cli) || !existsSync(boot) || !existsSync(appBoot) || !existsSync(packageManager)) throw new Error('安装包缺少官方 Profile 启动接口')
   const anchor = join(source, 'profile-installation.json'), profile = join(home, 'profiles', 'workdsh')
-  if (!existsSync(anchor)) throw new Error('安装包缺少完整官方与 WorkDSH 安装清单')
-  const launcher = join(home, '.workdsh-host.mjs')
+  if (!existsSync(anchor)) throw new Error('安装包缺少完整官方与 开物Praxis 安装清单')
+  // The market re-invokes whatever launched this process when argv[1] ends in
+  // bin.js. A packaged app has no `dsh` on PATH, so the host entry has to be
+  // that script and forward `plugin` to the official CLI.
+  const launcher = join(home, '.workdsh-host', 'bin.js')
+  mkdirSync(dirname(launcher), { recursive: true })
+  writeJson(join(home, '.workdsh-host', 'package.json'), { type: 'module' })
   packageManager = cachedPackageManager(home, packageManager)
-  writeFileSync(launcher, `import { runProfile } from ${JSON.stringify(pathToFileURL(boot).href)};\nimport { loadProfileDirectory, loadLayeredEnv, reportSkippedBundles } from ${JSON.stringify(pathToFileURL(appBoot).href)};\nconst installAnchor = ${JSON.stringify(anchor)};\nconst profile = loadProfileDirectory('dsh', ${JSON.stringify(profile)}, installAnchor);\nreportSkippedBundles('dsh', profile);\nawait runProfile({ environment: loadLayeredEnv('dsh'), profile: 'workdsh', resolvedProfile: { profile, installAnchor }, patchFiles: ${JSON.stringify(patches)}, args: process.argv.slice(2), packageManager: { command: ${JSON.stringify(executable)}, args: [${JSON.stringify(packageManager)}] } });\n`, { mode: 0o600 })
+  const packageManagerLiteral = `{ command: ${JSON.stringify(executable)}, args: [${JSON.stringify(packageManager)}] }`
+  writeFileSync(launcher, `import { runCli } from ${JSON.stringify(pathToFileURL(cli).href)};\nimport { runProfile } from ${JSON.stringify(pathToFileURL(boot).href)};\nimport { loadProfileDirectory, loadLayeredEnv, reportSkippedBundles } from ${JSON.stringify(pathToFileURL(appBoot).href)};\nconst installAnchor = ${JSON.stringify(anchor)};\nconst profile = loadProfileDirectory('dsh', ${JSON.stringify(profile)}, installAnchor);\nconst packageManager = ${packageManagerLiteral};\nif (process.argv[2] === 'plugin') await runCli({ manageDesktopProfile: true, packageManager });\nelse { reportSkippedBundles('dsh', profile);\nawait runProfile({ environment: loadLayeredEnv('dsh'), profile: 'workdsh', resolvedProfile: { profile, installAnchor }, patchFiles: ${JSON.stringify(patches)}, args: process.argv.slice(2), packageManager }); }\n`, { mode: 0o600 })
   return launcher
 }
 

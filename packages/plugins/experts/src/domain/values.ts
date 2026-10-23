@@ -52,6 +52,7 @@ export function actionAccess(action: ExpertAction): AccessAction {
   switch (action) {
     case 'experts.publish':
     case 'experts.set-availability':
+    case 'experts.delete':
       return 'manage';
     case 'experts.create-draft':
     case 'experts.update-draft':

@@ -33,11 +33,11 @@ type OriginFilter = 'all' | 'default' | 'personal';
 type StateFilter = 'all' | 'draft' | 'published' | 'disabled' | 'archived';
 type Notice = { kind: 'info' | 'warn' | 'error'; text: string };
 
-function messageOf(cause: unknown): string { return cause instanceof Error ? cause.message : '专家操作失败，请重试。'; }
+function messageOf(cause: unknown): string { return cause instanceof Error ? cause.message : '数字员工操作失败，请重试。'; }
 function codeOf(cause: unknown): string { const code = (cause as unknown as { code?: unknown })?.code; return typeof code === 'string' ? code : ''; }
 function icon(name: string) { return <Icon name={name as IconName} />; }
 
-const ORIGIN_LABEL: Record<string, string> = { default: '默认模板', personal: '我的专家', organization: '组织' };
+const ORIGIN_LABEL: Record<string, string> = { default: '默认模板', personal: '我的数字员工', organization: '组织' };
 const AVAILABILITY_LABEL: Record<ExpertAvailability, string> = { enabled: '已启用', disabled: '已停用', archived: '已归档' };
 const READINESS: Record<string, { label: string; cls: string }> = {
   ready: { label: '可用', cls: 'ready' },
@@ -48,10 +48,20 @@ const READINESS: Record<string, { label: string; cls: string }> = {
 };
 
 function Avatar({ summary }: { summary: ExpertSummary }) {
-  return <span className="avatar" aria-hidden>{summary.avatarRef?.startsWith('data:image/') ? <img src={summary.avatarRef} alt="" /> : summary.name.trim().charAt(0) || '专'}</span>;
+  const hasImage = summary.avatarRef?.startsWith('data:image/') || summary.avatarRef?.startsWith('http://') || summary.avatarRef?.startsWith('https://');
+  return <span className="avatar" aria-hidden>
+    {hasImage && summary.avatarRef
+      ? <img src={summary.avatarRef} alt="" />
+      : <span className="avatar-placeholder">{summary.name.trim().charAt(0) || '专'}</span>}
+  </span>;
 }
 
-export function ExpertsPanel({ toggleNavigation, management, openCapability, hasCapability, summon, createExpertTask, editExpertTask }: ExpertsPanelProps) {
+function cardSubtitle(summary: ExpertSummary, mine: boolean, state: string): string {
+  const base = summary.profession?.trim() || (summary.expertType === 'team' ? '数字员工团' : '数字员工');
+  return mine ? `${base} · ${state}` : base;
+}
+
+export function ExpertsPanel({ toggleNavigation, management, summon, createExpertTask, editExpertTask }: ExpertsPanelProps) {
   const [view, setView] = useState<View>(() => expertDraftId(window.location.search) || new URLSearchParams(window.location.search).get('expert-library') === 'mine' ? 'mine' : 'center');
   const [kind, setKind] = useState<'agent' | 'team'>(() => new URLSearchParams(window.location.search).get('expert-kind') === 'team' ? 'team' : 'agent');
   const [typeCounts, setTypeCounts] = useState({ agent: 0, team: 0 });
@@ -74,7 +84,7 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
   const [acting, setActing] = useState(false);
   const search = useRef<HTMLInputElement>(null);
   const loadSequence = useRef(0);
-  const kindLabel = kind === 'team' ? '专家团' : '专家';
+  const kindLabel = kind === 'team' ? '数字员工团' : '数字员工';
 
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -175,14 +185,25 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
     try { await management.setAvailability(summary.id, availability, management.newOperationId('availability')); refresh(); if (detailId === summary.id) setDetailId(undefined); }
     catch (cause) { setError(messageOf(cause)); } finally { setActing(false); }
   };
+  const deleteArchived = async (summary: ExpertSummary) => {
+    if (summary.availability !== 'archived' || summary.origin === 'default') return;
+    const confirmed = window.confirm(`确认彻底删除「${summary.name}」？删除后无法从目录恢复，Agent 预设中的对应条目也会移除；历史任务引用仍保留。`);
+    if (!confirmed) { setActionMenu(undefined); return; }
+    setActionMenu(undefined); setActing(true); setError('');
+    try {
+      await management.deleteArchived(summary.id, management.newOperationId('delete'));
+      if (detailId === summary.id) setDetailId(undefined);
+      if (editorId === summary.id) setEditorId(undefined);
+      setNotice({ kind: 'info', text: `已彻底删除「${summary.name}」。` });
+      refresh();
+    } catch (cause) { setError(messageOf(cause)); } finally { setActing(false); }
+  };
   const exportExpert = async (summary: ExpertSummary) => {
     setActionMenu(undefined); setActing(true); setError('');
     try { const result = await management.downloadExport(summary.id, summary.publishedRevisionRef?.revisionId); setNotice({ kind: 'info', text: `已导出「${result.fileName}」（${result.bytes} 字节，摘要 ${result.digest.slice(0, 12)}…）。` }); }
     catch (cause) { setError(messageOf(cause)); } finally { setActing(false); }
   };
 
-  const capabilityTabs = [['experts', '专家'], ['skills', '技能'], ['connectors', '连接器']] as const;
-  const capabilityKey: Record<string, string> = { experts: 'workdsh-experts', skills: 'workdsh-skills', connectors: 'workdsh-connectors' };
   const isDraft = (summary: ExpertSummary) => summary.publishedRevisionRef === undefined;
   const stateLabel = (summary: ExpertSummary) => isDraft(summary) ? '草稿' : AVAILABILITY_LABEL[summary.availability];
 
@@ -197,27 +218,20 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
     <style>{expertsCss}</style>
     <header className="cap-header">
       <button className="nav-toggle" onClick={toggleNavigation} aria-label="切换导航">导航</button>
-      {capabilityTabs.map(([key, label]) => {
-        const active = key === 'experts';
-        const target = capabilityKey[key];
-        const enabled = active || (target !== undefined && hasCapability(target));
-        return <button key={key} className={`cap-tab ${active ? 'active' : ''}`} disabled={!enabled}
-          aria-current={active ? 'page' : undefined}
-          onClick={() => { if (!active && target) openCapability(target); }}>{icon(key)}{label}</button>;
-      })}
-      <Input ref={search} className="search" aria-label="搜索专家" placeholder={view === 'mine' ? `搜索我创建的${kind === 'team' ? '专家团' : '专家'}` : `搜索${kindLabel}`} value={query}
+      <h1 className="cap-title">{icon('experts')}数字员工</h1>
+      <Input ref={search} className="search" aria-label="搜索数字员工" placeholder={view === 'mine' ? `搜索我创建的${kind === 'team' ? '数字员工团' : '数字员工'}` : `搜索${kindLabel}`} value={query}
         onChange={event => setQuery(event.currentTarget.value)} />
       <Button className={`mine-toggle ${view === 'mine' ? 'active' : ''}`} aria-pressed={view === 'mine'}
-        onClick={() => { setView('mine'); setQuery(''); }}>我的专家 {mineCount}</Button>
-      <details className="create-menu"><summary className="create-expert">制作专家</summary><div role="menu">
-        <button role="menuitem" disabled={acting} onClick={event => { event.currentTarget.closest('details')?.removeAttribute('open'); void createExpert('agent'); }}>创建专家</button>
-        <button role="menuitem" disabled={acting} onClick={event => { event.currentTarget.closest('details')?.removeAttribute('open'); void createExpert('team'); }}>创建专家团</button>
+        onClick={() => { setView('mine'); setQuery(''); }}>我的数字员工 {mineCount}</Button>
+      <details className="create-menu"><summary className="create-expert">制作数字员工</summary><div role="menu">
+        <button role="menuitem" disabled={acting} onClick={event => { event.currentTarget.closest('details')?.removeAttribute('open'); void createExpert('agent'); }}>创建数字员工</button>
+        <button role="menuitem" disabled={acting} onClick={event => { event.currentTarget.closest('details')?.removeAttribute('open'); void createExpert('team'); }}>创建数字员工团</button>
       </div></details>
     </header>
 
-    {view === 'mine' && <Button variant="ghost" size="sm" className="back-center" onClick={() => { setView('center'); setQuery(''); setStateFilter('all'); }}>‹ 全部专家</Button>}
+    {view === 'mine' && <Button variant="ghost" size="sm" className="back-center" onClick={() => { setView('center'); setQuery(''); setStateFilter('all'); }}>‹ 全部数字员工</Button>}
     <div className="section-head">
-      <nav className="work-types" aria-label={view === 'mine' ? '我的作品类型' : '专家中心类型'}>{([['agent', '专家'], ['team', '专家团']] as const).map(([type, label]) => <button key={type} className={kind === type ? 'active' : ''} aria-pressed={kind === type} onClick={() => { setKind(type); setQuery(''); }}>{label}{view === 'mine' && <span>{typeCounts[type]}</span>}</button>)}</nav>
+      <nav className="work-types" aria-label={view === 'mine' ? '我的作品类型' : '数字员工中心类型'}>{([['agent', '数字员工'], ['team', '数字员工团']] as const).map(([type, label]) => <button key={type} className={kind === type ? 'active' : ''} aria-pressed={kind === type} onClick={() => { setKind(type); setQuery(''); }}>{label}{view === 'mine' && <span>{typeCounts[type]}</span>}</button>)}</nav>
       <div className="section-actions">
         <Button onClick={() => setImportOpen(true)}>导入</Button>
         <Button onClick={refresh} disabled={busy}>刷新</Button>
@@ -238,67 +252,71 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
 
     {notice && <div className={`notice ${notice.kind}`} role="status"><div className="notice-body"><span>{notice.text}</span></div><Button onClick={() => setNotice(undefined)} aria-label="关闭提示">×</Button></div>}
     <div role="status" aria-live="polite" className={error ? 'error counts' : 'counts'}>
-      {busy ? '正在读取专家目录…' : error || `目录共 ${total} 个${kindLabel} · 当前显示 ${visible.length} 个${debounced ? `（搜索“${debounced}”）` : ''}`}
+      {busy ? '正在读取数字员工目录…' : error || `目录共 ${total} 个${kindLabel} · 当前显示 ${visible.length} 个${debounced ? `（搜索“${debounced}”）` : ''}`}
     </div>
 
     {busy
       ? <div className="grid" aria-hidden>{Array.from({ length: 8 }, (_, index) => <div className="skeleton" key={index} />)}</div>
       : !error && !visible.length
         ? <div className="empty">
-          <strong>{debounced ? `没有匹配的${kindLabel}` : view === 'mine' ? `还没有自己的${kind === 'team' ? '专家团' : '专家'}` : `暂无可用${kindLabel}`}</strong>
-          <span className="muted">{debounced ? '保留搜索词，可清除后重试。' : view === 'mine' ? '从默认模板复制，或直接制作一个属于你的专家。' : '默认模板尚未就绪，请稍后重试或制作专家。'}</span>
+          <strong>{debounced ? `没有匹配的${kindLabel}` : view === 'mine' ? `还没有自己的${kind === 'team' ? '数字员工团' : '数字员工'}` : `暂无可用${kindLabel}`}</strong>
+          <span className="muted">{debounced ? '保留搜索词，可清除后重试。' : view === 'mine' ? '从默认模板复制，或直接制作一个属于你的数字员工。' : '默认模板尚未就绪，请稍后重试或制作数字员工。'}</span>
           <div className="empty-actions">
             {debounced && <Button onClick={() => { setQuery(''); search.current?.focus(); }}>清除搜索</Button>}
             <Button variant="primary" className="create-expert" disabled={acting} onClick={() => void createExpert()}>创建{kindLabel}</Button>
-            {view === 'mine' && <Button onClick={() => setView('center')}>浏览专家中心</Button>}
+            {view === 'mine' && <Button onClick={() => setView('center')}>浏览数字员工中心</Button>}
           </div>
         </div>
         : <div className="grid">{visible.map(summary => {
           const readiness = READINESS[summary.readiness] ?? READINESS.unknown;
           const draft = isDraft(summary);
           const usable = summary.canUse && !draft && summary.availability === 'enabled' && summary.readiness === 'ready';
-          return <article className={`card ${draft ? 'draft' : ''} ${summary.availability !== 'enabled' ? 'unavailable' : ''} ${actionMenu === summary.id ? 'menu-open' : ''}`} key={summary.id}>
+          return <article className={`card ${draft ? 'draft' : ''} ${summary.availability !== 'enabled' ? 'unavailable' : ''} ${actionMenu === summary.id ? 'menu-open' : ''} ${summary.pinned ? 'pinned' : ''}`} key={summary.id}>
             <div className="card-top">
-              <button className="card-open" aria-label={`查看专家 ${summary.name}`} onClick={() => setDetailId(summary.id)}>
+              <button className="card-open" aria-label={`查看数字员工 ${summary.name}`} onClick={() => setDetailId(summary.id)}>
                 <Avatar summary={summary} />
-                <span className="card-title"><strong title={summary.name}>{summary.name}</strong>
-                  <span className="card-meta">{summary.profession || (summary.expertType === 'team' ? '专家团' : '专家')}{view === 'mine' && <span> · {stateLabel(summary)}</span>}</span></span>
+                <span className="card-title">
+                  <strong title={summary.name}>{summary.name}</strong>
+                  <span className="card-meta" title={cardSubtitle(summary, view === 'mine', stateLabel(summary))}>
+                    {cardSubtitle(summary, view === 'mine', stateLabel(summary))}
+                  </span>
+                </span>
               </button>
-              {summary.canManage && <div className="card-actions">
-                <Button variant="ghost" size="sm" className="more-button" aria-label={`管理专家 ${summary.name}`} aria-haspopup="menu" aria-expanded={actionMenu === summary.id}
+              <div className="card-actions">
+                <Button variant="ghost" size="sm" className="more-button" aria-label={`管理数字员工 ${summary.name}`} aria-haspopup="menu" aria-expanded={actionMenu === summary.id}
                   onClick={() => setActionMenu(current => (current === summary.id ? undefined : summary.id))}>•••</Button>
                 {actionMenu === summary.id && <div className="card-menu" role="menu">
                   {draft
                     ? <button role="menuitem" onClick={() => { void editInConversation(summary.id); }}>继续编辑</button>
-                    : <button role="menuitem" disabled={!usable || acting} onClick={() => void runSummon(summary.id, summary.publishedRevisionRef?.revisionId, undefined)}>召唤专家</button>}
+                    : <button role="menuitem" disabled={!usable || acting} onClick={() => void runSummon(summary.id, summary.publishedRevisionRef?.revisionId, undefined)}>召唤数字员工</button>}
                   {summary.canEdit && !draft && <button role="menuitem" onClick={() => { void editInConversation(summary.id); }}>编辑</button>}
-                  <button role="menuitem" disabled={acting} onClick={() => void copyToMine(summary)}>复制到我的专家</button>
+                  <button role="menuitem" disabled={acting} onClick={() => void copyToMine(summary)}>复制到我的数字员工</button>
                   <button role="menuitem" disabled={acting} onClick={() => void exportExpert(summary)}>导出</button>
-                  {summary.canManage && !draft && summary.availability === 'enabled' && <button role="menuitem" disabled={acting} onClick={() => void setAvailability(summary, 'disabled')}>停用</button>}
-                  {summary.canManage && summary.availability === 'disabled' && <button role="menuitem" disabled={acting} onClick={() => void setAvailability(summary, 'enabled')}>启用</button>}
-                  {summary.canManage && summary.availability !== 'archived' && <button className="danger" role="menuitem" disabled={acting} onClick={() => void setAvailability(summary, 'archived')}>归档</button>}
+                  <button role="menuitem" disabled={acting} onClick={() => void setPreference(summary, !summary.pinned)}>{summary.pinned ? '取消置顶' : '置顶'}</button>
+                  {summary.canManage && summary.origin !== 'default' && !draft && summary.availability === 'enabled' && <button role="menuitem" disabled={acting} onClick={() => void setAvailability(summary, 'disabled')}>停用</button>}
+                  {summary.canManage && (summary.availability === 'disabled' || summary.availability === 'archived') && <button role="menuitem" disabled={acting} onClick={() => void setAvailability(summary, 'enabled')}>启用</button>}
+                  {summary.canManage && summary.origin !== 'default' && summary.availability !== 'archived' && <button className="danger" role="menuitem" disabled={acting} onClick={() => void setAvailability(summary, 'archived')}>归档</button>}
+                  {summary.canManage && summary.origin !== 'default' && summary.availability === 'archived' && <button className="danger" role="menuitem" disabled={acting} onClick={() => void deleteArchived(summary)}>彻底删除</button>}
                 </div>}
-              </div>}
+              </div>
             </div>
-            <p className="desc">{summary.description || <span className="muted">（暂无简介）</span>}</p>
-            <div className="domain-tags">{(summary.tags ?? []).slice(0, 3).map(tag => <span key={tag}>{tag}</span>)}</div>
-            <div className="card-foot">
-              <span className="badge">{summary.expertType === 'team' ? '专家团' : '专家'}</span>
-              {!draft && <span className={`badge ${readiness.cls}`}>{readiness.label}</span>}
-              {draft && <span className="badge">未发布</span>}
-              {summary.origin === 'default' && <span className="badge">默认</span>}
-              <button className={`pin ${summary.pinned ? 'on' : ''}`} role="switch" aria-checked={summary.pinned}
-                aria-label={`${summary.pinned ? '取消置顶' : '置顶'}专家 ${summary.name}`}
-                onClick={() => void setPreference(summary, !summary.pinned)}>★</button>
-            </div>
+            <button className="card-body" aria-label={`查看数字员工 ${summary.name}`} onClick={() => setDetailId(summary.id)}>
+              <p className="desc">{summary.description || <span className="muted">（暂无简介）</span>}</p>
+              <div className="domain-tags">
+                {(summary.tags ?? []).slice(0, 3).map(tag => <span key={tag}>{tag}</span>)}
+                {draft && <span className="status-tag">未发布</span>}
+                {!draft && summary.availability !== 'enabled' && <span className="status-tag">{stateLabel(summary)}</span>}
+                {!draft && (readiness.cls === 'bad' || readiness.cls === 'warn') && <span className={`status-tag ${readiness.cls}`}>{readiness.label}</span>}
+              </div>
+            </button>
           </article>;
-        })}{view === 'mine' && <button className="card create-card" disabled={acting} onClick={() => void createExpert()}><span aria-hidden>＋</span>创建{kind === 'team' ? '专家团' : '专家'}</button>}</div>}
+        })}{view === 'mine' && <button className="card create-card" disabled={acting} onClick={() => void createExpert()}><span aria-hidden>＋</span>创建{kind === 'team' ? '数字员工团' : '数字员工'}</button>}</div>}
 
     {nextCursor && !busy && <div className="empty-actions" style={{ justifyContent: 'center', marginTop: 18 }}>
       <Button disabled={loadingMore} onClick={() => void load(nextCursor)}>{loadingMore ? '正在加载…' : '加载更多'}</Button>
     </div>}
 
-    <Modal open={Boolean(detailId)} label={detailId ? '专家详情' : '专家详情'} className="expert-dialog" onClose={() => setDetailId(undefined)}>
+    <Modal open={Boolean(detailId)} label={detailId ? '数字员工详情' : '数字员工详情'} className="expert-dialog" onClose={() => setDetailId(undefined)}>
       {detailId && <ExpertDetailModal expertId={detailId} management={management} acting={acting}
         onClose={() => setDetailId(undefined)}
         onSummon={(expertId, revisionId, draftText) => void runSummon(expertId, revisionId, draftText)}
@@ -314,6 +332,19 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
           try { await management.setAvailability(expertId, availability, management.newOperationId('availability')); setDetailId(undefined); refresh(); }
           catch (cause) { setError(messageOf(cause)); } finally { setActing(false); }
         }}
+        onDelete={async (expertId) => {
+          const name = visible.find(item => item.id === expertId)?.name ?? '该数字员工';
+          const confirmed = window.confirm(`确认彻底删除「${name}」？删除后无法从目录恢复，Agent 预设中的对应条目也会移除；历史任务引用仍保留。`);
+          if (!confirmed) return;
+          setActing(true);
+          try {
+            await management.deleteArchived(expertId, management.newOperationId('delete'));
+            setDetailId(undefined);
+            if (editorId === expertId) setEditorId(undefined);
+            setNotice({ kind: 'info', text: `已彻底删除「${name}」。` });
+            refresh();
+          } catch (cause) { setError(messageOf(cause)); } finally { setActing(false); }
+        }}
         onExport={async expertId => {
           setActing(true);
           try { const result = await management.downloadExport(expertId, undefined); setNotice({ kind: 'info', text: `已导出「${result.fileName}」。` }); }
@@ -328,7 +359,7 @@ export function ExpertsPanel({ toggleNavigation, management, openCapability, has
       onPublished={() => { closeEditor(); refresh(); }}
       onSummon={(id, revisionId, text) => { closeEditor(); void runSummon(id, revisionId, text); }} />}
 
-    <Modal open={importOpen} label="导入专家" className="import-dialog" onClose={() => setImportOpen(false)}>
+    <Modal open={importOpen} label="导入数字员工" className="import-dialog" onClose={() => setImportOpen(false)}>
       {importOpen && <ImportExpertModal management={management} onClose={() => setImportOpen(false)}
         onImported={id => { setImportOpen(false); refresh(); setEditorId(id); }} />}
     </Modal>

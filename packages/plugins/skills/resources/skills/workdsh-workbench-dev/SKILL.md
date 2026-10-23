@@ -1,17 +1,17 @@
 ---
 name: workdsh-workbench-dev
-description: 在官方 Creator 插件开发流程上补充 WorkDSH 业务 SDK、对象协作、身份和数据保护规范。
+description: 在官方 Creator 插件开发流程上补充 开物Praxis 业务 SDK、对象协作、身份和数据保护规范。
 ---
 
 # 工作台插件开发
 
-先通过宿主技能工具加载官方 `cordis-plugin-development`，在官方 Creator（创造模式，`cordis`）中使用原生会话、权限与工具链。本 Skill 只补充 WorkDSH 的业务约束；Host、Client、Loader、Slots、插件包和安装流程遵循官方 Skill，不另造开发 Agent、会话界面或安装器。
+先通过宿主技能工具加载官方 `cordis-plugin-development`，在官方 Creator（创造模式，`cordis`）中使用原生会话、权限与工具链。本 Skill 只补充 开物Praxis 的业务约束；Host、Client、Loader、Slots、插件包和安装流程遵循官方 Skill，不另造开发 Agent、会话界面或安装器。
 
 再阅读 [需求定义](references/requirements.md) 和 [工作台产品体验](references/product-experience.md)，从一句想法开始时先阅读 [需求梳理](references/intake.md)，首次制作阅读 [首次开发](references/first-development.md)，修改已有插件阅读 [继续调整](references/iteration.md)。用户本轮的范围、布局选择和暂停要求优先；这些文档不代表能力已经实现。
 
 ## 共同规则
 
-1. 从“和 AI 一起梳理”进入且尚未确认需求时，先调用 `workbench_read_creation_request`，阅读 [需求梳理](references/intake.md)，帮助用户明确目标并保存可编辑摘要，不生成源码、构建或安装。用户在左侧确认后，当前会话会关联正式需求与开发工程；已进入开发时先调用 `workbench_read_development_context`，读取当前原生会话实际关联的需求、源码、稳定插件身份、目标实例和候选包；不根据旧提示词猜测归属。先使用上下文 `sdk` 提供的已解析公开文档与类型；不要用 `Service.listService` 查询已知未收录的 WorkDSH 注册服务。官方 API 按官方 Skill 核对本轮用到的服务、事件、工具和 Slot，避免枚举无关接口。WorkDSH 扩展接口须按 [SDK 核验](references/sdk-verification.md) 单独核对：官方 Service 目录未收录不等于服务未运行，Config 的 `absent` 不等于插件未安装。WorkDSH 业务 SDK 和模板也以宿主实际交付的版本为准。不得猜测接口、复制私有实现或伪造回执；缺能力时保留源码和具体未完成项。
+1. 从“和 AI 一起梳理”进入且尚未确认需求时，先调用 `workbench_read_creation_request`，阅读 [需求梳理](references/intake.md)，帮助用户明确目标并保存可编辑摘要，不生成源码、构建或安装。用户在左侧确认后，当前会话会关联正式需求与开发工程；已进入开发时先调用 `workbench_read_development_context`，读取当前原生会话实际关联的需求、源码、稳定插件身份、目标实例和候选包；不根据旧提示词猜测归属。先使用上下文 `sdk` 提供的已解析公开文档与类型；不要用 `Service.listService` 查询已知未收录的 开物Praxis 注册服务。官方 API 按官方 Skill 核对本轮用到的服务、事件、工具和 Slot，避免枚举无关接口。开物Praxis 扩展接口须按 [SDK 核验](references/sdk-verification.md) 单独核对：官方 Service 目录未收录不等于服务未运行，Config 的 `absent` 不等于插件未安装。开物Praxis 业务 SDK 和模板也以宿主实际交付的版本为准。不得猜测接口、复制私有实现或伪造回执；缺能力时保留源码和具体未完成项。
 2. 先定义业务对象、状态、用户动作、AI 分工和成果落点，再安排模块。项目关联是可选的；项目、资料、技能、专家、连接器使用各自公开服务和授权，不复制管理系统。一个包只声明一个工作台，后续保持包名与工作台 ID；本地制作不要求公开 GitHub 仓库。
 3. 保持用户已选布局，包括业务在左、原生会话在右的并排方式；不因套用模板强制重构。复用完整原生会话及其执行过程，不自制 Composer、聊天进度或工具轨迹。AI 通过真实业务工具读取当前对象、执行并写回候选或独立草稿，页面读取后供用户继续加工或采用；跳转聊天、复制提示词或回复结束都不等于完成业务协作。
 4. Excel、CSV 等文件复用系统 Office 的公开预览、编辑、保存和导出能力，不另写电子表格编辑器。业务页面负责字段对应、核对和统计；资料引用准确的资产及版本，统计由代码对完整已授权输入的固定修订确定性计算，不能拿截断预览作统计源。保存新文件版本后明确采用，历史分析与报告保留原快照。

@@ -13,7 +13,7 @@ import { authoringDocuments, definitionFromDocuments } from '../authoring/docume
 /**
  * Local expert package portability (EP-06, CONTRACTS §6, AT-21).
  *
- * Format `workdsh-expert` schemaVersion 1 — a WorkDSH product format, never the
+ * Format `workdsh-expert` schemaVersion 1 — a 开物Praxis product format, never the
  * official Harness skill format. A package carries `manifest.json` + `expert.json`
  * (the definition + source attribution) and nothing that auto-installs: no owner,
  * internal preset id, granted permission, session id, credential, executable

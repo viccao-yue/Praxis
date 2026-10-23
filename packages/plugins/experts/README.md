@@ -1,8 +1,8 @@
-# WorkDSH 专家插件 / Experts plugin
+# 开物Praxis 专家插件 / Experts plugin
 
 一个插件管理多个专家与专家团配置。当前源码候选为 `workdsh-plugin-experts@0.1.0-alpha.8`，精确锁定 **DeepSeek Harness 0.2.0-rc.2 / Cordis 4.0.4**；实际构建、安装与运行范围见[验收要求](../../../apps/web/docs/ACCEPTANCE.md)，旧探针和已发布安装包不能证明本轮候选已验收。
 
-WorkDSH manages authored expert assets and immutable revisions. Team execution, messaging, tasks and the Web team panel use the official DSH Agent Teams plugins.
+开物Praxis manages authored expert assets and immutable revisions. Team execution, messaging, tasks and the Web team panel use the official DSH Agent Teams plugins.
 
 ## 专家资产与官方团队执行
 
@@ -25,7 +25,7 @@ WorkDSH manages authored expert assets and immutable revisions. Team execution, 
 
 启用 Team 时，按官方 Profile 组合停用旧 `subagent`、`subagent_fork` 及旧控制工具。默认成员创建上限为 16。九项工具为 `spawn_teammate`、`send_message`、`list_agents`、`wait_agent`、`interrupt_agent`、`team_task_create`、`team_task_list`、`team_task_get`、`team_task_update`。
 
-WorkDSH 的必需组合仍包含 identity-local、audit、access、skills、experts；可选 bundle 提供工作台导航，activity 仅显示个人工作动态。各包通过官方 Loader/Profile 和公开服务注入装配；无自建 Agent loop、消息邮箱、团队执行表或插件加载器。
+开物Praxis 的必需组合仍包含 identity-local、audit、access、skills、experts；可选 bundle 提供工作台导航，activity 仅显示个人工作动态。各包通过官方 Loader/Profile 和公开服务注入装配；无自建 Agent loop、消息邮箱、团队执行表或插件加载器。
 
 ## 旧版迁移边界
 

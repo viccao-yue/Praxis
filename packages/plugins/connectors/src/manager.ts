@@ -49,18 +49,22 @@ export class ConnectorManager extends Service implements ConnectorManagementServ
     const selectionDomain = await this.ctx.storageDomain.open(connectorSelectionsDomainSpec);
     this.ctx.effect(() => () => selectionDomain.close(), 'workdshConnectors.selectionDomainClose');
     this.selections = selectionDomain.table('selections');
-    if (this.options.seedExample !== false && !domain.global.get().seededExample) {
+    if (this.options.seedExample !== false && this.definitions.get('workdsh-example')) {
+      await this.definitions.delete('workdsh-example');
+      if (!domain.global.get().seededExample) await domain.global.set({ seededExample: true });
+    }
+    if (this.options.seedExample !== false && !this.definitions.get('windows-mcp')) {
       const now = new Date().toISOString();
-      await this.definitions.put('workdsh-example', {
-        id: 'workdsh-example', title: 'WorkDSH MCP 示例', description: '可查询业务目录，并通过 MCP 资源与 URI 模板读取示例资料。',
-        serverName: 'workdsh-example', transport: 'stdio', command: process.execPath, args: [serverPath], enabled: true,
+      await this.definitions.put('windows-mcp', {
+        id: 'windows-mcp', title: 'Windows MCP', description: '各系统都能在列表中看到。仅 Windows 10/11 可启用，用来操作本机桌面；启用前需要 Python 3.14 和 uv。默认关闭。',
+        serverName: 'windows-mcp', transport: 'stdio', command: 'uvx', args: ['windows-mcp', 'serve'], enabled: false,
         createdAt: now, updatedAt: now,
       });
-      await domain.global.set({ seededExample: true });
     }
     for (const [, definition] of this.table().entries()) {
-      this.runtimes.set(definition.id, { state: definition.enabled ? 'discovering' : 'disabled' });
-      if (definition.enabled) void this.start(definition).catch(() => undefined);
+      const blocked = this.windowsOnlyBlocked(definition);
+      this.runtimes.set(definition.id, { state: definition.enabled && !blocked ? 'discovering' : 'disabled', ...(blocked ? { diagnostic: 'Windows MCP 只能在 Windows 上使用。' } : {}) });
+      if (definition.enabled && !blocked) void this.start(definition).catch(() => undefined);
     }
     this.ctx.on('agent/created', ({ agent }) => { this.applyRestriction(agent); return undefined; });
     for (const agent of this.ctx.agents.list()) this.applyRestriction(agent);
@@ -124,6 +128,7 @@ export class ConnectorManager extends Service implements ConnectorManagementServ
   async setEnabled(id: string, enabled: boolean): Promise<ConnectorSummary> {
     return this.enqueue(async () => {
       const current = this.definition(id); if (enabled === current.enabled) return this.summary(current);
+      if (enabled && this.windowsOnlyBlocked(current)) throw new Error('connector/windows-only');
       if (!enabled) { await this.stop(id, false); await this.removeFromSelections(id); }
       const next = { ...current, enabled, updatedAt: new Date().toISOString() };
       await this.table().put(id, next); this.runtimes.set(id, { state: enabled ? 'discovering' : 'disabled' });
@@ -190,6 +195,7 @@ export class ConnectorManager extends Service implements ConnectorManagementServ
 
   private async health(definition: ConnectorDefinition, signal?: AbortSignal): Promise<{ state: ConnectorState; toolNames: string[]; resourceCount: number; resourceTemplateCount: number; diagnostic?: string }> {
     const runtime = this.runtime(definition.id);
+    if (this.windowsOnlyBlocked(definition)) return { state: 'disabled', toolNames: [], resourceCount: 0, resourceTemplateCount: 0, diagnostic: 'Windows MCP 只能在 Windows 上使用。' };
     if (!definition.enabled) return { state: 'disabled', toolNames: [], resourceCount: 0, resourceTemplateCount: 0 };
     const prefix = `mcp__${definition.serverName}__`; const toolNames = this.ctx.tools.schemas().map(tool => tool.name).filter(name => name.startsWith(prefix));
     if (!runtime.child) return { state: runtime.state, toolNames, resourceCount: 0, resourceTemplateCount: 0, ...(runtime.diagnostic ? { diagnostic: runtime.diagnostic } : {}) };
@@ -238,6 +244,9 @@ export class ConnectorManager extends Service implements ConnectorManagementServ
     const access = this.ctx.reflect.get('workdshSessionAccess') as { inspect(id: string): Promise<unknown> } | undefined;
     if (!access) throw new Error('connector/session-access-required');
     await access.inspect(sessionId);
+  }
+  private windowsOnlyBlocked(definition: Pick<ConnectorDefinition, 'id'>): boolean {
+    return definition.id === 'windows-mcp' && process.platform !== 'win32';
   }
   private credentialName(serverName: string): string { return `WORKDSH_CONNECTOR_${serverName.replace(/[^A-Za-z0-9]+/g, '_').toUpperCase()}_AUTHORIZATION`; }
   private definition(id: string): ConnectorDefinition { const row = this.table().get(id); if (!row) throw new Error('connector/not-found'); return row; }

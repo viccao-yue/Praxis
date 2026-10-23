@@ -16,8 +16,28 @@ import { fileURLToPath } from 'node:url'
 const MARKER = '/* praxis-account-menu-patched */'
 
 /** Apply Praxis AccountMenu behavior to a compiled settings-account client bundle. */
+const UNSIGNED_ELLIPSIS = 'IconEllipsisOutlineMedium, { size: 14 }'
+const UNSIGNED_GEAR = 'IconSettingsOutlineMedium, { size: 16 }'
+
+/** Unsigned settings trigger uses a gear, not an ellipsis. */
+function repairSettingsGlyph(source) {
+  const menuStart = source.indexOf('function AccountMenu(')
+  if (menuStart < 0 || !source.includes(UNSIGNED_ELLIPSIS)) return { source, changed: false }
+  const menuEndMarker = source.indexOf('//#endregion', menuStart)
+  const menuEnd = menuEndMarker > menuStart ? menuEndMarker : source.length
+  const menu = source.slice(menuStart, menuEnd)
+  if (!menu.includes(UNSIGNED_ELLIPSIS)) return { source, changed: false }
+  return {
+    source: source.slice(0, menuStart) + menu.replace(UNSIGNED_ELLIPSIS, UNSIGNED_GEAR) + source.slice(menuEnd),
+    changed: true,
+  }
+}
+
 export function patchAccountMenuSource(source) {
-  if (source.includes(MARKER)) return { source, changed: false, already: true }
+  if (source.includes(MARKER)) {
+    const repaired = repairSettingsGlyph(source)
+    return { source: repaired.source, changed: repaired.changed, already: !repaired.changed, steps: repaired.changed ? ['ellipsis→gear'] : undefined }
+  }
 
   let next = source
   const steps = []
@@ -80,7 +100,9 @@ export function patchAccountMenuSource(source) {
   }
 
   next = MARKER + '\n' + next
-  return { source: next, changed: true, already: false, steps }
+  const repaired = repairSettingsGlyph(next)
+  if (repaired.changed) steps.push('ellipsis→gear')
+  return { source: repaired.source, changed: true, already: false, steps }
 }
 
 function resolveClientBundle(root) {

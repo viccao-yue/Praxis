@@ -11,9 +11,9 @@ function SummonedExpertSeat(props: any) {
   loadRef.current = props.load;
   React.useEffect(() => { void loadRef.current(); }, [state.current]);
   const name = state.options.find((row: any) => row.id === state.current)?.name;
-  return <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, font: 'inherit', color: 'inherit' }} title={name || '已召唤专家'}>
+  return <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, font: 'inherit', color: 'inherit' }} title={name || '已召唤数字员工'}>
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><circle cx="12" cy="6" r="3"/><circle cx="5" cy="17" r="3"/><circle cx="19" cy="17" r="3"/><path d="M10 9 6.5 14M14 9l3.5 5M8 17h8"/></svg>
-    {name || '已召唤专家'}
+    {name || '已召唤数字员工'}
   </span>;
 }
 

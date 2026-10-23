@@ -40,19 +40,15 @@ export function apply(ctx: Context) {
     const manager = ctx.slots.entriesOfSlot('main').some(entry => entry.options.key === WORKBENCH_MANAGER_PANEL);
     ctx.layout.selectPanel(manager ? WORKBENCH_MANAGER_PANEL as MainPanelId : null);
   };
-  ctx.slots.inject('main', () => ctx.slots.inject('sidebar.panellist', () => {
+  ctx.slots.inject('main', () => {
     const page = ctx.slots.register({ name: 'main', key: WORKBENCH_MANAGER_PANEL }, () => <WorkbenchCatalogPanel
       shortcuts={shortcuts}
       onCreate={() => openAuthoring('create')} onDevelopments={() => openAuthoring('developments')}
       onContinue={developmentId=>openAuthoring('developments',{developmentId})} onDiscuss={creationId=>openAuthoring('create',{creationId})}
       canOpen={id => ctx.slots.entriesOfSlot('main').some(row => row.options.key === `workdsh-workbench:${id}`)}
       onOpen={id => { const key = `workdsh-workbench:${id}`; if (ctx.slots.entriesOfSlot('main').some(row => row.options.key === key)) ctx.layout.selectPanel(key as MainPanelId); }} />);
-    let navigation: () => void;
-    try { navigation = ctx.slots.register({ name: 'sidebar.panellist', id: WORKBENCH_MANAGER_PANEL, label: '工作台', order: 44 },
-      ({ size }: { size: number }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg>); }
-    catch (cause) { page(); throw cause; }
-    return () => { try { if (ctx.layout.panelInfo.getSnapshot().activePanelId === WORKBENCH_MANAGER_PANEL) ctx.layout.selectPanel(null); } finally { try { navigation(); } finally { page(); } } };
-  }));
+    return () => { try { if (ctx.layout.panelInfo.getSnapshot().activePanelId === WORKBENCH_MANAGER_PANEL) ctx.layout.selectPanel(null); } finally { page(); } };
+  });
   ctx.slots.inject('main', () => {
     const lifetime=new AbortController();
     // This is the platform's own authoring surface, not an unverified business

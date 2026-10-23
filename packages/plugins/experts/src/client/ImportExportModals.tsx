@@ -55,7 +55,7 @@ export function ImportExpertModal({ management, onClose, onImported }: ImportExp
     return <>
       <h2>导入预览</h2>
       <div className="review">
-        <h3>{preview.candidate.name || '（未命名专家）'}</h3>
+        <h3>{preview.candidate.name || '（未命名数字员工）'}</h3>
         <dl>
           <dt>简介</dt><dd>{preview.candidate.description || '—'}</dd>
           <dt>来源文件</dt><dd>{fileName || '—'}</dd>
@@ -80,18 +80,18 @@ export function ImportExpertModal({ management, onClose, onImported }: ImportExp
   }
 
   return <>
-    <h2>导入专家</h2>
-    <p className="muted" style={{ margin: '0 0 16px' }}>选择此前导出的专家包（.zip）。导入后会创建为可编辑草稿，需你确认后再发布。</p>
+    <h2>导入数字员工</h2>
+    <p className="muted" style={{ margin: '0 0 16px' }}>选择此前导出的数字员工包（.zip）。导入后会创建为可编辑草稿，需你确认后再发布。</p>
     <button type="button" className={`dropzone ${dragging ? 'dragging' : ''}`} disabled={busy}
       onClick={() => input.current?.click()}
       onDragOver={event => { event.preventDefault(); setDragging(true); }}
       onDragLeave={() => setDragging(false)}
       onDrop={onDrop}>
       <span className="upload-glyph" aria-hidden>↑</span>
-      <strong>{busy ? '正在解析…' : '点击选择或拖拽专家包到此处'}</strong>
-      <small>{fileName || '仅支持本地导出的 .zip 专家包'}</small>
+      <strong>{busy ? '正在解析…' : '点击选择或拖拽数字员工包到此处'}</strong>
+      <small>{fileName || '仅支持本地导出的 .zip 数字员工包'}</small>
     </button>
-    <input ref={input} type="file" accept=".zip,application/zip" className="visually-hidden" aria-label="选择专家包"
+    <input ref={input} type="file" accept=".zip,application/zip" className="visually-hidden" aria-label="选择数字员工包"
       onChange={event => { const file = event.currentTarget.files?.[0]; if (file) void ingest(file); event.currentTarget.value = ''; }} />
     {error && <p className="error" role="alert">{error}</p>}
     <div className="import-actions">

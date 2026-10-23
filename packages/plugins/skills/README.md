@@ -4,7 +4,7 @@
 
 状态：**Skill 0.1 开发候选，已提供本地技能管理和独立插件入口**。当前构建、安装和运行验收以[验收要求](../../../apps/web/docs/ACCEPTANCE.md)为准。当前候选制品 `workdsh-plugin-skills@0.1.0-alpha.34`，尚未发布 npm。一个插件管理多个 Skill 业务对象；用户制作技能不需要发布 npm 包。
 
-本包提供标准 Host `apply/inject`、独立 Client `apply/inject`、`dsh.bundle` 配置 patch 和 `dsh.client` 浏览器产物。官方 Loader/Profile/Cordis 拥有加载及生命周期；不依赖 WorkDSH 总包或另一个插件框架。旧候选的独立安装、默认组合、移除与重装过程见[历史记录](../../../apps/web/docs/CONTRACTS.md)，不代替当前版本验收。
+本包提供标准 Host `apply/inject`、独立 Client `apply/inject`、`dsh.bundle` 配置 patch 和 `dsh.client` 浏览器产物。官方 Loader/Profile/Cordis 拥有加载及生命周期；不依赖 开物Praxis 总包或另一个插件框架。旧候选的独立安装、默认组合、移除与重装过程见[历史记录](../../../apps/web/docs/CONTRACTS.md)，不代替当前版本验收。
 
 - 模块版本线：**0.1**，Host、Client、资源和内置管理 Skill 共用版本。
 - 主任务：P1-03；任务编号用于开发追溯，不代表当前版本已经完成验收。
@@ -20,7 +20,7 @@ dsh plugin --profile <你的 Web Profile> add /absolute/path/workdsh-plugin-skil
 
 按官方流程停服修改组合，再重启该 Profile。卸载管理插件用官方 `dsh plugin --profile <Profile> remove workdsh-plugin-skills`；用户技能文件和管理数据保留，重装继续使用。插件移除与页面中“卸载某个技能对象”不同：后者进入可恢复回收站。当前未宣称完整运行中 CLI 热卸载。
 
-仓库开发使用固定 pnpm；先 `corepack pnpm build`，再 `corepack pnpm preview:install`。安装脚本通过官方 CLI 将 Skill 和 WorkDSH 展示包作为两个独立 Profile 层安装；最后 `corepack pnpm preview`。现有预览应先停止，自动化测试使用隔离 Agents home，人工预览仍默认使用用户原有 `~/.agents`。
+仓库开发使用固定 pnpm；先 `corepack pnpm build`，再 `corepack pnpm preview:install`。安装脚本通过官方 CLI 将 Skill 和 开物Praxis 展示包作为两个独立 Profile 层安装；最后 `corepack pnpm preview`。现有预览应先停止，自动化测试使用隔离 Agents home，人工预览仍默认使用用户原有 `~/.agents`。
 
 可独立打包并验收：
 
@@ -74,9 +74,9 @@ export function apply(ctx: Context) {
 
 ## 专业内容制作指南
 
-内置 `workdsh-ppt-design`、`workdsh-word-design`、`workdsh-excel-design`、`workdsh-web-design`，参考腾讯 / WorkBuddy 的产品化方法，由 WorkDSH 按当前工具重新编写。包含叙事、排版、公式审查、响应式与交付参考；不是腾讯 SDK、转换引擎或云服务。感谢相关产品提供的设计启发。指南不能扩充当前编辑器或工具能力，具体来源与边界见[适配说明](../../../apps/web/docs/CONTRACTS.md)。
+内置 `workdsh-ppt-design`、`workdsh-word-design`、`workdsh-excel-design`、`workdsh-web-design`，参考腾讯 / WorkBuddy 的产品化方法，由 开物Praxis 按当前工具重新编写。包含叙事、排版、公式审查、响应式与交付参考；不是腾讯 SDK、转换引擎或云服务。感谢相关产品提供的设计启发。指南不能扩充当前编辑器或工具能力，具体来源与边界见[适配说明](../../../apps/web/docs/CONTRACTS.md)。
 
-创建指南使用 WorkDSH 独立命令，保留用户同名原版技能。多阶段创建要求更新原生任务进度；中断恢复先核对已有草稿与成果。
+创建指南使用 开物Praxis 独立命令，保留用户同名原版技能。多阶段创建要求更新原生任务进度；中断恢复先核对已有草稿与成果。
 
 2026-09-14源码候选0.1.0-alpha.28：配合活动插件提供已有技能标题；通过公开展示契约协作，不复制执行或技能状态。
 

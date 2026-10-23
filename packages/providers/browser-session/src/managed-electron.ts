@@ -62,7 +62,7 @@ export function electronWorkerArguments(port: number, profileDir: string, applic
   ];
 }
 
-/** Start one hidden Electron instance whose CDP exposes no WorkDSH app page. */
+/** Start one hidden Electron instance whose CDP exposes no 开物Praxis app page. */
 export async function launchManagedElectron(executable: string, signal?: AbortSignal, applicationPath?: string): Promise<ManagedChromium> {
   if (!executable.trim()) throw new Error('Desktop Electron executable is required');
   signal?.throwIfAborted();

@@ -330,6 +330,12 @@ export interface PublishReceipt {
   readonly operationId: string;
 }
 
+/** Permanent delete receipt for an already-archived personal expert. */
+export interface DeleteReceipt {
+  readonly expertId: string;
+  readonly operationId: string;
+}
+
 /** Availability change receipt. */
 export interface AvailabilityReceipt {
   readonly expertId: string;
@@ -423,6 +429,8 @@ export interface ExpertsService {
   confirmPublish(actor: ActorContext, confirmationToken: string, signal?: AbortSignal): Promise<ConfirmationProof>;
   publish(actor: ActorContext, expertId: string, draftRevision: string, dependencyLockDigest: string, proof: ConfirmationProof, context: MutationContext, signal?: AbortSignal): Promise<PublishReceipt>;
   setAvailability(actor: ActorContext, expertId: string, availability: ExpertAvailability, context: MutationContext, proof?: ConfirmationProof, signal?: AbortSignal): Promise<AvailabilityReceipt>;
+  /** Permanently remove an already-archived personal expert. Frozen revisions stay so historical sessions can still be verified. */
+  deleteArchived(actor: ActorContext, expertId: string, context: MutationContext, signal?: AbortSignal): Promise<DeleteReceipt>;
   setPreference(actor: ActorContext, expertId: string, pinned: boolean, expectedRevision?: string, signal?: AbortSignal): Promise<ExpertPreference>;
   prepareExecution(actor: ActorContext, expertId: string, revisionId: string | undefined, workspaceRef: string | undefined, modelSelection: ModelSelectionRequest | undefined, draftText: string | undefined, signal?: AbortSignal, workspaceId?: string): Promise<ExecutionPlan>;
   createExecution(actor: ActorContext, executionPlanId: string, context: MutationContext, signal?: AbortSignal): Promise<ExecutionCreation>;
@@ -441,6 +449,6 @@ export interface ExpertsService {
 export type ExpertAction =
   | 'experts.list' | 'experts.get' | 'experts.create-draft' | 'experts.update-draft'
   | 'experts.copy' | 'experts.validate' | 'experts.publish' | 'experts.set-availability'
-  | 'experts.set-preference' | 'experts.prepare-execution' | 'experts.create-execution'
+  | 'experts.delete' | 'experts.set-preference' | 'experts.prepare-execution' | 'experts.create-execution'
   | 'experts.prepare-handoff' | 'experts.create-handoff' | 'experts.preview-import'
   | 'experts.commit-import' | 'experts.export' | 'experts.operation' | 'experts.verify-binding';

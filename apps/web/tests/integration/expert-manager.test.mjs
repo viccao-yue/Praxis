@@ -241,9 +241,11 @@ test('AT-01 experts list seeds defaults, searches, filters, pages and stays owne
   try {
     const a = actor('owner-a');
     const first = await h.experts.list(a, {});
-    assert.equal(first.total, 3, 'the three shipped defaults seed on first read');
-    assert.deepEqual(first.items.map((item) => item.origin), ['default', 'default', 'default']);
-    assert.ok(first.items.every((item) => item.readiness === 'ready'), 'compiled default presets are healthy');
+    assert.equal(first.total, 4, 'the shipped defaults, including 常青云容器运维顾问, seed on first read');
+    assert.deepEqual(first.items.map((item) => item.origin), ['default', 'default', 'default', 'default']);
+    assert.ok(first.items.filter((item) => item.id !== 'changqingyun-container-advisor').every((item) => item.readiness === 'ready'), 'compiled default presets are healthy');
+    assert.equal(first.items[0]?.id, 'changqingyun-container-advisor', '常青云容器运维顾问 stays first');
+    assert.equal(first.items[0]?.name, '常青云容器运维顾问');
     assert.ok(first.items.every((item) => item.canUse && item.canManage && !item.canEdit), 'defaults are usable/manageable but not directly editable');
     assert.ok(first.items.every((item) => item.publishedRevisionRef !== undefined), 'defaults are published');
 
@@ -263,10 +265,10 @@ test('AT-01 experts list seeds defaults, searches, filters, pages and stays owne
     assert.equal(page1.items.length, 2);
     assert.ok(page1.nextCursor, 'a partial page yields a next cursor');
     const page2 = await h.experts.list(a, { limit: 2, cursor: page1.nextCursor });
-    assert.equal(page2.items.length, 1);
+    assert.equal(page2.items.length, 2);
     assert.equal(page2.catalogRevision, page1.catalogRevision, 'catalog revision is stable across pages');
     const seen = new Set([...page1.items, ...page2.items].map((item) => item.id));
-    assert.equal(seen.size, 3, 'paging visits every row exactly once');
+    assert.equal(seen.size, 4, 'paging visits every row exactly once');
     await assert.rejects(h.experts.list(a, { cursor: 'not-base64-json' }), (err) => err.code === 'experts/cursor-stale');
 
     // A different principal in the same org cannot see owner-a's personal defaults.

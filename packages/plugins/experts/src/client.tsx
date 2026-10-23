@@ -12,11 +12,13 @@ import type { ISessions } from '@deepseek-ai/dsh-api-session-controller/client';
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client';
 import type {} from '@deepseek-ai/dsh-api-workspace-controller/client';
 import type {} from '@deepseek-ai/dsh-client-ui-layout/client';
+import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client';
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client';
 import type {} from '@deepseek-ai/dsh-client-ui-session/client';
 import type {} from '@deepseek-ai/dsh-client-ui-workspace/client';
 import type {} from '@deepseek-ai/dsh-client-ui-slots';
 import { ExpertsPanel } from './client/ExpertsPanel.js';
+import { ExpertNavigationIcon } from './client/ExpertNavigationIcon.js';
 import { PendingExpertDraft, pendingExpertDraftKey, pendingExpertDraftEvent, expertManagerGuide, expertTeamManagerGuide } from './client/drafts.js';
 import { createExpertManagementClient } from './client/management.js';
 
@@ -28,12 +30,8 @@ type SessionId = Awaited<ReturnType<ISessions['create']>>;
 /**
  * Expert Client assembly (D04 / P1-02).
  *
- * Contributes exactly one `main` panel (`workdsh-experts`) and one native-input draft
- * overlay. It deliberately does NOT register a `sidebar.panellist` entry: the shared
- * capability center ("专家 · 技能 · 连接器") stays a single navigation item owned by the
- * Skill plugin, and the two panels switch through the in-panel capability tabs via
- * `layout.selectPanel`. This keeps AT-20 (no duplicate navigation) and lets the Skill
- * panel keep working when experts is removed.
+ * Contributes one `main` panel (`workdsh-experts`), its own sidebar item「数字员工」,
+ * and one native-input draft overlay. Skills keep a separate「技能 · 连接器」entry.
  *
  * Summon creates the bound native Session on the Host (so the expert's compiled preset
  * is attached at creation), then opens it here and seeds a one-shot draft hand-off; the
@@ -189,6 +187,9 @@ export function apply(ctx: Context): void {
     name: 'main', key: 'workdsh-experts',
     inject: () => ({ toggleNavigation: () => ctx.layout.toggleSidebar(), management, openCapability, hasCapability, summon, createExpertTask, editExpertTask }),
   }, ExpertsPanel));
+  ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({
+    name: 'sidebar.panellist', id: 'workdsh-experts', label: '数字员工', order: 25,
+  }, ExpertNavigationIcon));
   ctx.slots.inject('conversation.input.overlay', () => ctx.slots.register({ name: 'conversation.input.overlay', id: 'workdsh-expert-draft' }, PendingExpertDraft));
   ctx.slots.inject('conversation.input.left', () => ctx.slots.register({ name: 'conversation.input.left', id: 'workdsh-summon-expert', order: 25, inject: () => ({ management, summon, openManagement: () => openCapability('workdsh-experts') }) }, ConversationExperts));
 }

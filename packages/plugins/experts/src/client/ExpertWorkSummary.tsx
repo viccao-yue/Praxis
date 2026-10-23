@@ -8,7 +8,7 @@ export function ExpertWorkSummary({ definition }: { readonly definition: ExpertD
     ['怎么处理你的任务', definition.methodology],
     ['使用前需要了解', definition.boundaries],
   ] as const;
-  return <section className="expert-work-summary" aria-label="专家工作与交付">
+  return <section className="expert-work-summary" aria-label="数字员工工作与交付">
     {sections.filter(([, body]) => body.trim()).map(([title, body]) =>
       <section key={title}><h3>{title}</h3><p>{body}</p></section>)}
   </section>;

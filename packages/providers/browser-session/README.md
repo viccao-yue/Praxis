@@ -1,6 +1,6 @@
 # 受管浏览器会话提供方
 
-状态：0.1 开发中（任务 BROWSER-01）。目标是让官方 Playwright MCP 工具和 WorkDSH 当前会话右栏操作同一个受管 Chromium 页面。浏览器所有权和清理由官方 `SessionResources` 承担，工具接入使用官方 `McpClient`；本模块不实现第二套 Agent loop 或 MCP 传输。
+状态：0.1 开发中（任务 BROWSER-01）。目标是让官方 Playwright MCP 工具和 开物Praxis 当前会话右栏操作同一个受管 Chromium 页面。浏览器所有权和清理由官方 `SessionResources` 承担，工具接入使用官方 `McpClient`；本模块不实现第二套 Agent loop 或 MCP 传输。
 
 目前已有可加载的 Host provider 入口。每个官方 Agent Session 分配独立临时 Chromium profile 和随机本机 CDP 端点，官方 `McpClient` 通过 `@playwright/mcp` 连接该浏览器；Session 关闭时清理进程和 profile。Host 内部的 `workdshBrowserSession` 服务可捕获 JPEG 画面并执行点击、输入和滚动，所有操作经同一 `SessionResources` 队列串行化。真实浏览器集成测试验证两个官方 Agent Session 的工具发现、分别导航、页面隔离，以及 Host 点击被 MCP 页面快照观察到。
 
@@ -10,4 +10,4 @@
 
 当前源码精确锁定官方 DSH `0.2.0-rc.2` / Cordis `4.0.4`；当前实际运行与验收见[验收要求](../../../apps/web/docs/ACCEPTANCE.md)。上述旧探针不能代替本轮源码、浏览器实机和 Desktop 安装包验收。
 
-包同时包含 Host 与 Client，使用空的 `dsh.bundle` 补丁声明其类型。Host 的启用和可执行路径由 WorkDSH 组合中的 `workdsh-browser-session` 配置负责；市场不得将根 Host 入口当作纯客户端 shim 自动启动。
+包同时包含 Host 与 Client，使用空的 `dsh.bundle` 补丁声明其类型。Host 的启用和可执行路径由 开物Praxis 组合中的 `workdsh-browser-session` 配置负责；市场不得将根 Host 入口当作纯客户端 shim 自动启动。

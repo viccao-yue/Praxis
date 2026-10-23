@@ -39,7 +39,7 @@ function failure(value: unknown): Error {
       details: isRecord(value.details) ? value.details : {},
     });
   }
-  return new Error('专家操作失败，请重试。');
+  return new Error('数字员工操作失败，请重试。');
 }
 
 function transportFailure(cause: unknown): Error {
@@ -49,7 +49,7 @@ function transportFailure(cause: unknown): Error {
   if (cause instanceof DOMException && cause.name === 'AbortError') {
     return Object.assign(new Error('操作已取消。'), { code: 'experts/request-cancelled' });
   }
-  return cause instanceof Error ? cause : new Error('无法连接专家管理服务，请重试。');
+  return cause instanceof Error ? cause : new Error('无法连接数字员工管理服务，请重试。');
 }
 
 async function request<T>(url: string, init: RequestInit, timeoutMs: number, signal?: AbortSignal): Promise<T> {
@@ -133,6 +133,8 @@ export function createExpertManagementClient(ctx: Context, lifetime?: AbortSigna
       invoke<PublishReceipt>('publish', { expertId, draftRevision, dependencyLockDigest, proof: { token }, operationId }, signal, 60_000),
     setAvailability: (expertId: string, availability: ExpertAvailability, operationId: string, proof?: ConfirmationProof, signal?: AbortSignal) =>
       invoke<AvailabilityReceipt>('set-availability', { expertId, availability, operationId, ...(proof === undefined ? {} : { proof }) }, signal),
+    deleteArchived: (expertId: string, operationId: string, signal?: AbortSignal) =>
+      invoke<{ expertId: string; operationId: string }>('delete', { expertId, operationId }, signal),
     setPreference: (expertId: string, pinned: boolean, expectedRevision?: string, signal?: AbortSignal) =>
       invoke<ExpertPreference>('set-preference', { expertId, pinned, ...(expectedRevision === undefined ? {} : { expectedRevision }) }, signal),
     prepareExecution: (expertId: string, options: PrepareExecutionOptions = {}, signal?: AbortSignal) =>

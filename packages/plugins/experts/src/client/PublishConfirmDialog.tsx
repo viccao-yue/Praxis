@@ -49,18 +49,18 @@ export function PublishConfirmDialog({ expertId, draftRevision, definition, defi
   if (receipt) {
     return <Modal open label="发布成功" className="confirm-dialog" onClose={onPublished}>
       <h2>发布成功</h2>
-      <p>已发布「{definition.name || '该专家'}」。已有任务保持原版本；新召唤将使用此版本。</p>
+      <p>已发布「{definition.name || '该数字员工'}」。已有任务保持原版本；新召唤将使用此版本。</p>
       <p className="digest">修订 {receipt.revision.revisionId}</p>
       <div className="confirm-actions">
-        <Button onClick={onPublished}>返回我的专家</Button>
+        <Button onClick={onPublished}>返回我的数字员工</Button>
         <Button variant="primary" className="primary" onClick={() => onSummon(expertId, receipt.revision.revisionId, undefined)}>去试试</Button>
       </div>
     </Modal>;
   }
 
-  return <Modal open label="确认发布专家" className="confirm-dialog publish-dialog" onClose={() => { if (!busy) onClose(); }}>
+  return <Modal open label="确认发布数字员工" className="confirm-dialog publish-dialog" onClose={() => { if (!busy) onClose(); }}>
     <h2>确认发布此版本</h2>
-    <p>请审阅下方专家内容和配备技能。确认后，新召唤的任务使用此版本；以后编辑需重新发布，已有任务保持原版本。</p>
+    <p>请审阅下方数字员工内容和配备技能。确认后，新召唤的任务使用此版本；以后编辑需重新发布，已有任务保持原版本。</p>
     <div className="publish-scroll">
       <ExpertUsagePreview definition={definition} dependencyLock={dependencyLock} />
       <details className="preview-digests"><summary>版本校验信息</summary><p className="digest">定义摘要 {definitionDigest}</p><p className="digest">依赖锁定摘要 {dependencyLockDigest}</p></details>

@@ -41,21 +41,21 @@ async function invoke<T>(endpoint: string, payload: Record<string, unknown> = {}
 }
 
 const css = `
-.wd-collab{color-scheme:inherit;height:100%;overflow:auto;background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);font:14px/1.6 "PingFang SC","Microsoft YaHei",sans-serif;padding:32px 32px 56px}
-.wd-collab *{box-sizing:border-box}.wd-collab .wrap{width:100%;max-width:880px;margin:0 auto}
-.wd-collab header{display:flex;align-items:center;gap:12px;margin-bottom:28px}.wd-collab h1{font-size:22px;line-height:30px;font-weight:600;margin:0}.wd-collab header p{margin:4px 0 0;color:var(--dsw-alias-label-tertiary);font-size:12px}
+.wd-collab{color-scheme:inherit;height:100%;overflow:auto;box-sizing:border-box;display:flex;flex-direction:column;background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);font:14px/22px "PingFang SC","Microsoft YaHei",sans-serif;padding:24px}
+.wd-collab *{box-sizing:border-box}.wd-collab .wrap{width:100%;max-width:none;margin:0;flex:1;min-height:0;display:flex;flex-direction:column}
+.wd-collab header{display:flex;align-items:center;gap:12px;margin-bottom:20px}.wd-collab h1{font-size:25px;line-height:34px;font-weight:600;margin:0}.wd-collab header p{margin:4px 0 0;color:var(--dsw-alias-label-tertiary);font-size:12px;line-height:18px}
 .wd-collab button,.wd-collab textarea{font:inherit}.wd-collab button{cursor:pointer;border:1px solid var(--dsw-alias-border-l2);border-radius:8px;background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary);padding:6px 12px;min-height:34px;transition:background .15s}
 .wd-collab button:hover{background:var(--dsw-alias-interactive-bg-hover)}.wd-collab button:disabled{opacity:.45;cursor:default}.wd-collab button:focus-visible,.wd-collab a:focus-visible,.wd-collab textarea:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:3px}
-.wd-collab svg{width:20px;height:20px;flex:none}.wd-collab .nav{display:grid;place-items:center;width:34px;padding:0;background:transparent}
+.wd-collab svg{width:20px;height:20px;flex:none}.wd-collab .nav{display:none;place-items:center;width:34px;padding:0;background:transparent}
 .wd-collab .tabs{display:flex;gap:24px;margin:0 0 18px;border-bottom:1px solid var(--dsw-alias-border-l2)}.wd-collab .tabs button{padding:0 2px 12px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:var(--dsw-alias-label-tertiary)}.wd-collab .tabs button.active{color:var(--dsw-alias-label-primary);border-bottom-color:var(--dsw-alias-label-primary)}
-.wd-collab .list{border:1px solid var(--dsw-alias-border-l2);border-radius:12px;overflow:hidden;background:var(--dsw-alias-bg-layer-1)}.wd-collab .list .message-row{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--dsw-alias-interactive-bg-hover);border-radius:0;background:transparent;padding:18px 20px}.wd-collab .list .message-row:last-child{border-bottom:0}.wd-collab .list .message-row:hover{background:var(--dsw-alias-bg-layer-2)}
+.wd-collab .list{flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid var(--dsw-alias-border-l2);border-radius:12px;overflow:auto;background:var(--dsw-alias-bg-layer-1)}.wd-collab .list .message-row{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--dsw-alias-interactive-bg-hover);border-radius:0;background:transparent;padding:18px 20px}.wd-collab .list .message-row:last-child{border-bottom:0}.wd-collab .list .message-row:hover{background:var(--dsw-alias-bg-layer-2)}
 .wd-collab .avatar{display:grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;background:var(--dsw-alias-interactive-bg-hover);border:1px solid var(--dsw-alias-border-l2);color:var(--dsw-alias-label-secondary);font-size:14px;font-weight:500}.wd-collab .row-body{min-width:0;flex:1}.wd-collab .row-top{display:flex;align-items:center;gap:8px}.wd-collab .row-top strong{font-weight:500;font-size:14px}.wd-collab time{margin-left:auto;flex:none;color:var(--dsw-alias-label-tertiary);font-size:12px}.wd-collab .preview{margin-top:4px;color:var(--dsw-alias-label-tertiary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}.wd-collab .unread{width:6px;height:6px;border-radius:50%;background:var(--dsw-alias-brand-primary)}.wd-collab .chevron{color:var(--dsw-alias-label-tertiary);width:16px}
 .wd-collab .head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}.wd-collab .head button{display:flex;align-items:center;gap:6px}.wd-collab .back{border:0;background:transparent;padding-left:0;color:var(--dsw-alias-label-tertiary)}.wd-collab .head .ai{font-size:12px}
 .wd-collab article{border:1px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-1);border-radius:12px;padding:24px}.wd-collab .sender{display:flex;align-items:center;gap:12px}.wd-collab .sender strong{font-weight:500}.wd-collab .meta{color:var(--dsw-alias-label-tertiary);font-size:12px}.wd-collab .summary{margin:20px 0 16px;font-size:16px;font-weight:500;overflow-wrap:anywhere}.wd-collab .body{line-height:1.8;overflow-wrap:anywhere}.wd-collab .body p{margin:10px 0}.wd-collab .body h1,.wd-collab .body h2,.wd-collab .body h3{font-size:16px;margin:20px 0 8px}.wd-collab .body pre{overflow:auto}.wd-collab .body table{display:block;overflow:auto}
 .wd-collab .files{border-top:1px solid var(--dsw-alias-border-l2);padding-top:18px;margin-top:22px}.wd-collab .section-label{font-size:12px;color:var(--dsw-alias-label-tertiary);margin-bottom:10px}.wd-collab .file{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--dsw-alias-bg-layer-2);border:1px solid var(--dsw-alias-border-l2);border-radius:8px;margin-top:8px;color:var(--dsw-alias-label-primary);text-decoration:none}.wd-collab .file:hover{background:var(--dsw-alias-interactive-bg-hover)}.wd-collab .file-icon{display:grid;place-items:center;background:var(--dsw-alias-interactive-bg-hover);border-radius:6px;width:34px;height:38px;flex:none}.wd-collab .file-text{min-width:0;flex:1}.wd-collab .file-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}.wd-collab .download{color:var(--dsw-alias-label-tertiary)}
 .wd-collab .thread{margin-top:24px}.wd-collab .message{display:flex;gap:12px;margin:18px 0}.wd-collab .message .avatar{width:32px;height:32px;font-size:12px}.wd-collab .message-content{flex:1;min-width:0}.wd-collab .message p{white-space:pre-wrap;overflow-wrap:anywhere;margin:6px 0 0;font-size:14px}.wd-collab .reply{border:1px solid var(--dsw-alias-border-l2);border-radius:12px;background:var(--dsw-alias-bg-layer-1);padding:12px 14px;margin-top:18px}.wd-collab textarea{display:block;width:100%;min-height:72px;resize:vertical;background:transparent;color:var(--dsw-alias-label-primary);border:0;padding:0;line-height:24px}.wd-collab textarea::placeholder{color:var(--dsw-alias-label-tertiary)}.wd-collab .reply-actions{display:flex;justify-content:flex-end;margin-top:8px}.wd-collab .primary{background:var(--dsw-alias-label-primary);color:var(--dsw-alias-label-primary-foreground);border:0;display:flex;align-items:center;gap:6px}.wd-collab .primary:hover{background:var(--dsw-alias-label-secondary)}
-.wd-collab .error{color:var(--dsw-alias-state-error-primary);margin:12px 0}.wd-collab .empty{padding:64px 20px;text-align:center;color:var(--dsw-alias-label-tertiary)}.wd-collab .empty svg{width:28px;height:28px;margin-bottom:8px}.wd-collab .empty p{margin:4px 0}
-@media(max-width:600px){.wd-collab{padding:20px 16px 40px}.wd-collab .list .message-row{padding:16px 12px;gap:10px}.wd-collab article{padding:18px}.wd-collab .row-top{flex-wrap:wrap}.wd-collab time{font-size:11px}.wd-collab button{min-height:44px}.wd-collab .nav{width:44px}.wd-collab header{margin-bottom:20px}}
+.wd-collab .error{color:var(--dsw-alias-state-error-primary);margin:12px 0}.wd-collab .empty{flex:1;display:grid;place-items:center;align-content:center;padding:64px 20px;text-align:center;color:var(--dsw-alias-label-tertiary)}.wd-collab .empty svg{width:28px;height:28px;margin-bottom:8px}.wd-collab .empty p{margin:4px 0}
+@media(max-width:600px){.wd-collab{padding:16px}.wd-collab .nav{display:grid}.wd-collab .list .message-row{padding:16px 12px;gap:10px}.wd-collab article{padding:18px}.wd-collab .row-top{flex-wrap:wrap}.wd-collab time{font-size:11px}.wd-collab button{min-height:44px}.wd-collab .nav{width:44px}.wd-collab header{margin-bottom:20px}}
 `;
 function Mark({kind}:{kind:'menu'|'back'|'next'|'file'|'download'|'send'|'spark'|'inbox'}){
  const paths={menu:'M4 6h16M4 12h16M4 18h16',back:'m14 6-6 6 6 6',next:'m9 6 6 6-6 6',file:'M14 3H6v18h12V7l-4-4Zm0 0v5h4M9 12h6M9 16h6',download:'M12 3v12m-5-5 5 5 5-5M5 17v4h14v-4',send:'M12 20V4m-6 6 6-6 6 6',spark:'m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3',inbox:'M4 4h16v16H4V4Zm0 10h5l1 3h4l1-3h5'};
@@ -119,7 +119,7 @@ function Panel({toggleNavigation,continueWithAI}:Props){
   try{await invoke('reply',{handoffId:selected.id,content:draft.trim(),requestKey:requestKey.current});requestKey.current=crypto.randomUUID();setDraft('');setThread(await invoke<MessageEntry[]>('thread',{handoffId:selected.id}));}
   catch(e){setError(e instanceof Error?e.message:'发送失败');}finally{setBusy(false);}};
  return <section className="wd-collab" data-testid="workdsh-collaboration"><style>{css}</style><div className="wrap">
- <header><button className="nav" onClick={toggleNavigation} aria-label="切换导航"><Mark kind="menu"/></button><div><h1>协作</h1><p>查看同事分享的内容，一起交流</p></div></header>
+ <header><button className="nav" onClick={toggleNavigation} aria-label="切换导航"><Mark kind="menu"/></button><div><h1>同事</h1><p>查看同事分享的内容，一起交流</p></div></header>
  {error&&<p role="alert" className="error">{error}</p>}
  {account==='required'?<div className="empty"><Mark kind="inbox"/><p>登录企业账号，开启同事协作</p><p className="meta">当前为个人使用。请前往“设置 → 企业账号”登录。</p></div>:account==='checking'?<p className="meta">正在确认账号状态…</p>:selected?<><div className="head"><button className="back" onClick={()=>{selection.current='';setSelected(undefined);}}><Mark kind="back"/>返回列表</button><button className="ai" onClick={()=>void continueWithAI(selected.id).catch(e=>setError(e.message))}><Mark kind="spark"/>用 AI 继续处理</button></div>
  <article><div className="sender"><span className="avatar" aria-hidden="true">{avatarText(selected.senderName)}</span><div><strong>{selected.senderName}</strong><div className="meta">分享于 {new Date(selected.createdAt).toLocaleString('zh-CN')}</div></div></div><div className="summary">{displayName(selected.summary)}</div>
@@ -132,11 +132,24 @@ function Panel({toggleNavigation,continueWithAI}:Props){
  </div></section>;
 }
 
-function SidebarMark({ openConversation }: InjectFace<{openConversation:(notification:CollaborationNotification)=>Promise<void>}>) {
+function SidebarMark({ size = 20, openConversation }: InjectFace<{openConversation:(notification:CollaborationNotification)=>Promise<void>}> & { size?: number }) {
+  const anchor=useRef<HTMLSpanElement>(null);
+  const [row,setRow]=useState<HTMLButtonElement|null>(null);
+  const [wide,setWide]=useState(true);
   const [notifications,setNotifications]=useState<CollaborationNotification[]>([]);
   const [hidden,setHidden]=useState<Set<string>>(new Set());
   const [online,setOnline]=useState(true);
   const firstRefresh=useRef(true);
+  useEffect(()=>{
+    const button=anchor.current?.closest('button');
+    if(!(button instanceof HTMLButtonElement))return;
+    setRow(button);
+    const update=()=>setWide(button.clientWidth>72);
+    update();
+    const observer=new ResizeObserver(update);
+    observer.observe(button);
+    return()=>observer.disconnect();
+  },[]);
   useEffect(()=>{
     const abort=new AbortController(); let running=false;
     const refresh=async()=>{
@@ -162,9 +175,12 @@ function SidebarMark({ openConversation }: InjectFace<{openConversation:(notific
   const visible=notifications.filter(item=>!hidden.has(item.id)).slice(-1).reverse();
   const visibleId=visible[0]?.id;
   useEffect(()=>{if(!visibleId)return;const timer=window.setTimeout(()=>setHidden(old=>new Set([...old,visibleId])),8000);return()=>window.clearTimeout(timer);},[visibleId]);
-  return <><MaterialReview/><span aria-label={notifications.length?`${notifications.length} 条未读协作通知`:'协作'} style={{position:'relative'}}>
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M4 4h16v12H9l-5 4z"/><path d="M8 8h8M8 12h5"/></svg>
-    {notifications.length>0&&<span data-testid="collaboration-unread" style={{position:'absolute',top:-8,right:-10,minWidth:16,borderRadius:8,background:'#678ef5',color:'var(--dsw-alias-label-secondary)',fontSize:11,textAlign:'center'}}>{notifications.length===100?'99+':notifications.length}</span>}</span>
+  const countLabel=notifications.length>99?'99+':String(notifications.length);
+  const badge=notifications.length>0?<span data-testid="collaboration-unread" style={wide?{marginLeft:'auto',flex:'none',display:'inline-flex',alignItems:'center',justifyContent:'center',boxSizing:'border-box',minWidth:18,height:18,padding:'0 5px',borderRadius:9,background:'#f53f3f',color:'#fff',fontSize:11,fontWeight:600,lineHeight:'18px',fontVariantNumeric:'tabular-nums'}:{position:'absolute',top:-4,right:-6,display:'inline-flex',alignItems:'center',justifyContent:'center',boxSizing:'border-box',minWidth:16,height:16,padding:'0 4px',borderRadius:8,background:'#f53f3f',color:'#fff',fontSize:10,fontWeight:600,lineHeight:'16px',fontVariantNumeric:'tabular-nums',boxShadow:'0 0 0 2px var(--dsw-alias-bg-base,#fff)',zIndex:1}}>{countLabel}</span>:null;
+  return <><MaterialReview/><span ref={anchor} aria-label={notifications.length?`${notifications.length} 条未读协作通知`:'同事'} style={{position:'relative',display:'inline-flex',alignItems:'center',justifyContent:'center',width:size,height:size,lineHeight:0,flex:'none'}}>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{display:'block'}}><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"/></svg>
+    {!wide&&badge}</span>
+    {wide&&row&&badge&&createPortal(badge,row)}
     {createPortal(<aside data-testid="collaboration-notifications" aria-label="协作通知" style={{position:'fixed',right:20,top:20,width:'min(360px,calc(100vw - 40px))',zIndex:1000,display:'grid',gap:10}}>
       {visible.map(item=><div key={item.id} role="status" style={{padding:16,border:'1px solid var(--dsw-alias-border-l2)',borderRadius:12,background:'var(--dsw-alias-bg-layer-2)',color:'var(--dsw-alias-label-primary)',boxShadow:'var(--dsw-elevation-prominent)',font:'14px system-ui,sans-serif'}}>
         <strong>{item.authorName} · {item.kind==='HANDOFF'?'分享给你':item.kind==='COMPLETED'?'已完成交接':'回复了你'}</strong>
@@ -185,7 +201,7 @@ export function apply(ctx: Context): void {
     if(!preview.context&&!preview.files.length){
       const result=await invoke<Handoff>('send',{recipientId,summary:note?.trim()||'分享给你',requestKey:crypto.randomUUID()});
       window.dispatchEvent(new Event('workdsh:collaboration:changed'));
-      return `已向 ${name} 发送协作信息，对方可在协作列表中查看。分享编号：${result.id}`;
+      return `已向 ${name} 发送协作信息，对方可在同事列表中查看。分享编号：${result.id}`;
     }
     const files=await reviewMaterials(name,preview);
     const result=await materialRequest<Handoff>({action:'send',token:preview.token,recipientId,files,note});
@@ -224,5 +240,5 @@ export function apply(ctx: Context): void {
   };
 
   ctx.slots.inject('main', () => ctx.slots.register({ name: 'main', key: 'workdsh-collaboration', inject: () => ({ toggleNavigation: () => ctx.layout.toggleSidebar(),continueWithAI:(id:string)=>openConversation({handoffId:id} as CollaborationNotification) }) }, Panel));
-  ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({ name: 'sidebar.panellist', id: 'workdsh-collaboration', label: '协作', order: 35, inject: () => ({openConversation:async(notification:CollaborationNotification)=>{focusedNotification=notification;ctx.layout.selectPanel('workdsh-collaboration' as MainPanelId);window.dispatchEvent(new Event('workdsh:collaboration:open'));}}) }, SidebarMark));
+  ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({ name: 'sidebar.panellist', id: 'workdsh-collaboration', label: '同事', order: 35, inject: () => ({openConversation:async(notification:CollaborationNotification)=>{focusedNotification=notification;ctx.layout.selectPanel('workdsh-collaboration' as MainPanelId);window.dispatchEvent(new Event('workdsh:collaboration:open'));}}) }, SidebarMark));
 }

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Icon } from 'workdsh-ui';
 
-export function SkillNavigationIcon() {
-  return <Icon name="experts" />;
+export function SkillNavigationIcon({ size }: { readonly size?: number }) {
+  return <Icon name="skills" size={size} />;
 }

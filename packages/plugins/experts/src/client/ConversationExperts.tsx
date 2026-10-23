@@ -44,7 +44,7 @@ export function ConversationExperts({ useInput, sessionId, management, summon, o
     setActive(undefined);
     void management.verifyBinding(String(sessionId), controller.signal).then(async binding => {
       const detail = await management.get(binding.expertRevisionRef.expertId, binding.expertRevisionRef.revisionId, controller.signal);
-      if (!controller.signal.aborted) setActive({ id: detail.expert.id, name: detail.revision?.definition.name ?? '已召唤专家' });
+      if (!controller.signal.aborted) setActive({ id: detail.expert.id, name: detail.revision?.definition.name ?? '已召唤数字员工' });
     }).catch(() => { /* Ordinary unbound conversations have no selected expert. */ });
     return () => controller.abort();
   }, [sessionId, management]);
@@ -67,7 +67,7 @@ export function ConversationExperts({ useInput, sessionId, management, summon, o
         rows.push(...page.items); cursor = page.nextCursor;
       } while (cursor);
       if (!controller.signal.aborted) setItems(rows.filter(row => row.canUse && row.publishedRevisionRef));
-    })().catch(cause => { if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : '无法加载专家，请重试。'); })
+    })().catch(cause => { if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : '无法加载数字员工，请重试。'); })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
   }, [open, management]);
@@ -81,16 +81,16 @@ export function ConversationExperts({ useInput, sessionId, management, summon, o
   return <>
     <style>{pickerCss}</style>
     <div className="wd-expert-picker" ref={root}>
-      <button ref={trigger} className="wd-expert-trigger" type="button" aria-label="召唤专家" aria-haspopup="dialog" aria-expanded={open} disabled={blocked || acting} title={blocked ? '请先处理当前附件或正在执行的任务，再召唤专家。' : active ? `当前专家：${active.name}；点击更换专家` : '召唤专家'} onClick={() => setOpen(value => !value)}><Icon name="experts" />{active && <span className="expert-name">{active.name}</span>}</button>
-      {open && <div role="dialog" aria-label="召唤专家" className="wd-expert-popover">
-        {loading && <div className="wd-expert-status" role="status">正在加载专家…</div>}
+      <button ref={trigger} className="wd-expert-trigger" type="button" aria-label="召唤数字员工" aria-haspopup="dialog" aria-expanded={open} disabled={blocked || acting} title={blocked ? '请先处理当前附件或正在执行的任务，再召唤数字员工。' : active ? `当前数字员工：${active.name}；点击更换数字员工` : '召唤数字员工'} onClick={() => setOpen(value => !value)}><Icon name="experts" />{active && <span className="expert-name">{active.name}</span>}</button>
+      {open && <div role="dialog" aria-label="召唤数字员工" className="wd-expert-popover">
+        {loading && <div className="wd-expert-status" role="status">正在加载数字员工…</div>}
         {error && <div className="wd-expert-status" role="alert">{error}</div>}
-        {!loading && !error && !items.length && <div className="wd-expert-status">暂无可用专家，请先导入或发布专家。</div>}
+        {!loading && !error && !items.length && <div className="wd-expert-status">暂无可用数字员工，请先导入或发布数字员工。</div>}
         {items.map(row => <div className="wd-expert-row" key={row.id}>
           <div className="wd-expert-copy"><span className="wd-expert-mark"><Icon name="experts" /></span><span><strong>{row.name}</strong><small>{row.description}</small></span></div>
-          <button className="wd-expert-action" type="button" aria-label={`召唤 ${row.name}`} aria-pressed={active?.id === row.id} disabled={acting || row.readiness !== 'ready'} title={row.readiness === 'ready' ? '新建专家任务，保留输入文字，由你确认发送' : '专家依赖尚未就绪，请在专家中心查看'} onClick={() => void choose(row)}>{acting ? '处理中' : row.readiness === 'ready' ? '召唤' : '未就绪'}</button>
+          <button className="wd-expert-action" type="button" aria-label={`召唤 ${row.name}`} aria-pressed={active?.id === row.id} disabled={acting || row.readiness !== 'ready'} title={row.readiness === 'ready' ? '新建数字员工任务，保留输入文字，由你确认发送' : '数字员工依赖尚未就绪，请在数字员工中心查看'} onClick={() => void choose(row)}>{acting ? '处理中' : row.readiness === 'ready' ? '召唤' : '未就绪'}</button>
         </div>)}
-        <button className="wd-expert-manage" type="button" disabled={acting} onClick={() => { setOpen(false); openManagement(); }}><span aria-hidden="true">↗</span>管理专家</button>
+        <button className="wd-expert-manage" type="button" disabled={acting} onClick={() => { setOpen(false); openManagement(); }}><span aria-hidden="true">↗</span>管理数字员工</button>
       </div>}
     </div>
   </>;

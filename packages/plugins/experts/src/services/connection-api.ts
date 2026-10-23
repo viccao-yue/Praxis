@@ -35,7 +35,7 @@ const maximumBodyBytes = 32 * 1024 * 1024;
 type Endpoint =
   | 'skills' | 'list' | 'get' | 'create-draft' | 'update-draft' | 'copy' | 'validate'
   | 'request-publish-confirmation' | 'confirm-publish' | 'publish'
-  | 'set-availability' | 'set-preference' | 'prepare-execution' | 'create-execution'
+  | 'set-availability' | 'delete' | 'set-preference' | 'prepare-execution' | 'create-execution'
   | 'consume-handoff' | 'prepare-handoff' | 'create-handoff' | 'preview-import'
   | 'commit-import' | 'export' | 'operation' | 'verify-binding';
 
@@ -222,6 +222,12 @@ async function dispatch(manager: ExpertsService, actor: ActorContext, rawEndpoin
         if (!expertId || !availability || !context) return fail('experts/invalid-request', '可用性变更请求无效。');
         const token = str(record(input?.proof)?.token);
         return ok(await manager.setAvailability(actor, expertId, availability, context, token ? { token } : undefined, signal));
+      }
+      case 'delete': {
+        const expertId = str(input?.expertId);
+        const context = mutationContext(payload);
+        if (!expertId || !context) return fail('experts/invalid-request', '删除请求无效。');
+        return ok(await manager.deleteArchived(actor, expertId, context, signal));
       }
       case 'set-preference': {
         const expertId = str(input?.expertId);

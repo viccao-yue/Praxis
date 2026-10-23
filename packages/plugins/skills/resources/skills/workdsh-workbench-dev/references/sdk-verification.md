@@ -1,8 +1,8 @@
-# WorkDSH SDK 核验
+# 开物Praxis SDK 核验
 
 ## 区分目录、安装和运行
 
-官方 `cordis_inspect_query` 的 `Service.listService` 查询官方预生成的接口目录，并非任意第三方插件动态提供服务的全量清单。`workdshWorkbenchRegistration` 和 `workdshWorkbenchClientRegistration` 是 WorkDSH 扩展服务；返回 `no catalogued Service named ...` 只说明该目录没有收录，不能断言服务未运行，也不能反向当成服务可用的证明。这两个接口已知不在该目录内，不调用 `Service.listService` 查询它们，也不切换 Host/Client 重试。
+官方 `cordis_inspect_query` 的 `Service.listService` 查询官方预生成的接口目录，并非任意第三方插件动态提供服务的全量清单。`workdshWorkbenchRegistration` 和 `workdshWorkbenchClientRegistration` 是 开物Praxis 扩展服务；返回 `no catalogued Service named ...` 只说明该目录没有收录，不能断言服务未运行，也不能反向当成服务可用的证明。这两个接口已知不在该目录内，不调用 `Service.listService` 查询它们，也不切换 Host/Client 重试。
 
 官方 `Config.listConfigs` 的状态描述配置 Schema：`absent` 表示插件运行模块没有声明 Config，`schema` 表示可读取配置结构，`unsupported` 表示配置结构不能按该协议投影；`inactive` 表示条目禁用或没有活动 fiber。`absent` 不表示未安装。Client 查询超时也不单独证明服务不存在，应结合输出中的实际错误和活动状态核对。
 
@@ -16,7 +16,7 @@
 
 ## 本次典型误判
 
-- 错误：Service 目录里没有 WorkDSH 注册服务 → SDK 没安装。
+- 错误：Service 目录里没有 开物Praxis 注册服务 → SDK 没安装。
 - 正确：目录未收录 → 继续读取实际 SDK 的公开文档与类型，并通过实际加载验收确认。
 - 错误：Config 状态 absent → 插件未启用。
 - 正确：没有 Config Schema → 另行核对活动状态和实际注册结果。

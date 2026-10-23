@@ -30,7 +30,7 @@ vi.mock('electron', async () => {
   return {
     BrowserWindow: Window,
     ipcMain: { handle: (name: string, fn: any) => { state.handlers[name] = fn } },
-    app: Object.assign(new EventEmitter(), { setActivationPolicy: vi.fn(), setName: vi.fn(), requestSingleInstanceLock: () => true, whenReady: async () => {}, quit: vi.fn(), relaunch: vi.fn(), getPath: () => state.userData, getAppPath: () => '/tmp/WorkDSH development/app' }),
+    app: Object.assign(new EventEmitter(), { setActivationPolicy: vi.fn(), setName: vi.fn(), setPath: vi.fn(), requestSingleInstanceLock: () => true, whenReady: async () => {}, quit: vi.fn(), relaunch: vi.fn(), getPath: () => state.userData, getAppPath: () => '/tmp/WorkDSH development/app' }),
     shell: { openExternal: vi.fn() }, dialog: { showErrorBox: vi.fn(), showOpenDialog: vi.fn(async () => ({ canceled: true, filePaths: [] })) },
     Menu: { buildFromTemplate: (menu: any[]) => { state.menu = menu; return menu }, setApplicationMenu: vi.fn() },
   }
@@ -99,7 +99,7 @@ it('enforces the packaged backend, uses explicitly installed enterprise identity
     expect(launch[2]?.env?.DSH_HOME).toBe(enterprise.home)
     expect(launch[2]?.env?.DSH_AGENTS_HOME).toBe(join(enterprise.root, 'agents'))
     expect(launch[1]?.join(' ')).not.toContain('secret')
-    expect(launch[1]).toEqual([join(enterprise.home, '.workdsh-host.mjs'), '--no-open'])
+    expect(launch[1]).toEqual([join(enterprise.home, '.workdsh-host', 'bin.js'), '--no-open'])
     const { app } = await import('electron')
     app.emit('activate')
     expect(app.relaunch).not.toHaveBeenCalled()

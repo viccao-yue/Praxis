@@ -17,7 +17,7 @@ export const businessPanels = [
   { id: 'workdsh-assistant', label: '助理', icon: 'assistant', order: 10, description: '创建和管理面向具体工作的 AI 助理。', pending: true },
   { id: 'workdsh-automation', label: '定时任务', icon: 'automation', order: 40, description: '查看和管理周期性工作。', pending: true },
   { id: 'workdsh-library', label: '资料库', icon: 'library', order: 50, description: '集中管理工作资料与任务成果。', pending: false },
-  { id: 'workdsh-more', label: '更多', icon: 'more', order: 60, description: '进入 WorkDSH 的更多业务能力。', pending: true },
+  { id: 'workdsh-more', label: '更多', icon: 'more', order: 60, description: '进入 开物Praxis 的更多业务能力。', pending: true },
 ] as const satisfies readonly BusinessPanelDefinition[];
 
 export type BusinessPanelProps = PropsRuntime<'main'> & InjectFace<{
@@ -41,6 +41,6 @@ export function BusinessPanel({ label, description }: BusinessPanelProps) {
 
 export type BusinessPanelIconProps = InjectFace<{ readonly icon: IconName }>;
 
-export function BusinessPanelIcon({ icon }: BusinessPanelIconProps) {
-  return <Icon name={icon} />;
+export function BusinessPanelIcon({ icon, size }: BusinessPanelIconProps & { readonly size?: number }) {
+  return <Icon name={icon} size={size} />;
 }

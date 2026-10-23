@@ -20,8 +20,14 @@ export const ENTERPRISE_PACKAGES = Object.freeze([
 export const CATALOG_PACKAGES = Object.freeze({
   '@cocofhu/skillhub': '0.2.16',
   dshmarket: '1.66.8',
-  // Praxis: living memory plugin seeded beside community catalog packages.
+  // Praxis plugins that shipped preinstalled. Versions track DSH 0.2.1;
+  // the 0.1.7 pins no longer resolve on this runtime.
+  'dsh-ui-appearance': '0.1.23',
+  'dsh-better-sidebar': '0.28.0',
+  '@xmanrui/dsh-im': '5.4.0',
   'dsh-living-memory': '0.2.10',
+  // Praxis: image transcription for text-only models (设置 → 视觉增强).
+  'dsh-vision-plugin': '1.4.0',
 })
 
 export const RELEASE_PACKAGES = Object.freeze([

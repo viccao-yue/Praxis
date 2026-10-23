@@ -120,7 +120,7 @@
         ]
       },
       "hardenedRuntime": true,
-      "icon": "build/app-icon-mac.png",
+      "icon": "build/praxis-app-icon-mac.png",
       "notarize": true,
       "signIgnore": [
         "\\.(?:pak|dat|wasm)$"

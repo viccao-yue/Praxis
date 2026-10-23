@@ -89,7 +89,18 @@ export function expertPresetDir(presetId: string, agentsHome?: string): string {
   return join(resolveAgentsHome(agentsHome), '.workdsh-state', 'experts', 'presets', presetId);
 }
 
-const registrations = new WeakMap<Context, Map<string, Promise<void>>>();
+type PresetRegistration = { ready: Promise<void>; dispose?: () => void | Promise<void> };
+const registrations = new WeakMap<Context, Map<string, PresetRegistration>>();
+
+/** Drop every preset this context still owns when the expert plugin stops. */
+export function retainExpertPresetLifetime(ctx: Context): void {
+  ctx.effect(() => () => {
+    const pending = registrations.get(ctx);
+    if (!pending) return;
+    for (const entry of pending.values()) void entry.dispose?.();
+    pending.clear();
+  }, 'workdsh.expert-presets.release');
+}
 
 /** Restore only the frozen declaration; never recompile an existing revision against a new base. */
 export async function readExpertPreset(presetId: string, agentsHome?: string): Promise<string> {
@@ -105,14 +116,37 @@ export async function registerExpertPreset(ctx: Context, presetId: string, expec
   if (sha256(text) !== expectedDigest) throw Object.assign(new Error('专家预设内容已变化，请重新发布。'), { code: 'experts/preset-drift' });
   let pending = registrations.get(ctx);
   if (!pending) { pending = new Map(); registrations.set(ctx, pending); }
-  if (!pending.has(presetId)) {
-    const definition = JSON.parse(text) as PresetDefinition;
-    if (definition.id !== presetId) throw Object.assign(new Error('专家预设内容已变化，请重新发布。'), { code: 'experts/preset-drift' });
-    const promise = ctx.agentPresets.register(definition).then(dispose => { ctx.effect(() => dispose); });
-    pending.set(presetId, promise);
-    promise.catch(() => { pending!.delete(presetId); });
+  const existing = pending.get(presetId);
+  if (existing) {
+    await existing.ready;
+    return;
   }
-  await pending.get(presetId);
+  const definition = JSON.parse(text) as PresetDefinition;
+  if (definition.id !== presetId) throw Object.assign(new Error('专家预设内容已变化，请重新发布。'), { code: 'experts/preset-drift' });
+  const registration: PresetRegistration = { ready: Promise.resolve() };
+  pending.set(presetId, registration);
+  try {
+    // Await inside this call. A later `.then` loses the plugin fiber, and
+    // `ctx.effect` there both throws and drops the only unregister handle.
+    registration.dispose = await ctx.agentPresets.register(definition);
+  } catch (error) {
+    if (pending.get(presetId) === registration) pending.delete(presetId);
+    if (error instanceof Error && error.message.startsWith('Duplicate agent preset:')) return;
+    throw error;
+  }
+}
+
+/** Remove compiled presets from the official Agent preset roster. Frozen preset directories stay on disk. */
+export async function releaseExpertPresets(ctx: Context, presetIds: readonly string[]): Promise<void> {
+  const pending = registrations.get(ctx);
+  if (!pending) return;
+  await Promise.all(presetIds.map(async (presetId) => {
+    const entry = pending.get(presetId);
+    if (!entry) return;
+    pending.delete(presetId);
+    await entry.ready.catch(() => undefined);
+    await entry.dispose?.();
+  }));
 }
 
 export async function compileExpertPreset(ctx: Context, input: CompileInput, agentsHome?: string): Promise<CompiledPreset> {

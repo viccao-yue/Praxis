@@ -10,6 +10,8 @@ import { CATALOG_PACKAGES, ENTERPRISE_PACKAGES, PRODUCT_PACKAGES, RELEASE_PACKAG
 import { composeProfilePatches, verifyDefaultComposition, verifyDefaultProfile, verifyInstalledDshVersions, verifyOfficialWebPackages, verifyPackageDshReferences, verifyProfileRelease, verifyReleaseArchives } from './verify-profile-release.mjs'
 import { runtimeArchitecture, runtimeArchitectureYaml } from './runtime-architecture.mjs'
 import { patchAccountMenuAt } from '../../../scripts/praxis/patch-account-menu.mjs'
+import { patchSkillhubPlazaAt } from '../../../scripts/praxis/patch-skillhub-plaza.mjs'
+import { patchSidebarIconsAt } from '../../../scripts/praxis/patch-sidebar-icons.mjs'
 const architecture = runtimeArchitecture()
 const desktopRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const output = join(desktopRoot, 'build/workdsh-runtime')
@@ -75,6 +77,10 @@ function verifyInstalled() {
   }
   // Praxis: hide contact/signin; unsigned click opens settings.
   patchAccountMenuAt(profile)
+  // Praxis: 插件广场 only lists plugins; skills stay on 技能 · 连接器.
+  patchSkillhubPlazaAt(profile)
+  // Praxis: official 插件 / 自动化任务 glyphs match the owned sidebar set.
+  patchSidebarIconsAt(profile)
   for (const id of ['workdsh-installation-probe', 'workdsh-identity-local', 'workdsh-access', 'workdsh-audit', 'workdsh-workbenches']) {
     if (!config.stdout.includes('id: ' + id)) throw new Error('Missing required infrastructure: ' + id)
   }
