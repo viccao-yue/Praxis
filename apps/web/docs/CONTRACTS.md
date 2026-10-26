@@ -1,6 +1,6 @@
 # 公开领域与执行契约
 
-本文件约束 WorkDSH 自有服务及其官方适配。实际 TypeScript 定义由 `packages/contracts` 与各包的公开入口拥有；未来草案不能当成官方 API。模块来源见 [ARCHITECTURE](ARCHITECTURE.md)，验收见 [ACCEPTANCE](ACCEPTANCE.md)。
+本文件约束 kaiwu 自有服务及其官方适配。实际 TypeScript 定义由 `packages/contracts` 与各包的公开入口拥有；未来草案不能当成官方 API。模块来源见 [ARCHITECTURE](ARCHITECTURE.md)，验收见 [ACCEPTANCE](ACCEPTANCE.md)。
 
 ## 身份、资源与授权
 
@@ -28,7 +28,7 @@ CredentialBinding 只表达凭据引用、连接实例、目标指纹与外部�
 
 专家、应用或项目提供默认值，用户明确选择优先；组织限制始终单独约束。任务建立时固定专家/技能修订、preset 指纹、模型、项目、资产和连接账号。恢复、fork、交接及每个子任务重新解析身份、资源与执行授权，不能回退最新修订或其他连接账号。
 
-WorkDSH 通过官方 preset、Session Controller、Agent 与 Team 公开接口执行，不另建 Agent loop。PromptReceipt 只表示持久入队；结果以原生 sessionId、durable cursor、turn/step 与工具结算读取。中断请求、mailbox 接受或 provider 移除不表示已停止，部分/未知结果不能宣称完整交付。
+kaiwu 通过官方 preset、Session Controller、Agent 与 Team 公开接口执行，不另建 Agent loop。PromptReceipt 只表示持久入队；结果以原生 sessionId、durable cursor、turn/step 与工具结算读取。中断请求、mailbox 接受或 provider 移除不表示已停止，部分/未知结果不能宣称完整交付。
 
 原生 Session 拥有消息、工具、步骤、运行审批与子 Agent 事实；业务待办、资产修订、组织授权和自动化由各领域拥有。原生工具或 Team 完成不能直接完成项目待办，成果须经过资料服务校验并返回修订引用。持久化读取、导出或交接前按官方机制 flush。
 

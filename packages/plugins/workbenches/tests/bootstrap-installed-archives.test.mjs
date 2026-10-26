@@ -6,7 +6,7 @@ test('an obsolete bootstrap seed cannot block the updated Profile or certify its
  const root=await realpath(await mkdtemp(join(tmpdir(),'workdsh-bootstrap-updated-')));
  try{
   const directory=join(root,'workdsh-bootstrap-archives');await mkdir(directory);await mkdir(join(root,'node_modules/example'),{recursive:true});
-  await writeFile(join(root,'node_modules/example/package.json'),JSON.stringify({name:'example',version:'2.0.0',workdsh:{workbench:{id:'probe.example',title:'Updated',description:'',protocolVersion:'1.0',layout:'full-page',hostCompatibility:{sdk:'^1.0.0',harness:'0.2.1-rc.1'},capabilities:[]}}}));
+  await writeFile(join(root,'node_modules/example/package.json'),JSON.stringify({name:'example',version:'2.0.0',kaiwu:{workbench:{id:'probe.example',title:'Updated',description:'',protocolVersion:'1.0',layout:'full-page',hostCompatibility:{sdk:'^1.0.0',harness:'0.2.1-rc.1'},capabilities:[]}}}));
   await writeFile(join(directory,'index.json'),JSON.stringify({version:1,entries:[{fileName:'old.tgz',packageName:'example',version:'1.0.0',workbenchId:'probe.example',sha256:'a'.repeat(64)}]}));
   let retained=0;await seed(root,{resolve(){throw Error('must-not-resolve-old');},async retainVerified(){retained++;}},()=>{});assert.equal(retained,0);
  }finally{await rm(root,{recursive:true,force:true});}

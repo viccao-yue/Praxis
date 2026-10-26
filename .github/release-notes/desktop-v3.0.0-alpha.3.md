@@ -1,4 +1,4 @@
-# WorkDSH Desktop 3.0.0-alpha.3
+# kaiwu Desktop 3.0.0-alpha.3
 
 本次为专家预设目录修复版本，基于已通过检查的 `main` 合并提交 `069110dce84e63a1d26f1055b69f7b149ab6a439`。继续使用官方 DeepSeek Harness **0.2.1-rc.2**，保留完整原生对话与工作台并排布局。
 

@@ -7,7 +7,7 @@ export function createWorkbenchStarter(packageName:string,descriptor:WorkbenchDe
   exports:{'.':{types:'./dist/index.d.ts',default:'./dist/index.js'},'./client':{types:'./dist/client.d.ts',default:'./dist/client.browser.js'},'./package.json':'./package.json'},
   files:['dist','cordis.patch.yml','README.md'],scripts:{build:'node build.mjs','check:startup':'node check-startup.mjs',deliver:'node deliver.mjs',prepack:'node build.mjs && node check-startup.mjs'},
   dsh:{bundle:{patch:'./cordis.patch.yml'},client:{platform:'web',inject:['workdsh-plugin-workbenches']}},
-  workdsh:{workbench:descriptor},
+  kaiwu:{workbench:descriptor},
   peerDependencies:{'@deepseek-ai/cordis':'4.0.5','workdsh-plugin-workbenches':'^'+sdkPackageVersion},
   devDependencies:{esbuild:'0.25.12'}};
  const sdkLocation="import {readFile,realpath} from 'node:fs/promises';\nimport {createRequire} from 'node:module';\nimport {dirname,join,isAbsolute} from 'node:path';\nimport {fileURLToPath,pathToFileURL} from 'node:url';\nconst source=dirname(fileURLToPath(import.meta.url));\nlet anchor=join(source,'package.json');\nlet record;try{record=await readFile(join(source,'.workdsh-runtime.json'),'utf8');}catch(error){if(error.code!=='ENOENT')throw error;}\nif(record!==undefined){try{const runtime=JSON.parse(record);if(runtime?.schemaVersion!==1||typeof runtime.installationAnchor!=='string'||!isAbsolute(runtime.installationAnchor))throw Error();anchor=await realpath(runtime.installationAnchor);}catch{throw Error('workbench/development-runtime-invalid');}}\nconst sdk=createRequire(anchor);\n";

@@ -1,6 +1,6 @@
 import { defineConfig } from 'tsdown'
 
-// Installers ship this Electron carrier and the bundled WorkDSH Profile only.
+// Installers ship this Electron carrier and the bundled kaiwu Profile only.
 export default defineConfig([{
   entry: { 'workdsh-main': 'src/workdsh-main.ts' },
   outDir: 'lib',

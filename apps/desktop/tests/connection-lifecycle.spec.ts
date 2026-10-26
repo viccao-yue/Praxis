@@ -87,13 +87,13 @@ it('enforces the packaged backend, uses explicitly installed enterprise identity
     const loginPage = state.windows[1]
     expect(loginPage.url).toMatch(/^data:text\/html/)
     expect(vi.mocked(spawn)).not.toHaveBeenCalled()
-    const signIn = state.handlers['workdsh:enterprise-login']!
+    const signIn = state.handlers['kaiwu:enterprise-login']!
     expect(await signIn({ sender: {} }, { account: 'a', password: 'secret' })).toEqual({ error: '此页面不能发起企业登录' })
     expect(await signIn({ sender: loginPage.webContents }, { account: 'a', password: 'secret' })).toEqual({})
     expect(state.logins).toEqual(['https://company.test'])
     expect(readFileSync(join(state.userData, 'enterprise-backend.json'), 'utf8')).toBe(savedBackend)
     expect(spawn).toHaveBeenCalledOnce()
-    expect(state.handlers['workdsh:enterprise-install']).toBeUndefined()
+    expect(state.handlers['kaiwu:enterprise-install']).toBeUndefined()
     expect(existsSync(join(enterprise.home, 'profiles/workdsh/node_modules/workdsh-provider-identity-enterprise'))).toBe(false)
     const launch = vi.mocked(spawn).mock.calls[0]!
     expect(launch[2]?.env?.DSH_HOME).toBe(enterprise.home)

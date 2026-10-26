@@ -9,7 +9,7 @@
 | 会话右栏 | rightbar.session、sidebar.right.*、ctx.sidebarRight | 当前 Session 的资源和成果 |
 | 临时浮层 | shell.overlay 或页面所属局部层 | 选择器、确认与暂时提示 |
 
-WorkDSH 不复制 Workspace、Session 列表、Conversation、Composer、模型设置、插件管理或执行状态。左栏使用新稳定 list id，与 main keyed entry 配对，不占用已有 single/keyed owner。右栏属于确定 Session，tab 身份由 kind/address 决定；注册 tab definition 与 keyed pane 正文，通过公开 Resource provider 交接数据。
+kaiwu 不复制 Workspace、Session 列表、Conversation、Composer、模型设置、插件管理或执行状态。左栏使用新稳定 list id，与 main keyed entry 配对，不占用已有 single/keyed owner。右栏属于确定 Session，tab 身份由 kind/address 决定；注册 tab definition 与 keyed pane 正文，通过公开 Resource provider 交接数据。
 
 Client 通过 `ctx.slots.inject` 等待 owner 声明，owner 卸载时撤销贡献。组件 props 来自公开 Slot 类型；owner 已知状态使用 props，私有 callback 使用 entry inject，共享视图使用 Slot store。React 组件不接收 Cordis ctx、Remote service、凭据或领域服务；复杂页面使用 TSX，由官方唯一 renderer 挂载。
 

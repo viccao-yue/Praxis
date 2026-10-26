@@ -99,4 +99,4 @@ export function apply(ctx: Context) {
 
 ### 第三方 Skill 展示名称（alpha.35候选）
 
-领域插件通过依赖注入`workdshSkills`，在自己的`ctx.effect`内调用`registerDisplayMetadata(namespace, entries)`。entries包含name、title和可选localizedDescription；name必须以namespace加连字符开头，保留官方英文标识。返回释放函数，停用/卸载时由调用者释放。注册不会安装技能，不创建文件、不修改SKILL.md；已有宿主目录标题优先。`workdsh`命名空间保留，重复或重叠声明拒绝。旧宿主未提供此方法时消费者应明确提示兼容限制。
+领域插件通过依赖注入`workdshSkills`，在自己的`ctx.effect`内调用`registerDisplayMetadata(namespace, entries)`。entries包含name、title和可选localizedDescription；name必须以namespace加连字符开头，保留官方英文标识。返回释放函数，停用/卸载时由调用者释放。注册不会安装技能，不创建文件、不修改SKILL.md；已有宿主目录标题优先。`kaiwu`命名空间保留，重复或重叠声明拒绝。旧宿主未提供此方法时消费者应明确提示兼容限制。

@@ -61,7 +61,7 @@ export function registerLibraryContextInjection(ctx: Context): void {
     const text = await buildLibrarySelectionContext(ctx.workdshLibrary, actor, sessionId, context.signal);
     if (!text) return resolved;
     resolved.contexts.push({
-      name: 'workdsh:library-selection',
+      name: 'kaiwu:library-selection',
       text,
     });
     return resolved;

@@ -1,7 +1,7 @@
 import { parseWorkbenchSystemDefinition, type WorkbenchSystemDefinition } from './workbench-system.js';
 import type { ActorContext, ResourceOwner } from './governance.js';
 
-/** WorkDSH protocol version, independent of product, kernel and plugin versions. */
+/** kaiwu protocol version, independent of product, kernel and plugin versions. */
 export const WORKBENCH_PROTOCOL_VERSION = '1.0' as const;
 export interface WorkbenchRequirementsDraft {
   readonly title: string;

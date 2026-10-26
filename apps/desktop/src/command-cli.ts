@@ -31,7 +31,7 @@ async function main(): Promise<void> {
   const env = space.mode === 'enterprise' ? enterpriseEnvironment(space.root!, process.execPath, process.env) : { ...process.env }
   Object.assign(env, { DSH_HOME: space.home, DSH_AGENTS_HOME: space.mode === 'enterprise' ? join(space.root!, 'agents') : join(space.home, 'agents'), DSH_BUNDLED_PRIMARY_RUNTIME: primary, ELECTRON_RUN_AS_NODE: undefined })
   process.stderr.write(`开物Praxis：${space.label}\n`)
-  const child = spawn(process.execPath, [launcher, '--profile', 'workdsh', ...patches, ...args], { cwd: space.home, env, stdio: 'inherit' })
+  const child = spawn(process.execPath, [launcher, '--profile', 'kaiwu', ...patches, ...args], { cwd: space.home, env, stdio: 'inherit' })
   child.once('error', error => { process.stderr.write(error.message + '\n'); process.exitCode = 1 })
   child.once('exit', code => { process.exitCode = code ?? 1 })
 }

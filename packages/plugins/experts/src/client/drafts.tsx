@@ -15,7 +15,7 @@ import type { SessionSnapshot } from '@deepseek-ai/dsh-api-session-controller/cl
  * finds the key already cleared.
  */
 export const pendingExpertDraftKey = 'workdsh.pending-expert-task-draft';
-export const pendingExpertDraftEvent = 'workdsh:expert-draft-staged';
+export const pendingExpertDraftEvent = 'kaiwu:expert-draft-staged';
 
 /** Fixed guide text seeded when the user chooses “制作数字员工” (UX §4). Never auto-sent. */
 export const expertManagerGuide =

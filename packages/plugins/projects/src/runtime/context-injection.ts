@@ -15,7 +15,7 @@ export function registerProjectContextInjection(ctx: Context): void {
       if (!selected) return resolved;
       const references = selected.task.references.filter(row => row.kind !== 'asset').map(row => `- ${row.kind === 'work-item' ? '计划待办' : '技能'}：${row.label}（修订 ${row.revision}）`);
       resolved.contexts.push({
-        name: 'workdsh:project-task',
+        name: 'kaiwu:project-task',
         text: [
           `当前任务属于协同空间“${selected.project.name}”，使用协同空间配置修订 ${selected.config.number}。`,
           selected.config.instruction.trim() ? `协同空间指令：\n${selected.config.instruction.trim()}` : '',

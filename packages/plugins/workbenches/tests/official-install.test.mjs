@@ -62,7 +62,7 @@ test('official manager installs, updates and removes a local archive without eva
   for(const version of ['0.1.0','0.1.1']){
    await writeFile(join(source,'package.json'),JSON.stringify({name:'workdsh-install-probe',version,type:'module',files:['index.js','index.d.ts','client.js','client.d.ts','cordis.patch.yml'],
     exports:{'.':{default:'./index.js',types:'./index.d.ts'},'./client':{default:'./client.js',types:'./client.d.ts'}},
-    dsh:{bundle:{patch:'./cordis.patch.yml'},client:{platform:'web'}},workdsh:{workbench:descriptor}}));
+    dsh:{bundle:{patch:'./cordis.patch.yml'},client:{platform:'web'}},kaiwu:{workbench:descriptor}}));
    await writeFile(join(source,'index.js'),`throw new Error('entry-must-not-run-${version}');`);
    await Promise.all(['index.d.ts','client.d.ts'].map(name=>writeFile(join(source,name),'export {};')));
    await writeFile(join(source,'client.js'),'throw new Error("client-must-not-run");');

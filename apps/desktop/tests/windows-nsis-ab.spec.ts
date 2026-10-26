@@ -510,7 +510,7 @@ describe('Windows NSIS A/B packaging', () => {
       electronPlatformName: 'win32',
       arch: 1,
       packager: {
-        executableName: 'WorkDSH',
+        executableName: 'kaiwu',
         appInfo: { productFilename: 'WorkDSH' },
       },
     })

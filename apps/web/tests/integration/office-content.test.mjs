@@ -301,9 +301,9 @@ test("Office native tools, atomic batches, replay before CAS, leases, ownership 
     );
     await h.s.edit(actor(), change(restored, "after-restart", "恢复后继续"));
     const old = h.s;
-    assert.ok(h.sections.has("workdsh:office-authoring"));
+    assert.ok(h.sections.has("kaiwu:office-authoring"));
     await h.fiber.dispose();
-    assert.equal(h.sections.has("workdsh:office-authoring"), false, "Office disposal removes its writing guide");
+    assert.equal(h.sections.has("kaiwu:office-authoring"), false, "Office disposal removes its writing guide");
     assert.equal(
       h.ctx.tools.get("content_read"),
       undefined,
@@ -431,10 +431,10 @@ test("Office Host unload revokes tools and writing guide, and reinstall preserve
     const before = await h.s.read(actor(), initial.documentId);
     const names = ["content_open", "content_read", "content_capabilities", "content_edit", "content_present", "content_export"];
     for (const name of names) assert.ok(h.ctx.tools.get(name));
-    assert.ok(h.sections.has("workdsh:office-authoring"));
+    assert.ok(h.sections.has("kaiwu:office-authoring"));
     await h.toolFiber.dispose();
     for (const name of names) assert.equal(h.ctx.tools.get(name), undefined);
-    assert.equal(h.sections.has("workdsh:office-authoring"), false);
+    assert.equal(h.sections.has("kaiwu:office-authoring"), false);
     await h.fiber.dispose();
     assert.equal(h.ctx.workdshOfficeContent, undefined);
     const restoredFiber = await h.ctx.plugin(ContentService);

@@ -8,7 +8,7 @@ const built = await build({ entryPoints: [fileURLToPath(new URL('../src/runtime/
 const { parseInstalledWorkbenchManifest } = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`);
 const descriptor = { id: 'techflag.quality-analysis', title: '质量分析', description: '', protocolVersion: '1.0', layout: 'full-page', hostCompatibility: { sdk: '^1.0.0', harness: '0.2.1-rc.1' }, capabilities: [] };
 test('discover static workbench metadata independently of package code and enablement', () => {
-  const manifest = { name: 'quality-workbench', version: '1.0.0', workdsh: { workbench: descriptor } };
+  const manifest = { name: 'quality-workbench', version: '1.0.0', kaiwu: { workbench: descriptor } };
   const result = parseInstalledWorkbenchManifest(manifest, 'quality-workbench');
   assert.equal(result.descriptor.id, descriptor.id);
   assert.equal(result.packageName, manifest.name);
@@ -17,6 +17,6 @@ test('discover static workbench metadata independently of package code and enabl
 });
 test('reject installed identity mismatch, malformed declaration and multiple workbenches', () => {
   assert.throws(() => parseInstalledWorkbenchManifest({ name: 'other-package' }, 'quality-workbench'), /package-name-mismatch/);
-  assert.throws(() => parseInstalledWorkbenchManifest({ name: 'quality-workbench', version: '1.0.0', workdsh: { workbench: [descriptor, descriptor] } }, 'quality-workbench'), /one-workbench-per-package/);
-  assert.throws(() => parseInstalledWorkbenchManifest({ name: 'quality-workbench', workdsh: { workbench: descriptor } }, 'quality-workbench'), /invalid-manifest/);
+  assert.throws(() => parseInstalledWorkbenchManifest({ name: 'quality-workbench', version: '1.0.0', kaiwu: { workbench: [descriptor, descriptor] } }, 'quality-workbench'), /one-workbench-per-package/);
+  assert.throws(() => parseInstalledWorkbenchManifest({ name: 'quality-workbench', kaiwu: { workbench: descriptor } }, 'quality-workbench'), /invalid-manifest/);
 });

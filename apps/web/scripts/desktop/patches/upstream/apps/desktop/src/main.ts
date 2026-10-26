@@ -86,7 +86,7 @@ function createWindow(preload: string, shellFrame = false): BrowserWindow {
     minWidth: 880,
     minHeight: 600,
     show: false,
-    // WORKDSH TEST PATCH: blend the macOS title bar into the shell window content.
+    // kaiwu TEST PATCH: blend the macOS title bar into the shell window content.
     ...(shellFrame && process.platform === 'darwin'
       ? { titleBarStyle: 'hiddenInset' as const }
       : {}),

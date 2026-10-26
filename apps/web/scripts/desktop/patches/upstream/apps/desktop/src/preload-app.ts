@@ -4,7 +4,7 @@ import { contextBridge } from 'electron'
 
 contextBridge.exposeInMainWorld('dshDesktop', { protocolVersion: 1 })
 
-// WORKDSH TEST PATCH: inset-title-bar integration for the shell window. The macOS traffic
+// kaiwu TEST PATCH: inset-title-bar integration for the shell window. The macOS traffic
 // lights float over the top-left of the web content, so the sidebar logo row reserves
 // clearance for them and the drag regions make the frame movable again. Selectors match
 // the stable CSS-modules class suffixes of the official layout, not build hashes.

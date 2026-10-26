@@ -14,7 +14,7 @@ const value = (name, fallback) => {
   return index === -1 ? fallback : argv[index + 1];
 };
 const has = name => argv.includes(name);
-const profile = value('--profile', 'workdsh');
+const profile = value('--profile', 'kaiwu');
 const directory = resolve(value('--directory', dirname(fileURLToPath(import.meta.url))));
 const dsh = value('--dsh', 'dsh');
 const dryRun = has('--dry-run');
@@ -105,7 +105,7 @@ const dshHome = resolve(process.env.DSH_HOME || join(homedir(), '.dsh'));
 const versionResult = execute(['--version'], { always: true, capture: true });
 const actualHarness = versionResult?.stdout?.trim();
 if (actualHarness !== expectedHarness) {
-  throw new Error(`WorkDSH ${manifest.version} requires dsh ${expectedHarness}; found ${actualHarness || 'unknown'}. Pass --dsh /absolute/path/to/a-compatible-dsh.`);
+  throw new Error(`kaiwu ${manifest.version} requires dsh ${expectedHarness}; found ${actualHarness || 'unknown'}. Pass --dsh /absolute/path/to/a-compatible-dsh.`);
 }
 
 const profileManifest = join(dshHome, 'profiles', profile, 'package.json');
@@ -192,7 +192,7 @@ if (!dryRun) {
   if (result.error) throw result.error;
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
-// Profiles disable automatic peers, because WorkDSH's build-only workspace peers
+// Profiles disable automatic peers, because kaiwu's build-only workspace peers
 // are bundled and not published to npm. Install the official runtime peer closure
 // explicitly so a clean Profile can boot without relying on the developer repo.
 if (!dryRun) {

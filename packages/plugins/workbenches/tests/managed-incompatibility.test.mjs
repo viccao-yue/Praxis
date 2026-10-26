@@ -42,7 +42,7 @@ test('official Cordis Host and Client graphs survive a verified old managed work
    hostCompatibility:{sdk:'^1.0.0',harness:'0.2.1-rc.1'},capabilities:[]};
   const manifest={name,version:'0.1.0',type:'module',files:['index.js','client.js','index.d.ts','client.d.ts','cordis.patch.yml'],
    exports:{'.':{default:'./index.js',types:'./index.d.ts'},'./client':{default:'./client.js',types:'./client.d.ts'}},
-   workdsh:{workbench:descriptor},dsh:{bundle:{patch:'./cordis.patch.yml'},client:{platform:'web'}}};
+   kaiwu:{workbench:descriptor},dsh:{bundle:{patch:'./cordis.patch.yml'},client:{platform:'web'}}};
   await writeFile(join(installed,'package.json'),JSON.stringify(manifest));
   await writeFile(join(installed,'index.js'),`export const inject=['workdshWorkbenchRegistration'];export async function apply(ctx){await ctx.get('workdshWorkbenchRegistration').registerManaged(ctx,${JSON.stringify(descriptor)},'old-page');ctx.get('probe').ready(ctx);}`);
   await writeFile(join(installed,'client.js'),`export const inject=['workdshWorkbenchClientRegistration'];export async function apply(ctx){await ctx.get('workdshWorkbenchClientRegistration').registerManaged(ctx,${JSON.stringify(descriptor)},()=>null);ctx.get('probe').ready(ctx);}`);

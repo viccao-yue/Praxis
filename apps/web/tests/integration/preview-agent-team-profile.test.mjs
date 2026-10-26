@@ -10,7 +10,7 @@ test('preview keeps only the WorkDSH-owned Agent Team bundle', () => {
   assert.equal(withoutRedundantAgentTeamProfile(output), undefined);
 });
 
-test('preview leaves a standalone upstream Team profile alone without WorkDSH experts', () => {
+test('preview leaves a standalone upstream Team profile alone without kaiwu experts', () => {
   const input = { dsh: { profile: { bundles: ['@deepseek-ai/dsh-experimental-agent-team-profile'] } } };
   assert.equal(withoutRedundantAgentTeamProfile(input), undefined);
 });

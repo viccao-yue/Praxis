@@ -7,7 +7,7 @@ import{createHash}from'node:crypto';
 const index=process.argv.indexOf('--home');
 if(index<0||!process.argv[index+1])throw Error('Provide --home for an isolated test installation');
 const home=process.argv[index+1],profile=join(home,'profiles/workdsh');
-const child=spawn(process.execPath,[join(profile,'node_modules/@deepseek-ai/dsh/lib/bin.js'),'--profile','workdsh','--no-open','--host','127.0.0.1','--port','0'],{env:{...process.env,DSH_HOME:home,DSH_AGENTS_HOME:join(home,'agents')},stdio:['ignore','pipe','pipe']});
+const child=spawn(process.execPath,[join(profile,'node_modules/@deepseek-ai/dsh/lib/bin.js'),'--profile','kaiwu','--no-open','--host','127.0.0.1','--port','0'],{env:{...process.env,DSH_HOME:home,DSH_AGENTS_HOME:join(home,'agents')},stdio:['ignore','pipe','pipe']});
 let output='';child.stdout.on('data',b=>output+=b);child.stderr.on('data',b=>output+=b);
 try{
  const until=Date.now()+45000;let loginUrl;

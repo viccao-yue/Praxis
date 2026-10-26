@@ -104,15 +104,15 @@ function Panel({toggleNavigation,continueWithAI}:Props){
    if(selection.current!==row.id)return;setThread(messages);setMaterials(shared);
    const notifications=await invoke<CollaborationNotification[]>('notifications');
    await Promise.all(notifications.filter(item=>item.handoffId===row.id).map(item=>invoke('read-notification',{id:item.id})));
-   window.dispatchEvent(new Event('workdsh:collaboration:changed'));
+   window.dispatchEvent(new Event('kaiwu:collaboration:changed'));
   }catch(e){if(selection.current===row.id)setError(e instanceof Error?e.message:'读取失败');}
   finally{if(selection.current===row.id)setLoading(false);}
  },[]);
- useEffect(()=>{void refresh();const changed=()=>{selection.current='';setSelected(undefined);setMaterials(undefined);setThread([]);setRows([]);setError('');setAccount('checking');void refresh();};window.addEventListener('workdsh:identity:changed',changed);const timer=setInterval(()=>void refresh(),2000);return()=>{refreshVersion.current++;clearInterval(timer);window.removeEventListener('workdsh:identity:changed',changed);};},[refresh]);
+ useEffect(()=>{void refresh();const changed=()=>{selection.current='';setSelected(undefined);setMaterials(undefined);setThread([]);setRows([]);setError('');setAccount('checking');void refresh();};window.addEventListener('kaiwu:identity:changed',changed);const timer=setInterval(()=>void refresh(),2000);return()=>{refreshVersion.current++;clearInterval(timer);window.removeEventListener('kaiwu:identity:changed',changed);};},[refresh]);
  useEffect(()=>{
   const focus=async()=>{const notice=focusedNotification;if(!notice)return;focusedNotification=undefined;
    try{const row=await invoke<Handoff>('detail',{handoffId:notice.handoffId});await open(row);}catch(e){setError(e instanceof Error?e.message:'读取失败');}};
-  void focus();window.addEventListener('workdsh:collaboration:open',focus);return()=>window.removeEventListener('workdsh:collaboration:open',focus);
+  void focus();window.addEventListener('kaiwu:collaboration:open',focus);return()=>window.removeEventListener('kaiwu:collaboration:open',focus);
  },[open]);
  useEffect(()=>{if(!selected)return;const timer=setInterval(()=>{void invoke<MessageEntry[]>('thread',{handoffId:selected.id}).then(value=>{if(selection.current===selected.id)setThread(value);}).catch(()=>{});},2000);return()=>clearInterval(timer);},[selected]);
  const reply=async()=>{if(!selected||!draft.trim())return;setBusy(true);setError('');
@@ -164,10 +164,10 @@ function SidebarMark({ size = 20, openConversation }: InjectFace<{openConversati
     };
     void refresh();const timer=window.setInterval(()=>void refresh(),2000);
     const changed=()=>void refresh();
-    window.addEventListener('workdsh:identity:changed',changed);
-    window.addEventListener('workdsh:collaboration:changed',changed);
-    return()=>{abort.abort();window.clearInterval(timer);window.removeEventListener('workdsh:identity:changed',changed);
-      window.removeEventListener('workdsh:collaboration:changed',changed);};
+    window.addEventListener('kaiwu:identity:changed',changed);
+    window.addEventListener('kaiwu:collaboration:changed',changed);
+    return()=>{abort.abort();window.clearInterval(timer);window.removeEventListener('kaiwu:identity:changed',changed);
+      window.removeEventListener('kaiwu:collaboration:changed',changed);};
   },[]);
   const open=(notification:CollaborationNotification)=>{
     void openConversation(notification).catch(cause=>{setOnline(false);console.error('协作会话打开失败',cause);});
@@ -200,12 +200,12 @@ export function apply(ctx: Context): void {
     const preview=await materialRequest<MaterialPreview>({action:'prepare',sessionId});
     if(!preview.context&&!preview.files.length){
       const result=await invoke<Handoff>('send',{recipientId,summary:note?.trim()||'分享给你',requestKey:crypto.randomUUID()});
-      window.dispatchEvent(new Event('workdsh:collaboration:changed'));
+      window.dispatchEvent(new Event('kaiwu:collaboration:changed'));
       return `已向 ${name} 发送协作信息，对方可在同事列表中查看。分享编号：${result.id}`;
     }
     const files=await reviewMaterials(name,preview);
     const result=await materialRequest<Handoff>({action:'send',token:preview.token,recipientId,files,note});
-    window.dispatchEvent(new Event('workdsh:collaboration:changed'));
+    window.dispatchEvent(new Event('kaiwu:collaboration:changed'));
     return `已向 ${name} 分享分析及 ${files.length} 个文件，对方将收到通知。分享编号：${result.id}`;
   })), 'workdsh.collaboration.colleague-mentions');
   const sessions=ctx.sessions as unknown as ISessions;
@@ -231,7 +231,7 @@ export function apply(ctx: Context): void {
           const input=conversation.input.for(scope);
           if(!input.state.getSnapshot().draft.trim()) input.setDraft(draft);
           if(notification.id)await invoke('read-notification',{id:notification.id});
-          window.dispatchEvent(new Event('workdsh:collaboration:changed'));return;
+          window.dispatchEvent(new Event('kaiwu:collaboration:changed'));return;
         }catch(cause){if(attempt===59)throw cause;}
       }
       await new Promise<void>((resolve,reject)=>{const abort=()=>{clearTimeout(timer);reject(lifetime.signal.reason);};const timer=setTimeout(()=>{lifetime.signal.removeEventListener('abort',abort);resolve();},100);lifetime.signal.addEventListener('abort',abort,{once:true});});
@@ -240,5 +240,5 @@ export function apply(ctx: Context): void {
   };
 
   ctx.slots.inject('main', () => ctx.slots.register({ name: 'main', key: 'workdsh-collaboration', inject: () => ({ toggleNavigation: () => ctx.layout.toggleSidebar(),continueWithAI:(id:string)=>openConversation({handoffId:id} as CollaborationNotification) }) }, Panel));
-  ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({ name: 'sidebar.panellist', id: 'workdsh-collaboration', label: '同事', order: 35, inject: () => ({openConversation:async(notification:CollaborationNotification)=>{focusedNotification=notification;ctx.layout.selectPanel('workdsh-collaboration' as MainPanelId);window.dispatchEvent(new Event('workdsh:collaboration:open'));}}) }, SidebarMark));
+  ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({ name: 'sidebar.panellist', id: 'workdsh-collaboration', label: '同事', order: 35, inject: () => ({openConversation:async(notification:CollaborationNotification)=>{focusedNotification=notification;ctx.layout.selectPanel('workdsh-collaboration' as MainPanelId);window.dispatchEvent(new Event('kaiwu:collaboration:open'));}}) }, SidebarMark));
 }

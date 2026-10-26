@@ -14,7 +14,7 @@ export function expertDocument(definition: ExpertDefinition): string {
   if (definition.agentDocument) return definition.agentDocument;
   const { role, methodology, boundaries, deliverables, team, ...metadata } = definition;
   return `---\n${stringify({ format: 'workdsh-expert-document', version: 1, ...metadata })}---\n\n`
-    + Object.entries(sections).map(([key, title]) => `<!-- workdsh:${key} -->\n## ${title}\n\n${definition[key as keyof typeof sections]}\n`).join('\n');
+    + Object.entries(sections).map(([key, title]) => `<!-- kaiwu:${key} -->\n## ${title}\n\n${definition[key as keyof typeof sections]}\n`).join('\n');
 }
 
 function parseHeader(text: string): { metadata: Record<string, unknown>; body: string } {
@@ -37,7 +37,7 @@ export function parseExpertDocument(text: string): ExpertDefinition {
   }
   const { format, version, ...fields } = metadata;
   if (format !== 'workdsh-expert-document' || version !== 1 || 'team' in fields) fail('不支持的专家文档格式。团队信息请写在 team.md。');
-  const markers = [...body.matchAll(/<!-- workdsh:(role|methodology|boundaries|deliverables) -->/g)];
+  const markers = [...body.matchAll(/<!-- kaiwu:(role|methodology|boundaries|deliverables) -->/g)];
   if (markers.length !== 4 || new Set(markers.map(m => m[1])).size !== 4) fail('四个专业内容区段必须各出现一次。');
   for (let i = 0; i < markers.length; i++) {
     const start = markers[i].index! + markers[i][0].length;

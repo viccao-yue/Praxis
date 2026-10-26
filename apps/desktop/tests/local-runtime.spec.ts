@@ -8,7 +8,7 @@ const roots: string[] = []
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }) })
 function fixture() {
   const root = mkdtempSync(join(tmpdir(), 'desktop-profile-')); roots.push(root)
-  const source = join(root, 'bundle', 'profiles', 'workdsh'), home = join(root, 'home')
+  const source = join(root, 'bundle', 'profiles', 'kaiwu'), home = join(root, 'home')
   mkdirSync(join(source, 'node_modules/@deepseek-ai/dsh/lib'), { recursive: true })
   mkdirSync(join(source, 'node_modules/pnpm/bin'), { recursive: true })
   writeFileSync(join(source, 'node_modules/@deepseek-ai/dsh/package.json'), JSON.stringify({ version: '0.2.0-rc.2' }))

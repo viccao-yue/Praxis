@@ -52,7 +52,7 @@ function updatePackagePolicy(source: string, target: string): boolean {
 }
 
 export function materializeRuntimeProfile(source: string, home: string): { profile: string, changed: boolean } {
-  const target = join(home, 'profiles', 'workdsh')
+  const target = join(home, 'profiles', 'kaiwu')
   const release = json(join(source, 'package.json'))
   // Defaults are already installed in the immutable runtime. The member project owns only explicit additions.
   const base = memberDefaults(release)
@@ -167,7 +167,7 @@ export function officialHostLauncher(source: string, home: string, executable: s
   const boot = join(source, 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'profile-boot.js')
   const appBoot = join(source, 'node_modules', '@deepseek-ai', 'dsh-app-boot', 'lib', 'index.js')
   if (!existsSync(cli) || !existsSync(boot) || !existsSync(appBoot) || !existsSync(packageManager)) throw new Error('安装包缺少官方 Profile 启动接口')
-  const anchor = join(source, 'profile-installation.json'), profile = join(home, 'profiles', 'workdsh')
+  const anchor = join(source, 'profile-installation.json'), profile = join(home, 'profiles', 'kaiwu')
   if (!existsSync(anchor)) throw new Error('安装包缺少完整官方与 开物Praxis 安装清单')
   // The market re-invokes whatever launched this process when argv[1] ends in
   // bin.js. A packaged app has no `dsh` on PATH, so the host entry has to be
@@ -177,7 +177,7 @@ export function officialHostLauncher(source: string, home: string, executable: s
   writeJson(join(home, '.workdsh-host', 'package.json'), { type: 'module' })
   packageManager = cachedPackageManager(home, packageManager)
   const packageManagerLiteral = `{ command: ${JSON.stringify(executable)}, args: [${JSON.stringify(packageManager)}] }`
-  writeFileSync(launcher, `import { runCli } from ${JSON.stringify(pathToFileURL(cli).href)};\nimport { runProfile } from ${JSON.stringify(pathToFileURL(boot).href)};\nimport { loadProfileDirectory, loadLayeredEnv, reportSkippedBundles } from ${JSON.stringify(pathToFileURL(appBoot).href)};\nconst installAnchor = ${JSON.stringify(anchor)};\nconst profile = loadProfileDirectory('dsh', ${JSON.stringify(profile)}, installAnchor);\nconst packageManager = ${packageManagerLiteral};\nif (process.argv[2] === 'plugin') await runCli({ manageDesktopProfile: true, packageManager });\nelse { reportSkippedBundles('dsh', profile);\nawait runProfile({ environment: loadLayeredEnv('dsh'), profile: 'workdsh', resolvedProfile: { profile, installAnchor }, patchFiles: ${JSON.stringify(patches)}, args: process.argv.slice(2), packageManager }); }\n`, { mode: 0o600 })
+  writeFileSync(launcher, `import { runCli } from ${JSON.stringify(pathToFileURL(cli).href)};\nimport { runProfile } from ${JSON.stringify(pathToFileURL(boot).href)};\nimport { loadProfileDirectory, loadLayeredEnv, reportSkippedBundles } from ${JSON.stringify(pathToFileURL(appBoot).href)};\nconst installAnchor = ${JSON.stringify(anchor)};\nconst profile = loadProfileDirectory('dsh', ${JSON.stringify(profile)}, installAnchor);\nconst packageManager = ${packageManagerLiteral};\nif (process.argv[2] === 'plugin') await runCli({ manageDesktopProfile: true, packageManager });\nelse { reportSkippedBundles('dsh', profile);\nawait runProfile({ environment: loadLayeredEnv('dsh'), profile: 'kaiwu', resolvedProfile: { profile, installAnchor }, patchFiles: ${JSON.stringify(patches)}, args: process.argv.slice(2), packageManager }); }\n`, { mode: 0o600 })
   return launcher
 }
 

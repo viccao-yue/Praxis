@@ -43,4 +43,4 @@
 
 ## 独立业务插件认证
 
-Desktop 身份入口提供 `workdshEnterprise` 服务，业务插件通过 Cordis 注入，使用 `identity()` 与 `request()` 调用当前公司后台。凭据留在 Main，不读取 Token；允许的路径为 `/api/extensions/<plugin>/<operation>`。完整代码、后台权限要求及版本限制见[企业插件认证接入](../../../docs/ENTERPRISE-PLUGIN-AUTH.md)。
+Desktop 身份入口提供 `workdshEnterprise` 服务，业务插件通过 Cordis 注入，使用 `identity()` 与 `request()` 调用当前公司后台。凭据留在 Main，不读取 Token；允许的路径为 `/api/extensions/<plugin>/<operation>`。

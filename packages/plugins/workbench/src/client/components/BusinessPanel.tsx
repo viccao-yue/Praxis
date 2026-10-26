@@ -29,7 +29,7 @@ export function BusinessPanel({ label, description }: BusinessPanelProps) {
   return (
     <section className="wd-workbench-panel">
       <style>{workbenchPanelCss}</style>
-      <p className="wd-workbench-eyebrow">WORKDSH</p>
+      <p className="wd-workbench-eyebrow">kaiwu</p>
       <h1>{label}</h1>
       <p className="wd-workbench-description">{description}</p>
       <p className="wd-workbench-boundary">

@@ -10,7 +10,7 @@ const pnpmVersion=JSON.parse(await readFile(join(pnpmRoot,'package.json'),'utf8'
 async function fixture(failBuild=false,failStartup=false){
  const directory=await mkdtemp(join(tmpdir(),'workdsh-delivery-test-'));
  await mkdir(join(directory,'dist'));await symlink(fileURLToPath(new URL('../../../../apps/web/node_modules',import.meta.url)),join(directory,'node_modules'),process.platform==='win32'?'junction':'dir');
- await writeFile(join(directory,'package.json'),JSON.stringify({name:'workdsh-delivery-probe',version:'1.0.0',type:'module',packageManager:'pnpm@10.0.0',files:['dist'],scripts:{build:'node build.mjs',prepack:'node must-not-run.mjs'},exports:{'.':{default:'./dist/index.js'}},peerDependencies:{'@deepseek-ai/cordis':'4.0.5'},workdsh:{workbench:{id:'probe'}}}));
+ await writeFile(join(directory,'package.json'),JSON.stringify({name:'workdsh-delivery-probe',version:'1.0.0',type:'module',packageManager:'pnpm@10.0.0',files:['dist'],scripts:{build:'node build.mjs',prepack:'node must-not-run.mjs'},exports:{'.':{default:'./dist/index.js'}},peerDependencies:{'@deepseek-ai/cordis':'4.0.5'},kaiwu:{workbench:{id:'probe'}}}));
  await writeFile(join(directory,'build.mjs'),failBuild?'process.exit(2)':'');
  await writeFile(join(directory,'dist/index.js'),failStartup?'export function apply(){throw Error("private-error-must-not-leak");}':"export const inject=['workdshWorkbenchRegistration'];export async function apply(ctx){await ctx.get('workdshWorkbenchRegistration').registerManaged(ctx,{id:'probe'},'probe-page');}");
  return directory;
@@ -33,7 +33,7 @@ test('a hanging build times out and cannot reach startup or packaging',async()=>
 });
 
 test('a bundled Node and pnpm JS entry deliver with no system npm or pnpm on PATH',async()=>{
- const dir=await fixture(),primary=await mkdtemp(join(tmpdir(),'workdsh primary runtime '));let result;
+ const dir=await fixture(),primary=await mkdtemp(join(tmpdir(),'kaiwu primary runtime '));let result;
  try{
   await mkdir(join(primary,'dependencies'));
   await symlink(pnpmRoot,join(primary,'dependencies/pnpm'),process.platform==='win32'?'junction':'dir');

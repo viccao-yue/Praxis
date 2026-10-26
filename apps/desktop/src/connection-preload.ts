@@ -11,7 +11,7 @@ window.addEventListener('DOMContentLoaded', () => {
     busy = true; status.textContent = '正在核验企业账号并准备本机运行…'
     for (const button of form.querySelectorAll('button')) button.disabled = true
     try {
-      const result = await ipcRenderer.invoke('workdsh:enterprise-login', value) as { error?: string }
+      const result = await ipcRenderer.invoke('kaiwu:enterprise-login', value) as { error?: string }
       if (result.error) status.textContent = result.error
       else status.textContent = '正在启动本机官方 DSH…'
     } catch { status.textContent = '无法完成操作，请返回入口后重试' }

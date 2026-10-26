@@ -50,8 +50,8 @@ export function desktopTargetBuildPaths(target) {
     packedDsh: join(packed, 'dsh'),
     packedVendor: join(packed, 'vendor'),
     packedLandlock: join(packed, 'landlock'),
-    // WORKDSH TEST PATCH: local WorkDSH profile tarballs beside the official packed inputs.
-    packedWorkdsh: join(packed, 'workdsh'),
+    // kaiwu TEST PATCH: local kaiwu profile tarballs beside the official packed inputs.
+    packedWorkdsh: join(packed, 'kaiwu'),
     downloads: join(BUILD_ROOT, 'downloads'),
   }
 }

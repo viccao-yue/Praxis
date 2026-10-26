@@ -27,7 +27,7 @@ import { resolveDesktopTargetBuildPaths } from './desktop-build-paths.mjs'
 
 const DSH_PACKAGE = '@deepseek-ai/dsh'
 const ROOT_PACKAGES = [DSH_PACKAGE, DESKTOP_HOST_PACKAGE] as const
-// WORKDSH TEST PATCH: preseed the WorkDSH profile layers beside the official roots.
+// kaiwu TEST PATCH: preseed the kaiwu profile layers beside the official roots.
 const WORKDSH_ROOT_PACKAGES = [
   'workdsh-bundle',
   'workdsh-plugin-skills',
@@ -60,7 +60,7 @@ function dependencyNames(manifest: Readonly<Record<string, unknown>>, section: s
 
 /**
  * Select the complete available first-party dependency closures rooted at dsh, its private Host,
- * and the WORKDSH TEST PATCH WorkDSH layers.
+ * and the kaiwu TEST PATCH kaiwu layers.
  * @param available - Packed packages indexed by package name.
  * @returns Selected packages sorted by name.
  */

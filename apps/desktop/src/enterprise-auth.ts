@@ -15,7 +15,7 @@ export interface EnterpriseMember {
 
 async function loginFailure(response: Response): Promise<Error> {
   if (response.status === 401) return new Error('账号或密码不正确')
-  // WorkDSH login stays on this HTTP contract. Admin problem details use `detail`.
+  // kaiwu login stays on this HTTP contract. Admin problem details use `detail`.
   let detail = ''
   try {
     const body: unknown = await response.json()

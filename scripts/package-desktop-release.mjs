@@ -44,9 +44,9 @@ const releaseDirectory = join(root, 'apps/desktop', 'build', `workdsh-profile-re
 if (source === 'local') {
   run('Install Web dependencies', corepack, ['pnpm', 'install', '--frozen-lockfile'], { cwd: webRoot })
   run('Check platform-independent official package resolution', process.execPath, ['--test', join(webRoot, 'tests/planning/official-package-resolution.test.mjs')])
-  run('Build WorkDSH Web and plugins', corepack, ['pnpm', 'build'], { cwd: webRoot })
+  run('Build kaiwu Web and plugins', corepack, ['pnpm', 'build'], { cwd: webRoot })
   run('Build the bundled enterprise account plugin', corepack, ['pnpm', '--filter', 'workdsh-provider-identity-enterprise', 'build'], { cwd: webRoot })
-  run('Pack this commit\'s WorkDSH Profile', corepack, ['pnpm', 'release:project:pack'], { cwd: webRoot })
+  run('Pack this commit\'s kaiwu Profile', corepack, ['pnpm', 'release:project:pack'], { cwd: webRoot })
   const webReleaseDirectory = join(webRoot, '.artifacts', `project-v${version}`)
   const manifest = JSON.parse(readFileSync(join(webReleaseDirectory, 'release-manifest.json'), 'utf8'))
   if (manifest.version !== version || manifest.sourceCommit !== commit || manifest.sourceDirty) {
@@ -88,7 +88,7 @@ if (source === 'local') {
 }
 
 const runtimeEnv = { ...process.env, WORKDSH_RELEASE_DIRECTORY: releaseDirectory }
-run('Prepare the single WorkDSH DSH Profile', corepack, ['yarn', 'workspace', 'dsh-plugin-desktop', 'prepare:workdsh-runtime'], { env: runtimeEnv })
+run('Prepare the single kaiwu DSH Profile', corepack, ['yarn', 'workspace', 'dsh-plugin-desktop', 'prepare:workdsh-runtime'], { env: runtimeEnv })
 run('Prepare bundled Python and Node.js', corepack, ['yarn', 'workspace', 'dsh-plugin-desktop', 'prepare:workdsh-primary-runtime'], { env: runtimeEnv })
 run('Prepare official command management adapters', corepack, ['yarn', 'workspace', 'dsh-plugin-desktop', 'prepare:workdsh-command'], { env: runtimeEnv })
 run('Build the Desktop installer', process.execPath, [join(root, 'apps/desktop', 'scripts', platform === 'win32' ? 'package-win.ts' : 'package-mac.ts')], {

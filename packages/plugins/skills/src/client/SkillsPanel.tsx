@@ -80,12 +80,12 @@ export function SkillsPanel({ toggleNavigation, management, startSkillTask, star
     try {
       const [rows, summary] = await Promise.all([
         management.list(),
-        management.catalog().catch(cause => { console.error('[workdsh:skills:catalog]', cause); return undefined; }),
+        management.catalog().catch(cause => { console.error('[kaiwu:skills:catalog]', cause); return undefined; }),
       ]);
       setSkills(rows);
       if (summary) setCatalog(summary);
     }
-    catch (cause) { console.error('[workdsh:skills:list]', cause); setError(messageOf(cause)); }
+    catch (cause) { console.error('[kaiwu:skills:list]', cause); setError(messageOf(cause)); }
     finally { setBusy(false); }
   }, [management]);
   useEffect(() => { void refresh(); }, [refresh]);

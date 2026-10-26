@@ -1,5 +1,5 @@
 name: Feature request / 功能建议
-description: Suggest an improvement to WorkDSH / 提议改进 WorkDSH
+description: Suggest an improvement to kaiwu / 提议改进 kaiwu
 labels: ["enhancement"]
 body:
   - type: markdown
@@ -51,7 +51,7 @@ body:
     attributes:
       label: Desired outcome / 期望结果
       description: Describe the user-visible result, not necessarily the implementation / 描述用户最终能做到什么，不必设计技术实现
-      placeholder: I would like WorkDSH to ... / 希望 WorkDSH 能够……
+      placeholder: I would like kaiwu to ... / 希望 kaiwu 能够……
     validations:
       required: true
 

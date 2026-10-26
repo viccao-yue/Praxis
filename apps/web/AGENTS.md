@@ -1,6 +1,6 @@
-# WorkDSH Web repository rules
+# kaiwu Web repository rules
 
-This independent pnpm workspace owns WorkDSH feature packages and Web composition inside the combined Desktop repository. Use Node.js `^22.19.0 || >=24.0.0` and Corepack `pnpm@10.34.5`. The Desktop carrier uses the root Yarn workspace; never merge the package-manager graphs.
+This independent pnpm workspace owns kaiwu feature packages and Web composition inside the combined Desktop repository. Use Node.js `^22.19.0 || >=24.0.0` and Corepack `pnpm@10.34.5`. The Desktop carrier uses the root Yarn workspace; never merge the package-manager graphs.
 
 ## Runtime and ownership
 
@@ -8,7 +8,7 @@ This independent pnpm workspace owns WorkDSH feature packages and Web compositio
 - Personal Web, enterprise Web and Desktop share official runtime targets, owned feature packages, business services and pages. Identity, storage, execution and synchronization vary only at explicit adapter boundaries.
 - Use official Loader/Profile/Cordis, Session/Agent loop, preset registry, Skill parser/provider, MCP transport, model routing, Remote, Storage and Conversation UI. Do not introduce another Host, Client, loader or executor.
 - Feature packages own business objects, revisions, authorization and presentation. Page actions and Agent tools use the same business services. Optional cross-plugin collaboration uses public contracts and lifecycle injection, never another plugin's internal implementation.
-- Official Agent Teams owns expert-team execution, messaging and task runtime. Do not restore retired WorkDSH expert-team executors, shared multi-member Host implementations, runtimeToken or onboarding prototypes.
+- Official Agent Teams owns expert-team execution, messaging and task runtime. Do not restore retired kaiwu expert-team executors, shared multi-member Host implementations, runtimeToken or onboarding prototypes.
 
 ## Feature and delivery contracts
 

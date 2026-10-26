@@ -1,5 +1,5 @@
-export const librarySelectionChangedEvent = 'workdsh:library-selection-changed';
-export const libraryPickerRequestedEvent = 'workdsh:library-picker-requested';
+export const librarySelectionChangedEvent = 'kaiwu:library-selection-changed';
+export const libraryPickerRequestedEvent = 'kaiwu:library-picker-requested';
 
 export function notifyLibrarySelectionChanged(sessionId: string): void {
   window.dispatchEvent(new CustomEvent(librarySelectionChangedEvent, { detail: { sessionId } }));

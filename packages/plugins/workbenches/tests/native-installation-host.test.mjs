@@ -102,7 +102,7 @@ async function fixture() {
   await writeFile(join(source, 'package.json'), JSON.stringify({ name: packageName, version, type: 'module',
     files: ['index.js', 'index.d.ts', 'client.js', 'client.d.ts', 'cordis.patch.yml'],
     exports: { '.': { default: './index.js', types: './index.d.ts' }, './client': { default: './client.js', types: './client.d.ts' } },
-    dsh: { bundle: { patch: './cordis.patch.yml' }, client: { platform: 'web' } }, workdsh: { workbench: descriptor } }));
+    dsh: { bundle: { patch: './cordis.patch.yml' }, client: { platform: 'web' } }, kaiwu: { workbench: descriptor } }));
   await Promise.all(['index.js', 'client.js'].map(name => writeFile(join(source, name), 'throw new Error("fixture-entry-must-not-run");\n')));
   await Promise.all(['index.d.ts', 'client.d.ts'].map(name => writeFile(join(source, name), 'export {};\n')));
   await writeFile(join(source, 'cordis.patch.yml'), '- insert: []\n');

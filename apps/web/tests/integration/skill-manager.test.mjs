@@ -12,7 +12,7 @@ import { SkillManager } from '../../../../packages/plugins/skills/dist/index.js'
 const skillPackageRequire = createRequire(new URL('../../../../packages/plugins/skills/package.json', import.meta.url));
 const { zipSync } = skillPackageRequire('fflate');
 
-test('default managed skills stay inside the WorkDSH home', async () => {
+test('default managed skills stay inside the kaiwu home', async () => {
   const root = await mkdtemp(join(tmpdir(), 'workdsh-skill-private-home-'));
   const dshHome = join(root, 'dsh');
   const agentsHome = join(dshHome, 'agents');
@@ -23,7 +23,7 @@ test('default managed skills stay inside the WorkDSH home', async () => {
     process.env.DSH_HOME = dshHome;
     delete process.env.DSH_AGENTS_HOME;
     await mkdir(join(agentsHome, 'skills', 'private-skill'), { recursive: true });
-    await writeFile(join(agentsHome, 'skills', 'private-skill', 'SKILL.md'), '---\nname: private-skill\ndescription: Private WorkDSH skill\n---\n');
+    await writeFile(join(agentsHome, 'skills', 'private-skill', 'SKILL.md'), '---\nname: private-skill\ndescription: Private kaiwu skill\n---\n');
     await ctx.plugin(SkillRegistry);
     await ctx.plugin(filesystem, { dshHome, agentsHome, watch: false });
     new SkillManager(ctx);
@@ -469,7 +469,7 @@ test('plugin display contributions preserve execution identity and release witho
     assert.equal((await ctx.skills.get(registration.name)).name, registration.name);
     assert.throws(() => ctx.workdshSkills.registerDisplayMetadata('sigmapad', []), /display-conflict/);
     assert.throws(() => ctx.workdshSkills.registerDisplayMetadata('other', [{ name: registration.name, title: '覆盖' }]), /display-invalid/);
-    assert.throws(() => ctx.workdshSkills.registerDisplayMetadata('workdsh', []), /display-invalid/);
+    assert.throws(() => ctx.workdshSkills.registerDisplayMetadata('kaiwu', []), /display-invalid/);
     assert.throws(() => ctx.workdshSkills.registerDisplayMetadata('other', [{ name: 'other-one', title: '\n' }]), /display-invalid/);
     release(); release();
     assert.equal((await ctx.workdshSkills.detail(registration.name)).title, undefined);

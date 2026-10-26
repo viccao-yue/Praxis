@@ -31,7 +31,7 @@ export function createElectronBuilderConfig(
   const resolvedArch = env.DSH_DESKTOP_TARGET_ARCH ?? hostArch
   const packagesMacOS = targetPlatform === 'darwin' || (targetPlatform === undefined && hostPlatform === 'darwin')
   const packagesWindows = targetPlatform === 'win32'
-  // WORKDSH TEST PATCH: unsigned local test builds skip Developer ID signing and notarization.
+  // kaiwu TEST PATCH: unsigned local test builds skip Developer ID signing and notarization.
   const workdshUnsigned = env.WORKDSH_DESKTOP_UNSIGNED === '1'
   const macOSSigning = packagesMacOS && !workdshUnsigned ? resolveMacOSSigningEnvironment(env) : undefined
   if (packagesMacOS && !workdshUnsigned) resolveMacOSNotarizationEnvironment(env)
@@ -50,7 +50,7 @@ export function createElectronBuilderConfig(
   const buildPaths = desktopTargetBuildPaths(update.target)
   return {
     appId,
-    // WORKDSH TEST PATCH: WorkDSH product branding.
+    // kaiwu TEST PATCH: kaiwu product branding.
     productName: 'WorkDSH',
     artifactName: 'workdsh-${version}-${os}-${arch}.${ext}',
     directories: { output: buildPaths.artifacts },
@@ -67,7 +67,7 @@ export function createElectronBuilderConfig(
     ],
     mac: {
       category: 'public.app-category.developer-tools',
-      // WORKDSH TEST PATCH: WorkDSH branded application icon.
+      // kaiwu TEST PATCH: kaiwu branded application icon.
       icon: fileURLToPath(new URL('./workdsh-icon.icns', import.meta.url)),
       identity: workdshUnsigned ? null : macOSSigning?.signingIdentity,
       forceCodeSigning: !workdshUnsigned,

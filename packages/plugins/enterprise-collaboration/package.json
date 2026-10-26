@@ -3,7 +3,7 @@
   "version": "0.1.0-alpha.1",
   "private": true,
   "type": "module",
-  "description": "Member handoffs across isolated WorkDSH instances",
+  "description": "Member handoffs across isolated kaiwu instances",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

@@ -66,13 +66,13 @@ corepack pnpm probe:experts:team:real
 当前源码依赖 DSH 0.2.0-rc.2 / Cordis 4.0.4，应使用同一次构建产出的配套 tgz；不要把旧 Release 的安装包当作已含本次升级。先在独立 Profile 验证，再部署实际使用的 Profile：
 
 ```sh
-dsh --profile workdsh --from-default-profile web --dump-config
-dsh plugin --profile workdsh add /absolute/path/release/workdsh-provider-identity-local-0.1.0-alpha.6.tgz \
+dsh --profile kaiwu --from-default-profile web --dump-config
+dsh plugin --profile kaiwu add /absolute/path/release/workdsh-provider-identity-local-0.1.0-alpha.6.tgz \
   /absolute/path/release/workdsh-plugin-audit-0.1.0-alpha.5.tgz \
   /absolute/path/release/workdsh-plugin-access-0.1.0-alpha.6.tgz \
   /absolute/path/release/workdsh-plugin-skills-0.1.0-alpha.32.tgz \
   /absolute/path/release/workdsh-plugin-experts-0.1.0-alpha.8.tgz
-dsh --profile workdsh
+dsh --profile kaiwu
 ```
 
 在专家入口保存、校验、预览并确认发布，然后召唤。示例只填入原生草稿，发送后才执行；模型与账号在 Harness 中配置。

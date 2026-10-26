@@ -12,7 +12,7 @@ const modules=fileURLToPath(new URL('../../../../apps/web/node_modules',import.m
 async function candidate(body,change={}){
  const directory=await mkdtemp(join(tmpdir(),'workdsh-startup-test-'));
  await mkdir(join(directory,'dist'));await symlink(modules,join(directory,'node_modules'),'dir');
- await writeFile(join(directory,'package.json'),JSON.stringify({name:'startup-test',version:'1.0.0',type:'module',exports:{'.':{default:'./dist/index.js'}},peerDependencies:{'@deepseek-ai/cordis':'4.0.5'},workdsh:{workbench:{id:'probe'}},...change}));
+ await writeFile(join(directory,'package.json'),JSON.stringify({name:'startup-test',version:'1.0.0',type:'module',exports:{'.':{default:'./dist/index.js'}},peerDependencies:{'@deepseek-ai/cordis':'4.0.5'},kaiwu:{workbench:{id:'probe'}},...change}));
  await writeFile(join(directory,'dist/index.js'),body);
  return {directory,close:()=>rm(directory,{recursive:true,force:true})};
 }
@@ -45,7 +45,7 @@ test('npm prepack blocks a candidate archive when the shared startup check fails
  const f=await candidate('export function apply(){throw Error("startup failure");}');
  try{
   const runner=fileURLToPath(new URL('../scripts/check-startup.mjs',import.meta.url));
-  await writeFile(join(f.directory,'package.json'),JSON.stringify({name:'startup-test',version:'1.0.0',type:'module',exports:{'.':{default:'./dist/index.js'}},peerDependencies:{'@deepseek-ai/cordis':'4.0.5'},scripts:{prepack:`node "${runner}" .`},workdsh:{workbench:{id:'probe'}}}));
+  await writeFile(join(f.directory,'package.json'),JSON.stringify({name:'startup-test',version:'1.0.0',type:'module',exports:{'.':{default:'./dist/index.js'}},peerDependencies:{'@deepseek-ai/cordis':'4.0.5'},scripts:{prepack:`node "${runner}" .`},kaiwu:{workbench:{id:'probe'}}}));
   const result=spawnSync('npm',['pack','--offline','--json'],{cwd:f.directory,env:{...process.env,PATH:dirname(process.execPath)+':'+process.env.PATH},encoding:'utf8',timeout:15000});
   assert.notEqual(result.status,0);assert.equal((await readdir(f.directory)).some(name=>name.endsWith('.tgz')),false);assert.match(result.stdout+result.stderr,/startup-lifecycle-failed/);
  }finally{await f.close();}

@@ -10,7 +10,7 @@ test('actual official filesystem verifies source identity and rejects escaping m
  try{
   const source=join(root,'source');await mkdir(source);await ctx.plugin(LocalFileSystem,{cwd:root});
   const development={packageName:'quality-plugin',workbenchId:'company.quality'};
-  const metadata={name:'quality-plugin',workdsh:{workbench:{id:'company.quality'}}};
+  const metadata={name:'quality-plugin',kaiwu:{workbench:{id:'company.quality'}}};
   await writeFile(join(source,'package.json'),JSON.stringify(metadata));
   let reads=0;const authorize=async()=>{reads++;};
   assert.equal(await verifyWorkbenchSourceDirectory(ctx.fs,source,development,authorize),await ctx.fs.processPath(await ctx.fs.resolve(source)));assert.equal(reads,4);

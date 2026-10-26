@@ -24,7 +24,7 @@ import { cleanOwnedProcessTree, stopOwnedProcess, trackOwnedProcess } from './ow
 import { prepareRuntimePort, runtimePortConflict } from './runtime-port.ts'
 import { runOfficialCommand } from './official-command.ts'
 
-const PROFILE_NAME = 'workdsh'
+const PROFILE_NAME = 'kaiwu'
 const READY_PATTERN = /dsh web:\s+(http:\/\/127\.0\.0\.1:\d+\/?\?token=[^\s]+)/u
 
 let runtime: ChildProcess | undefined
@@ -365,7 +365,7 @@ function connectEntryNavigation(entry: BrowserWindow): void {
       switching = true
       try {
         const command = new URL(target)
-        if (command.protocol !== 'workdsh:') return
+        if (command.protocol !== 'kaiwu:') return
         if (command.hostname === 'enterprise') {
           if (enterprise) throw new Error('请先退出当前企业账号再修改后台地址')
           const connection = enterpriseConnection(managedBackend ?? command.searchParams.get('portal') ?? '')
@@ -437,7 +437,7 @@ async function activateEnterprise(existingHome: boolean): Promise<void> {
 }
 
 function installLoginHandlers(): void {
-  ipcMain.handle('workdsh:enterprise-login', async (event, input: unknown) => {
+  ipcMain.handle('kaiwu:enterprise-login', async (event, input: unknown) => {
     if (!entrySurface || event.sender !== window?.webContents || switching || !pendingConnection || enterprise) return { error: '此页面不能发起企业登录' }
     switching = true
     let admittedLogin: EnterpriseLogin | undefined

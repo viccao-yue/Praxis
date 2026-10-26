@@ -13,13 +13,13 @@ const target = process.platform === 'win32' ? 'win-x64'
   : process.platform === 'darwin' ? `mac-${process.env.WORKDSH_MAC_ARCH ?? process.arch}`
     : undefined
 if (target === undefined || !['win-x64', 'mac-arm64', 'mac-x64'].includes(target)) {
-  throw new Error(`Unsupported WorkDSH primary runtime target: ${target ?? process.platform}`)
+  throw new Error(`Unsupported kaiwu primary runtime target: ${target ?? process.platform}`)
 }
 const output = join(desktopRoot, 'build', 'workdsh-runtime')
-const profile = join(output, 'profiles', 'workdsh')
+const profile = join(output, 'profiles', 'kaiwu')
 const profileMarker = join(profile, '.workdsh-desktop-release.json')
 if (!existsSync(profileMarker) || JSON.parse(readFileSync(profileMarker, 'utf8')).harness !== DSH_VERSION) {
-  throw new Error('Prepare and verify the target WorkDSH Profile before its primary runtime')
+  throw new Error('Prepare and verify the target kaiwu Profile before its primary runtime')
 }
 // The only authorized official-file adaptation: the exact two outer-frame
 // seams. Replace the Profile's directory entry, never a shared pnpm hardlink.
@@ -36,7 +36,7 @@ verifyOfficialRuntimeProvenance(join(output,'primary-runtime'),target)
 const runtimePnpm = join(output, 'primary-runtime', 'dependencies', 'pnpm', 'bin', 'pnpm.cjs')
 if (manifest.pnpm !== OFFICIAL_PNPM_VERSION || !existsSync(runtimePnpm)) throw new Error('Official primary runtime must carry the locked official pnpm JavaScript CLI')
 const packagePath = join(profile, 'package.json')
-if (!existsSync(packagePath)) throw new Error('WorkDSH release profile must be prepared first')
+if (!existsSync(packagePath)) throw new Error('kaiwu release profile must be prepared first')
 const profilePackage = JSON.parse(readFileSync(packagePath, 'utf8'))
 const packages = [
   '@deepseek-ai/dsh-tool-workspace-dependencies',

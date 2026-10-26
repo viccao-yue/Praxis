@@ -246,7 +246,7 @@ export class SkillManager extends Service implements SkillManagementService {
   }
 
   registerDisplayMetadata(namespace: string, entries: readonly SkillDisplayMetadata[]): () => void {
-    if (!skillNamePattern.test(namespace) || namespace === 'workdsh' || entries.length > 256) throw new Error('skill/display-invalid');
+    if (!skillNamePattern.test(namespace) || namespace === 'kaiwu' || entries.length > 256) throw new Error('skill/display-invalid');
     if (this.displayContributions.has(namespace)) throw new Error('skill/display-conflict');
     const rows = new Map<string, SkillDisplayMetadata>();
     for (const entry of entries) {

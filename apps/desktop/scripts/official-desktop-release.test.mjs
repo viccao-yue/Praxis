@@ -8,7 +8,7 @@ import { copyOfficialRuntime, isOfficialReleaseCacheValid, verifyArtifact, lock 
 import {OFFICIAL_PROVENANCE_FILE,createOfficialRuntimeProvenance,officialDesktopArtifact,writeOfficialRuntimeProvenance,verifyOfficialRuntimeProvenance} from './official-runtime-provenance.mjs'
 
 test('both runtime copies preserve relative executable links after their sources are removed', { skip: process.platform === 'win32' }, () => {
-  const directory = mkdtempSync(join(tmpdir(), 'workdsh runtime links '))
+  const directory = mkdtempSync(join(tmpdir(), 'kaiwu runtime links '))
   try {
     const source = join(directory, 'extracted'), cache = join(directory, 'cache'), prepared = join(directory, 'prepared')
     const bin = join('dependencies', 'python', 'bin')

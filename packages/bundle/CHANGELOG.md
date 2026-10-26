@@ -4,7 +4,7 @@
 
 ## 0.1.0-alpha.49 — 2026-09-25
 
-- 将 11 个 WorkDSH 运行包与官方 DSH 0.1.7-rc.2 组合，并启用官方侧栏 Browser。
+- 将 11 个 kaiwu 运行包与官方 DSH 0.1.7-rc.2 组合，并启用官方侧栏 Browser。
 
 ## 0.1.0-alpha.48 — Unreleased（2026-09-22）
 
@@ -12,7 +12,7 @@
 
 # 0.1.0-alpha.47 — 2026-09-20
 
-- 修复设置页「外观」切换不生效：工作台客户端不再注册并强制 `workdsh` 深色主题、不再拦截 `theme/change`；外观改由官方 ThemeRuntime 与用户偏好驱动，浅色/深色/跟随系统切换即时生效，三个选项的选中态恢复显示。
+- 修复设置页「外观」切换不生效：工作台客户端不再注册并强制 `kaiwu` 深色主题、不再拦截 `theme/change`；外观改由官方 ThemeRuntime 与用户偏好驱动，浅色/深色/跟随系统切换即时生效，三个选项的选中态恢复显示。
 
 # 0.1.0-alpha.46 — 2026-09-18
 
@@ -54,7 +54,7 @@
 # 0.1.0-alpha.38
 
 - 组合共享 UI alpha.4：公开入口、TSX 组件、设计令牌与样式模块分离，保持现有组件 API 兼容。
-- 增加 WorkDSH 品牌 Logo 的可维护 SVG 与应用图标视觉稿。
+- 增加 kaiwu 品牌 Logo 的可维护 SVG 与应用图标视觉稿。
 
 # 0.1.0-alpha.37
 
@@ -135,7 +135,7 @@
 
 # 0.1.0-alpha.16
 
-组合 workbench alpha.8：在官方 Sidebar 骨架中恢复 WorkBuddy 参考的 WorkDSH 业务导航和能力中心入口，同时保留原生工作区/会话能力。
+组合 workbench alpha.8：在官方 Sidebar 骨架中恢复 WorkBuddy 参考的 kaiwu 业务导航和能力中心入口，同时保留原生工作区/会话能力。
 
 # 0.1.0-alpha.14
 
@@ -155,7 +155,7 @@
 
 # 0.1.0-alpha.10
 
-组合 workbench alpha.3：默认 home 改为 WorkDSH 新任务入口，使用 Harness 官方工作区、Session 与 Conversation 服务创建任务；接入验证移至 `workdsh-view=diagnostics`。
+组合 workbench alpha.3：默认 home 改为 kaiwu 新任务入口，使用 Harness 官方工作区、Session 与 Conversation 服务创建任务；接入验证移至 `workdsh-view=diagnostics`。
 
 # 0.1.0-alpha.9
 

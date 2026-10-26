@@ -132,7 +132,7 @@ try {
   await editor.fill('用户已输入的内容');
   const stage = target => page.evaluate(({ target }) => {
     sessionStorage.setItem('workdsh.pending-expert-task-draft', JSON.stringify({ sessionId: target, text: '不得覆盖', expiresAt: Date.now() + 60_000 }));
-    window.dispatchEvent(new Event('workdsh:expert-draft-staged'));
+    window.dispatchEvent(new Event('kaiwu:expert-draft-staged'));
   }, { target });
   await stage(summoned.sessionId);
   await expect.poll(() => page.evaluate(() => sessionStorage.getItem('workdsh.pending-expert-task-draft'))).toBe(null);

@@ -282,7 +282,7 @@ export function apply(ctx){ctx.effect(()=>ctx.connection.fetch.register({path:'/
  }else if(r.action==='guide'){
   const resolved=await ctx.workdshSessionAccess.resolveAgent(r.sessionId,request.signal);
   const assembly=await ctx.systemPrompt.assemble(assembleContextFor(resolved.agent,request.signal));
-  value={present:assembly.sections.some(s=>s.name==='workdsh:office-authoring'&&s.text.includes('First call content_open'))};
+  value={present:assembly.sections.some(s=>s.name==='kaiwu:office-authoring'&&s.text.includes('First call content_open'))};
  }
  else if(r.action==='visible-tools'){
   const resolved=await ctx.workdshSessionAccess.resolveAgent(r.sessionId,request.signal);

@@ -3,7 +3,7 @@
   "version": "3.0.0-alpha.49",
   "private": true,
   "type": "module",
-  "description": "WorkDSH workbench platform Host services; Client management integration is in development.",
+  "description": "kaiwu workbench platform Host services; Client management integration is in development.",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

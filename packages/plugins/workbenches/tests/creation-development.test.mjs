@@ -16,7 +16,7 @@ test('confirmation resumes after saved requirements and project preparation fail
  await ctx.plugin(Storage);await ctx.plugin(Json,{root});await ctx.plugin(Domain,{backend:'json'});
  const actor={principalId:'local-user',organizationId:'local-personal',requestId:'test',resolvedBy:'trusted-fixture'};
  const identity={resolve:async()=>actor,profile:()=>({principalId:actor.principalId,organization:{id:actor.organizationId},resolvedBy:actor.resolvedBy}),membership:()=>({state:'active'})};
- const target={hostId:'host',installationId:'installation',profileId:'workdsh',harnessVersion:'0.2.1-rc.1'};
+ const target={hostId:'host',installationId:'installation',profileId:'kaiwu',harnessVersion:'0.2.1-rc.1'};
  const requirements=new WorkbenchRequirementsService(ctx.storageDomain,identity);
  const development=new WorkbenchDevelopmentService(ctx.storageDomain,identity,requirements,async()=>target);
  let sdkAvailable=false,sourceChecks=0,sessionChecks=0,sessionsCreated=0;

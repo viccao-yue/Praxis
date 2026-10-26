@@ -1,9 +1,9 @@
 {
-  "name": "workdsh",
+  "name": "kaiwu",
   "version": "3.0.0-alpha.1",
   "private": true,
   "type": "module",
-  "description": "WorkDSH planning and plugin workspace",
+  "description": "kaiwu planning and plugin workspace",
   "packageManager": "pnpm@10.34.5",
   "engines": {
     "node": "^22.19.0 || >=24.0.0"

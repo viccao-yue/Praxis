@@ -80,9 +80,9 @@ const previewManifest = JSON.parse(await readFile(previewManifestPath, 'utf8'));
 const normalizedManifest = withoutRedundantAgentTeamProfile(previewManifest);
 if (normalizedManifest) {
   await writeFile(previewManifestPath, `${JSON.stringify(normalizedManifest, null, 2)}\n`);
-  console.log('Removed redundant standalone Agent Team profile from preview; WorkDSH experts owns Team composition.');
+  console.log('Removed redundant standalone Agent Team profile from preview; kaiwu experts owns Team composition.');
 }
-// Reinstall the pinned official Web bundle as well as the WorkDSH layers. An
+// Reinstall the pinned official Web bundle as well as the kaiwu layers. An
 // existing preview Profile may have been created by an older DSH release; its
 // bundle list alone does not upgrade the packages that provide newly added Web
 // surfaces such as Terminal and archived-session recovery.
@@ -200,5 +200,5 @@ for (const [index, { manifest }] of packages.entries()) {
   archiveEntries.push({ fileName, packageName: manifest.name, version: manifest.version, workbenchId: descriptor.id, sha256: createHash('sha256').update(bytes).digest('hex') });
 }
 await writeFile(join(archiveDirectory, 'index.json'), JSON.stringify({ version: 1, entries: archiveEntries }, null, 2) + '\n');
-console.log('Installed Skill, Expert, Connector, Office, Library, Projects, Workbenches, Quality Analysis and WorkDSH presentation as separate official Profile layers.');
+console.log('Installed Skill, Expert, Connector, Office, Library, Projects, Workbenches, Quality Analysis and kaiwu presentation as separate official Profile layers.');
 console.log('Start the stopped preview with: corepack pnpm preview');

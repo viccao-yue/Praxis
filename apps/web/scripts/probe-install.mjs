@@ -89,14 +89,14 @@ try {
     writeFileSync(resolve(home, 'storages/workspace.json'), `${JSON.stringify({
       unit: { name: 'workspace', version: 2 },
       global: { initialized: true, workspaceIds: [workspaceId], archivedSessionIds: [] },
-      tables: { workspaces: { [workspaceId]: { path: root, title: 'WorkDSH Probe', sessionIds: [], createdAt: now, updatedAt: now } } },
+      tables: { workspaces: { [workspaceId]: { path: root, title: 'kaiwu Probe', sessionIds: [], createdAt: now, updatedAt: now } } },
     }, null, 2)}\n`);
     const skillDir = resolve(home, 'agents/skills/workdsh-browser-fixture');
     mkdirSync(skillDir, { recursive: true });
     writeFileSync(resolve(skillDir, 'SKILL.md'), '---\nname: workdsh-browser-fixture\ndescription: 浏览器验收技能，只用于隔离测试目录。\n---\nRead the supplied document and summarize its key points.\n');
   }
   startServer();
-  await until(() => serverOutput.includes('[workdsh:probe] activated') && /http:\/\/127\.0\.0\.1:\d+/.test(serverOutput), 'activation');
+  await until(() => serverOutput.includes('[kaiwu:probe] activated') && /http:\/\/127\.0\.0\.1:\d+/.test(serverOutput), 'activation');
   const address = serverOutput.match(/http:\/\/127\.0\.0\.1:\d+/)[0];
   const response = await fetch(address, { signal: AbortSignal.timeout(5000) });
   assert.equal(response.status, 401, 'anonymous Web access must be rejected');
@@ -111,7 +111,7 @@ try {
     // rather than only exercising same-process reads.
     await stopServer();
     startServer();
-    await until(() => serverOutput.includes('[workdsh:probe] activated') && /http:\/\/127\.0\.0\.1:\d+/.test(serverOutput), 'first Skill persistence restart');
+    await until(() => serverOutput.includes('[kaiwu:probe] activated') && /http:\/\/127\.0\.0\.1:\d+/.test(serverOutput), 'first Skill persistence restart');
     const persistedAddress = serverOutput.match(/http:\/\/127\.0\.0\.1:\d+/)[0];
     const persistedCookie = await authenticate(persistedAddress);
     const { probeSkillStateAfterRestart, probeDisabledSkillAfterRestart } = await import('./probe-browser.mjs');
@@ -119,7 +119,7 @@ try {
 
     await stopServer();
     startServer();
-    await until(() => serverOutput.includes('[workdsh:probe] activated') && /http:\/\/127\.0\.0\.1:\d+/.test(serverOutput), 'second Skill persistence restart');
+    await until(() => serverOutput.includes('[kaiwu:probe] activated') && /http:\/\/127\.0\.0\.1:\d+/.test(serverOutput), 'second Skill persistence restart');
     const disabledAddress = serverOutput.match(/http:\/\/127\.0\.0\.1:\d+/)[0];
     const disabledCookie = await authenticate(disabledAddress);
     await probeDisabledSkillAfterRestart(disabledAddress, disabledCookie, resolve(artifacts, 'client-skill-disabled-restart.png'));
@@ -130,7 +130,7 @@ try {
     await stopServer();
     await command(dsh, ['plugin', '--profile', 'probe', 'remove', 'workdsh-plugin-skills']);
     startServer();
-    await until(() => serverOutput.includes('[workdsh:probe] activated') && /http:\/\/127\.0\.0\.1:\d+/.test(serverOutput), 'product without Skill');
+    await until(() => serverOutput.includes('[kaiwu:probe] activated') && /http:\/\/127\.0\.0\.1:\d+/.test(serverOutput), 'product without Skill');
     const shellAddress = serverOutput.match(/http:\/\/127\.0\.0\.1:\d+/)[0];
     const shellCookie = await authenticate(shellAddress);
     const { probeProductWithoutSkills } = await import('./probe-browser.mjs');
@@ -153,7 +153,7 @@ try {
   await until(() => /http:\/\/127\.0\.0\.1:\d+/.test(serverOutput), 'restart after removal');
   const removedAddress = serverOutput.match(/http:\/\/127\.0\.0\.1:\d+/)[0];
   assert.equal((await fetch(removedAddress, { signal: AbortSignal.timeout(5000) })).status, 401);
-  assert.ok(!serverOutput.includes('[workdsh:probe] activated'));
+  assert.ok(!serverOutput.includes('[kaiwu:probe] activated'));
   console.log('PASS: removed bundle absent from configuration and restarted Host');
   if (process.argv.includes('--browser')) {
     const { probeBrowser } = await import('./probe-browser.mjs');
@@ -163,7 +163,7 @@ try {
   await stopServer();
   await command(dsh, ['plugin', '--profile', 'probe', 'add', tarball]);
   startServer();
-  await until(() => serverOutput.includes('[workdsh:probe] activated'), 'reinstallation');
+  await until(() => serverOutput.includes('[kaiwu:probe] activated'), 'reinstallation');
   console.log('PASS: reinstallation activates plugin after restart; live CLI removal remains unverified');
 } finally {
   await stopServer();

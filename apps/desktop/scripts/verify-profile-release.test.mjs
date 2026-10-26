@@ -11,7 +11,7 @@ import { DSH_VERSION } from './runtime-version.mjs'
 import { ENTERPRISE_PACKAGES, PACKAGE_DIRECTORIES, PRODUCT_PACKAGES, RELEASE_PACKAGES } from './workdsh-package-boundary.mjs'
 
 test('release bootstrap installs dependencies before loading package validators', () => {
-  const directory = mkdtempSync(join(tmpdir(), 'workdsh clean release '))
+  const directory = mkdtempSync(join(tmpdir(), 'kaiwu clean release '))
   const root = fileURLToPath(new URL('../../..', import.meta.url))
   try {
     for (const relative of [
@@ -55,14 +55,14 @@ test('release bootstrap installs dependencies before loading package validators'
   } finally { rmSync(directory, { recursive: true, force: true }) }
 })
 
-test('accepts a WorkDSH release aligned with the pinned DSH runtime', () => {
+test('accepts a kaiwu release aligned with the pinned DSH runtime', () => {
   assert.doesNotThrow(() => verifyProfileRelease({
     harness: DSH_VERSION,
     runtimeOverrides: { '@deepseek-ai/dsh': DSH_VERSION, 'other-package': '1.0.0' },
   }, DSH_VERSION))
 })
 
-test('rejects an older WorkDSH release instead of relabeling its compatibility', () => {
+test('rejects an older kaiwu release instead of relabeling its compatibility', () => {
   assert.throws(() => verifyProfileRelease({ harness: 'obsolete-dsh-version' }, DSH_VERSION), /targets DSH/)
   assert.throws(() => verifyProfileRelease({
     harness: DSH_VERSION,
@@ -70,7 +70,7 @@ test('rejects an older WorkDSH release instead of relabeling its compatibility',
   }, DSH_VERSION), /overrides @deepseek-ai\/dsh-agent/)
 })
 
-test('rejects a WorkDSH package built against another DSH version', () => {
+test('rejects a kaiwu package built against another DSH version', () => {
   assert.doesNotThrow(() => verifyPackageDshReferences({
     name: 'workdsh-plugin-experts',
     peerDependencies: { '@deepseek-ai/dsh-agent': DSH_VERSION },

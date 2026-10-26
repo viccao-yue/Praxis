@@ -103,7 +103,7 @@ const PROJECT_NAME = '@deepseek-ai/dsh-desktop-runtime'
 const DSH_PACKAGE = '@deepseek-ai/dsh'
 const CORE_BUILD_PACKAGE = '@deepseek-ai/dsh-subprocess-local'
 const DESKTOP_PROFILE_BUNDLES = ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app'] as const
-// WORKDSH TEST PATCH: WorkDSH profile layers seeded after the built-in desktop bundles.
+// kaiwu TEST PATCH: kaiwu profile layers seeded after the built-in desktop bundles.
 const WORKDSH_PROFILE_BUNDLES = [
   'workdsh-bundle',
   'workdsh-plugin-skills',

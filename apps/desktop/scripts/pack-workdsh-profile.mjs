@@ -14,7 +14,7 @@ const output = resolve(process.argv[3] ?? fileURLToPath(new URL('../build/workds
 if (!source) throw new Error('Usage: node scripts/pack-workdsh-profile.mjs <built-workdsh-source> [output]')
 if (existsSync(output)) throw new Error('Use a fresh release directory; candidate archives are immutable')
 const project = JSON.parse(readFileSync(join(source, 'package.json'), 'utf8'))
-if (project.devDependencies?.['@deepseek-ai/dsh'] !== DSH_VERSION) throw new Error('WorkDSH source and Desktop must target the same official DSH version')
+if (project.devDependencies?.['@deepseek-ai/dsh'] !== DSH_VERSION) throw new Error('kaiwu source and Desktop must target the same official DSH version')
 const sourceRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd: source, encoding: 'utf8' }).trim()
 const sourcePath = relative(sourceRoot, source) || '.'
 const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: source, encoding: 'utf8' }).trim()

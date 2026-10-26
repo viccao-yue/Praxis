@@ -23,7 +23,7 @@ const spreadsheetGuide=`For Excel requests create the live workbook immediately 
 export function registerAuthoringGuide(ctx: Context) {
   ctx.effect(() =>
     ctx.systemPrompt.section({
-      name: "workdsh:office-authoring",
+      name: "kaiwu:office-authoring",
       order: ctx.systemPrompt.getSectionOrder("TOOL_REPORT"),
       text: authoringGuide + "\n" + htmlGuide + "\n" + pdfGuide + (ctx.workdshOfficeContent.presentationEnabled ? "\n" + presentationGuide : "") + (ctx.workdshOfficeContent.spreadsheetEnabled ? "\n" + spreadsheetGuide : ""),
     }),

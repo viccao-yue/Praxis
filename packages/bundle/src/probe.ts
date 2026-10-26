@@ -13,12 +13,12 @@ export const inject = ['connection', 'tools', 'agents', 'attachments', 'systemPr
 export function apply(ctx: Context): void {
   registerBrowserView(ctx);
   ctx.effect(() => ctx.systemPrompt.section({
-    name: 'workdsh:browser-in-sidebar',
+    name: 'kaiwu:browser-in-sidebar',
     order: ctx.systemPrompt.getSectionOrder('TOOL_REPORT'),
     text: 'For website browsing and page interaction in 开物Praxis, use the available Playwright MCP browser tools. They keep the live Agent Session page visible and operable in the right sidebar. Use native computer control for other desktop apps, or when the user explicitly asks to operate an existing external browser. Do not launch a separate visible system browser for an ordinary website task.',
   }), 'workdsh.browser-view.prompt');
   ctx.effect(() => {
-    process.stdout.write('[workdsh:probe] activated\n');
-    return () => process.stdout.write('[workdsh:probe] disposed\n');
+    process.stdout.write('[kaiwu:probe] activated\n');
+    return () => process.stdout.write('[kaiwu:probe] disposed\n');
   });
 }

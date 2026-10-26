@@ -1,7 +1,7 @@
 {
   "name": "dsh-plugin-desktop",
   "version": "3.0.0-alpha.3",
-  "description": "WorkDSH Electron carrier for a pinned DeepSeek Harness runtime Profile",
+  "description": "kaiwu Electron carrier for a pinned DeepSeek Harness runtime Profile",
   "license": "MIT",
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

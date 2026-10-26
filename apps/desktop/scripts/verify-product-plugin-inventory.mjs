@@ -6,7 +6,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { CATALOG_PACKAGES, ENTERPRISE_PACKAGES, PRODUCT_PACKAGES } from './workdsh-package-boundary.mjs'
 
 const runtime = resolve(process.argv[2] ?? fileURLToPath(new URL('../build/workdsh-runtime', import.meta.url)))
-const source = join(runtime, 'profiles', 'workdsh')
+const source = join(runtime, 'profiles', 'kaiwu')
 const profile = resolve(process.argv[3] ?? source)
 const installedInProfile = profile === source
 const config = join(profile, '.workdsh-plugin-inventory-probe.yml')
@@ -28,7 +28,7 @@ try {
   writeFileSync(config, JSON.stringify([{ id: 'manager', name: 'cordis:manager' }]))
   ctx = await boot('dsh', config, [], root => {
     root.provide('profileContext', {
-      name: 'workdsh', dir: profile, home: runtime, cwd: runtime,
+      name: 'kaiwu', dir: profile, home: runtime, cwd: runtime,
       patchPath: join(profile, 'cordis.patch.yml'), installAnchor: anchor,
       startedBundles: [], overlays: [], telemetryDisabledEnv: undefined,
     })
@@ -42,7 +42,7 @@ try {
   }
   for (const bundle of bundles) {
     if (!bundle.enabled || bundle.installed !== installedInProfile || bundle.removable || bundle.error) {
-      throw new Error(`WorkDSH product bundle is inactive or invalid: ${bundle.name}: ${JSON.stringify(bundle)}`)
+      throw new Error(`kaiwu product bundle is inactive or invalid: ${bundle.name}: ${JSON.stringify(bundle)}`)
     }
   }
   for (const name of Object.keys(CATALOG_PACKAGES)) {
@@ -51,7 +51,7 @@ try {
       throw new Error(`Community catalog integration is inactive or invalid: ${name}: ${JSON.stringify(bundle)}`)
     }
   }
-  console.log(`Verified plugin manager exposes exactly ${expected.length} ${installedInProfile ? 'installed' : 'installation-provided'} WorkDSH product bundles: ${names.join(', ')}`)
+  console.log(`Verified plugin manager exposes exactly ${expected.length} ${installedInProfile ? 'installed' : 'installation-provided'} kaiwu product bundles: ${names.join(', ')}`)
 } finally {
   try {
     await ctx?.fiber.dispose()

@@ -40,7 +40,7 @@ test('Profile source adapter creates real metadata, restores directories and rej
 });
 test('Desktop source preparation uses the installation anchor without writable Profile node_modules',async()=>{
  const root=await mkdtemp(join(tmpdir(),'workbench-source-installation-'));
- const profile={name:'workdsh',dir:join(root,'home/profiles/workdsh'),home:join(root,'home'),installAnchor:join(root,'installation/profile-installation.json')};
+ const profile={name:'kaiwu',dir:join(root,'home/profiles/workdsh'),home:join(root,'home'),installAnchor:join(root,'installation/profile-installation.json')};
  const actor={principalId:'user',organizationId:'org',resolvedBy:'fixture'};
  const identity={profile:()=>({principalId:'user',organization:{id:'org'},resolvedBy:'fixture'}),membership:()=>({state:'active'})};
  const requirements={history:async()=>[{id:'requirements-1',owner:{organizationId:'org',ownerPrincipalId:'user'},requirements:{title:'旅行管家·实测'}}]};

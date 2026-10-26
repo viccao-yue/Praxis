@@ -46,7 +46,7 @@ export async function probeBrowser(address, sessionCookie, screenshotPath, { ins
     await dismissSetup(page);
     const later = page.getByRole('button', { name: 'Configure later', exact: true });
     const graphRows = await page.evaluate(() => window.__DSH_BOOT__?.entries?.filter(row => row.id === 'workdsh-bundle'));
-    const nav = page.getByRole('button', { name: 'WorkDSH 接入验证', exact: true });
+    const nav = page.getByRole('button', { name: 'kaiwu 接入验证', exact: true });
     expect(graphRows).toHaveLength(installed ? 1 : 0);
     if (!installed) {
       await expect(page.getByText(/新会话|New Session/, { exact: true }).first()).toBeVisible({ timeout: 30000 });
@@ -61,11 +61,11 @@ export async function probeBrowser(address, sessionCookie, screenshotPath, { ins
       return;
     }
 
-    // Harness stays the sole Sidebar owner; WorkDSH contributes only public slots.
-    await expect(page.getByTestId('workdsh-brand')).toHaveText('WorkDSH', { timeout: 30000 });
+    // Harness stays the sole Sidebar owner; kaiwu contributes only public slots.
+    await expect(page.getByTestId('workdsh-brand')).toHaveText('kaiwu', { timeout: 30000 });
     await expect(page.getByTestId('workdsh-sidebar')).toHaveCount(0);
     await expect(page.getByRole('button', { name: '专家 · 技能 · 连接器', exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: '返回 WorkDSH', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: '返回 kaiwu', exact: true })).toHaveCount(0);
     const newSession = page.getByText(/新会话|New Session/, { exact: true }).first();
     await expect(newSession).toBeVisible();
     for (const label of ['项目', '专家 · 技能 · 连接器', '资料库']) {
@@ -200,8 +200,8 @@ export async function probeBrowser(address, sessionCookie, screenshotPath, { ins
     expect(sockets.length).toBeGreaterThan(0);
     const previousConnections = sockets.length;
     for (const { socket, upstream } of [...sockets]) {
-      await socket.close({ code: 1012, reason: 'WorkDSH reconnect probe' });
-      await upstream.close({ code: 1012, reason: 'WorkDSH reconnect probe' });
+      await socket.close({ code: 1012, reason: 'kaiwu reconnect probe' });
+      await upstream.close({ code: 1012, reason: 'kaiwu reconnect probe' });
     }
     await expect.poll(() => sockets.length, { timeout: 20000 }).toBeGreaterThan(previousConnections);
     await expect.poll(() => sockets.slice(previousConnections).some(socket => socket.received > 0), { timeout: 15000 }).toBe(true);
@@ -217,11 +217,11 @@ export async function probeBrowser(address, sessionCookie, screenshotPath, { ins
     await page.goto(invalid.href);
     await expect.poll(() => new URL(page.url()).searchParams.get('workdsh-view')).toBe('conversation');
     await page.goto(`${address}/?workdsh-view=diagnostics`, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('button', { name: 'WorkDSH 接入验证', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'kaiwu 接入验证', exact: true })).toHaveCount(0);
     await expect(page.getByTestId('workdsh-probe')).toHaveCount(0);
     await expect.poll(() => new URL(page.url()).searchParams.get('workdsh-view')).toBe('conversation');
     if (errors.length) throw new Error(`Browser reported ${errors.length} uncaught errors: ${errors.join('; ')}`);
-    console.log('PASS: official Sidebar owns native workspace/session actions; WorkDSH contributes brand and additive panels');
+    console.log('PASS: official Sidebar owns native workspace/session actions; kaiwu contributes brand and additive panels');
     console.log('PASS: global skill library, real Remote inventory, reconnect, and route normalization');
   } catch (error) {
     if (page) {
@@ -244,7 +244,7 @@ export async function probeProductWithoutSkills(address, sessionCookie) {
     await page.context().addCookies(sessionCookies(address, sessionCookie));
     await page.goto(`${address}/?workdsh-view=skills`);
     await dismissSetup(page);
-    await expect(page.getByTestId('workdsh-brand')).toHaveText('WorkDSH');
+    await expect(page.getByTestId('workdsh-brand')).toHaveText('kaiwu');
     await expect(page.getByRole('button', { name: '专家 · 技能 · 连接器', exact: true })).toHaveCount(0);
     await expect.poll(() => new URL(page.url()).searchParams.get('workdsh-view')).toBe('conversation');
     const graph = await page.evaluate(() => window.__DSH_BOOT__.entries.map(row => row.id));
@@ -255,7 +255,7 @@ export async function probeProductWithoutSkills(address, sessionCookie) {
     await page.getByText(/新会话|New Session/, { exact: true }).first().click();
     await expect(page.getByText(/探索未至之境|Into the Unknown/, { exact: true }).first()).toBeVisible();
     expect(errors).toEqual([]);
-    console.log('PASS: removing Skill keeps WorkDSH brand, workbench, native new session, and stale URL recovery');
+    console.log('PASS: removing Skill keeps kaiwu brand, workbench, native new session, and stale URL recovery');
   } finally {
     await browser.close();
   }

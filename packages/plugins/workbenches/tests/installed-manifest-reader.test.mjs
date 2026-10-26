@@ -17,7 +17,7 @@ test('read real installed package metadata without importing its executable entr
     const directory = join(root, 'node_modules', '@company', 'quality');
     await mkdir(directory, { recursive: true });
     await writeFile(join(directory, 'index.js'), 'throw new Error("PACKAGE_CODE_MUST_NOT_RUN");');
-    await writeFile(join(directory, 'package.json'), JSON.stringify({ name: '@company/quality', version: '1.0.0', main: 'index.js', workdsh: { workbench: descriptor } }));
+    await writeFile(join(directory, 'package.json'), JSON.stringify({ name: '@company/quality', version: '1.0.0', main: 'index.js', kaiwu: { workbench: descriptor } }));
     const reader = new InstalledWorkbenchManifestReader(root);
     assert.equal((await reader.read('@company/quality')).descriptor.id, descriptor.id);
     await assert.rejects(reader.read('../quality'), /invalid-package-name/);
