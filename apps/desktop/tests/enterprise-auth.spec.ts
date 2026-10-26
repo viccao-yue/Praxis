@@ -23,6 +23,10 @@ describe('Desktop Main enterprise authority', () => {
     expect(revoked).toHaveLength(1)
     expect(revoked[0]?.init).toMatchObject({ method: 'POST', headers: { Authorization: `Bearer ${token}` }, redirect: 'error' })
   })
+  it('shows the admin license reason when login is forbidden', async () => {
+    const request = (async () => json({ detail: '企业授权无效，请所有者更新许可证' }, 403)) as typeof fetch
+    await expect(EnterpriseLogin.login('https://company.test', actor.email, 'password', request)).rejects.toThrow('企业授权无效，请所有者更新许可证')
+  })
   it('reports an unconfirmed remote revocation when both admission and cleanup are offline', async () => {
     const request = (async (url: string | URL | Request) => {
       if (String(url).endsWith('/login')) return json({ token, member: actor })

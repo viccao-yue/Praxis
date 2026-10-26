@@ -13,6 +13,19 @@ export interface EnterpriseMember {
   mustChangePassword: boolean
 }
 
+async function loginFailure(response: Response): Promise<Error> {
+  if (response.status === 401) return new Error('账号或密码不正确')
+  // WorkDSH login stays on this HTTP contract. Admin problem details use `detail`.
+  let detail = ''
+  try {
+    const body: unknown = await response.json()
+    if (body && typeof body === 'object' && typeof (body as { detail?: unknown }).detail === 'string') {
+      detail = (body as { detail: string }).detail.trim().slice(0, 200)
+    }
+  } catch { /* status text remains the fallback */ }
+  return new Error(detail || `企业登录失败 (${response.status})`)
+}
+
 function member(value: unknown): EnterpriseMember {
   if (!value || typeof value !== 'object') throw new Error('企业后台返回了无效的成员信息')
   const m = value as Record<string, unknown>
@@ -39,7 +52,7 @@ export class EnterpriseLogin {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: account.trim(), password }),
       redirect: 'error', signal: AbortSignal.timeout(10_000),
     }).catch(() => { throw new Error('无法连接企业后台，请检查地址、证书和网络') })
-    if (!response.ok) throw new Error(response.status === 401 ? '账号或密码不正确' : `企业登录失败 (${response.status})`)
+    if (!response.ok) throw await loginFailure(response)
     const result: unknown = await response.json()
     const data = result as { token?: unknown, member?: unknown }
     if (!data || typeof data.token !== 'string' || !/^[A-Za-z0-9_-]{32,256}$/u.test(data.token)) throw new Error('企业登录响应无效')

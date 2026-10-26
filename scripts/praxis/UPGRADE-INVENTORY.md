@@ -9,6 +9,7 @@
 3. Preinstall: dsh-living-memory@0.2.10 (+ keep better-sidebar / dsh-im if still used in new pack pipeline)
 4. Desktop product name / icons: 开物Praxis.app display name + brand icons
 5. Optional copy: 专家→数字员工 (Praxis rename); upstream still says 专家
+6. Enterprise login copy: keep `loginFailure` in `apps/desktop/src/enterprise-auth.ts` and the test `shows the admin license reason when login is forbidden`. On a non-401 login response, read Problem Details `detail` and show it. 401 stays `账号或密码不正确`. Do not add seat counts, license files, or signature checks to the desktop. After login, leave WorkDSH's `/api/auth/me` and collaboration bridge unchanged.
 
 ## Obsolete on WorkDSH 3.0 (do not force-merge)
 - Entire scripts/desktop/patches against dsh-v0.1.7-alpha.1 snapshot packaging
@@ -22,6 +23,7 @@
 
 ## Applied (continued)
 - [x] AccountMenu: `scripts/praxis/patch-account-menu.mjs` runs from `prepare-workdsh-runtime.mjs` after Profile install (drop 联系我们/登录; unsigned label=设置; click→openSettings). Reference TSX kept at `scripts/praxis/AccountMenu.tsx`.
+- [ ] Enterprise login `detail`: uncommitted edit in `apps/desktop/src/enterprise-auth.ts`. Merge upstream, then keep `loginFailure` and its one call. Do not turn it into a runtime patch of `@deepseek-ai`.
 - [x] Branch pushed: `mine/upgrade/workdsh-3.0.0-alpha.3` (@ `f9b7e1a38d` base + follow-up commits)
 
 ## Deferred (next commits on this branch)
